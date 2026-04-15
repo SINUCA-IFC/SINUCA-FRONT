@@ -8,15 +8,15 @@ defineProps({
         type: String,
         default: 'primary' //secondary and danger
     },
-    disabled: Boolean
-})
+    disabled: Boolean,
+});
 </script>
 
 <template>
     <button 
-        :class="['app-button', `variant-${variant}`]"
         :type="type"
         :disabled="disabled"
+        :class="['app-button', `variant-${variant}`]"
         >
         <slot></slot>
     </button>
@@ -26,11 +26,16 @@ defineProps({
 .app-button {
     padding: 8px 30px;
     font-family: 'Poppins';
-    font-weight: bold;
+    font-weight: 600;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: all .3s;
+}
+
+.app-button:disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /*PRIMARY BUTTON*/
@@ -83,4 +88,5 @@ defineProps({
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
     transform: scale(0.98);
 }
+
 </style>
