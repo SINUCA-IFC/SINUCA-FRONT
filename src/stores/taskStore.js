@@ -7,12 +7,29 @@ const taskService = new TaskService()
 
 export const useTaskStore = defineStore('task', () => {
     const tasks = ref([])
+    const task = ref(
+        {
+        title: "string",
+        description: "string",
+        endDate: "2026-04-15",
+        startDate: "2026-04-15",
+        status: 1,
+        notification: true,
+        category: [
+            0
+        ],
+        user: [
+            0
+        ]
+    }
+    )
     const carregando = ref(false)
 
     async function getTasks() {
         carregando.value = true;
         try {
-            const data 
+            const data = await taskService.getTasks()
+            tasks.value = data.results
         } finally {
             carregando.value = false;
         }
@@ -25,6 +42,7 @@ export const useTaskStore = defineStore('task', () => {
     async function createTask(newTask) {
         const createdTask = await taskService.createTask(newTask)
         tasks.value.push(createdTask)
+
     }
 
     async function updateTask(id, updatedTask) {
@@ -43,8 +61,8 @@ export const useTaskStore = defineStore('task', () => {
     return {
         tasks,
         task,
-        fetchTasks,
-        fetchTask,
+        getTasks,
+        getTask,
         createTask,
         updateTask,
         deleteTask
