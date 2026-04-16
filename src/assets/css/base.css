@@ -55,7 +55,7 @@ table {
 	border-spacing: 0;
 }
 
-/*=====TEXT FORMATTING=====*/
+/*=====FORMATAÇÃO DE TEXTOS=====*/
 
 h1 {
     font-weight: bold;
@@ -80,4 +80,10 @@ p {
 
 button {
 	font-size: clamp(1rem, 1vw, 2rem)
+}
+
+/* ==== FORMATAÇÃO DE ESPAÇO ====  */
+
+main {
+	padding: 1.5rem;
 }
