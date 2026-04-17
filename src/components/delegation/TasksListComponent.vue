@@ -54,7 +54,7 @@ onMounted(() => {
             </h5>
             <ul v-if="statusStore.doing.length > 0">
                 <li v-for="task in statusStore.doing" class="task-card">
-                    <h3>{{ task.title }}</h3>
+                    <h3 >{{ task.title }}</h3>
                     <p v-for="c in task.category" :key="c.id" style="color: #969696">{{ c.name }}</p>
                 </li>
             </ul>
@@ -80,10 +80,16 @@ onMounted(() => {
 }
 
 .count-task {
-    margin-left: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    height: 24px;
+
     background-color: #fff;
-    border-radius: 100%;
-    padding: 0.1rem 0.7rem;
+    border-radius: 50%;
+    margin-left: 1rem;
 }
 
 .task-card {
@@ -96,9 +102,11 @@ onMounted(() => {
     min-height: 140px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(220, 220, 220, 0.1);
+    margin-bottom: 1rem;
 }
 
 .task-card h3 {
+    font-size: 1.2rem;
     max-width: 70%;
     word-break: break-word;
 }
