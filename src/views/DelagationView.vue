@@ -2,6 +2,7 @@
 import AppHeaderMob from '@/components/layout/mobile/AppHeaderMob.vue';
 import BannerDelegation from '@/components/delegation/BannerDelegation.vue';
 import NavigationComponent from '@/components/delegation/NavigationComponent.vue';
+import TasksListComponent from '@/components/delegation/TasksListComponent.vue';
 </script>
 
 <template>
@@ -9,6 +10,7 @@ import NavigationComponent from '@/components/delegation/NavigationComponent.vue
     <main>
         <BannerDelegation />
         <NavigationComponent />
+        <TasksListComponent />
     </main>
 </template>
 

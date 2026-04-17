@@ -53,7 +53,7 @@ function goToTask(id) {
 <button @click="createTask">Create Task</button>
 
 <div v-for="task in taskStore.tasks" :key="task.id">
-    <p @click="goToTask(task.id)">{{ task.title }}</p> <button @click="taskStore.deleteTask(task.id)">X</button>
+    <p @click="goToTask(task.id)">{{ task.title }}</p>  <button @click="taskStore.deleteTask(task.id)">X</button>
 </div>
 </template>
 <style scoped>
