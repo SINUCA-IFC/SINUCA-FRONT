@@ -16,7 +16,6 @@ import TasksListComponent from '@/components/delegation/TasksListComponent.vue';
 
 <style scoped>
 main {
-    padding: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;

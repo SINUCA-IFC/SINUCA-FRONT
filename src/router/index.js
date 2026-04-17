@@ -15,14 +15,14 @@ const router = createRouter({
       component: () => import('../views/DelagationView.vue'),
     },
     {
+      path: '/delegacao/nova-tarefa',
+      name: 'Criar-tarefa',
+      component: () => import('../views/CreateTaskView.vue')
+    },
+    {
       path: '/p',
       name: 'playground',
       component: () => import('../views/playground.vue'),
-    },
-    {
-      path: '/p/:id',
-      name: 'playground-task',
-      component: () => import('../views/playground2.vue'),
     },
   ],
 })

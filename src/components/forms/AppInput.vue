@@ -9,11 +9,11 @@ const props = defineProps({
     required: Boolean,
 });
 
-const emit = defineEmits(['update:ModelValue']);
+const emit = defineEmits(['update:modelValue']);
 
 const value = computed({
     get: () => props.modelValue,
-    set: (val) => emit('update:ModelValue', val)
+    set: (val) => emit('update:modelValue', val)
 })
 </script>
 
@@ -47,6 +47,7 @@ const value = computed({
 }
 
 .input-class {
+    box-sizing: border-box;
     border: 2px solid #D9D9D9;
     background-color: inherit;
     padding: 8px 15px;

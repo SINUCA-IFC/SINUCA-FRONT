@@ -1,22 +1,25 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useTaskStore } from '@/stores/taskStore'
 import { useStatusStore } from '@/stores/statusStore'
 import AppButton from '../forms/AppButton.vue'
 
-const taskStore = useTaskStore()
-const statusStore = useStatusStore()
+const router = useRouter();
+
+const taskStore = useTaskStore();
+const statusStore = useStatusStore();
 
 onMounted(() => {
     taskStore.getTasks()
-})
+});
 </script>
 
 <template>
     <section class="list-section">
         <div class="header-title">
             <h4 style="font-weight: bolder; font-size: 1.2rem">Quadro de Tarefas</h4>
-            <AppButton>Nova +</AppButton>
+            <AppButton @click="router.push('/delegacao/nova-tarefa')">Nova +</AppButton>
         </div>
 
         <div class="tasks-list">
