@@ -24,6 +24,7 @@ defineProps({
 
 <style scoped>
 .header-class {
+    max-width: 100%;
     display: flex;
     justify-content: space-between;
     background-color: #01295F;

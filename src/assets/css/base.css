@@ -81,9 +81,3 @@ p {
 button {
 	font-size: clamp(1rem, 1vw, 2rem)
 }
-
-/* ==== FORMATAÇÃO DE ESPAÇO ====  */
-
-main {
-	padding: 1.5rem;
-}
