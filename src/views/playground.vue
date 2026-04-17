@@ -20,6 +20,13 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+import { useUserStore } from '@/stores/userStore'
+const userStore = useUserStore();
+
+onMounted(() => {
+    userStore.
+})
+
 onMounted(() => {
     taskStore.getTasks()
 })
@@ -55,6 +62,11 @@ function goToTask(id) {
 <div v-for="task in taskStore.tasks" :key="task.id">
     <p @click="goToTask(task.id)">{{ task.title }}</p> <button @click="taskStore.deleteTask(task.id)">X</button>
 </div>
+<br>
+<br><br><br>
+
+<h2>Login:</h2>
+<input type="email" name="email" id="" v-model="Email">
 </template>
 <style scoped>
 
