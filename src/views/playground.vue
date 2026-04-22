@@ -20,6 +20,13 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+import { useUserStore } from '@/stores/userStore'
+const userStore = useUserStore();
+
+onMounted(() => {
+    userStore.checkAuth()
+})
+
 onMounted(() => {
     taskStore.getTasks()
 })
@@ -37,6 +44,7 @@ const novaTask = ref(
     }
 )
 
+
 function createTask() {
     taskStore.createTask(novaTask.value)
 }
@@ -44,6 +52,9 @@ function createTask() {
 function goToTask(id) {
   router.push({ name: 'playground-task', params: { id } })
 }
+
+const Email = ref('')
+const Password = ref('')
 
 </script>
 <template>
@@ -55,6 +66,17 @@ function goToTask(id) {
 <div v-for="task in taskStore.tasks" :key="task.id">
     <p @click="goToTask(task.id)">{{ task.title }}</p>  <button @click="taskStore.deleteTask(task.id)">X</button>
 </div>
+<br>
+<br><br><br>
+
+<h2>Login:</h2>
+
+<p>{{ userStore.loggedIn }}</p>
+
+<input type="email" name="email" id="" v-model="Email">
+<input type="password" name="password" id="" v-model="Password">
+
+<button @click="userStore.login(Email, Password)">Login</button>
 </template>
 <style scoped>
 

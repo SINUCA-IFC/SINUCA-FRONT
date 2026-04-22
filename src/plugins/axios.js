@@ -2,7 +2,9 @@ import axios from 'axios';
 import router from '@/router';
 
 // Configura a baseURL usando a variável de ambiente
+
 axios.defaults.baseURL = 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api'
+
 
 // Adiciona um interceptor para incluir o token de autenticação
 axios.interceptors.request.use(
