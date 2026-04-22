@@ -33,13 +33,13 @@ const categories = ref(
         {
             id: 5,
             icon: 'mdi mdi-handshake-outline',
-            name: 'Mesas de Cooperação',
+            name: 'Mesas de Coop.',
             activeStyle: 'background-color: #849324;'
         },
         {
             id: 6,
             icon: 'mdi mdi-drama-masks',
-            name: 'Apresentação Cultural',
+            name: 'Apres. Cultural',
             activeStyle: 'background-color: #FFB30F;'
         },
         {
@@ -56,11 +56,9 @@ const toogleCategory = (categoria) => {
     const index = task.category.indexOf(categoria.id)
     if(index === -1) {
         task.category.push(categoria.id)
-        console.log(task.category)
     }
     else {
         task.category.splice(index, 1);
-        console.log(task.category)
     }
 }
 
@@ -114,7 +112,7 @@ const addTask = (task) => {
                         @click="toogleCategory(c)"
                         :style="task.category.includes(c.id) ? c.activeStyle : ''"
                         >
-                        <p> <span :class="c.icon"></span> {{ c.name }}</p>
+                        <p style="font-size: 0.9rem;"> <span :class="c.icon"></span> {{ c.name }}</p>
                     </div>
                 </div>
                 <div class="date-row">
@@ -122,14 +120,12 @@ const addTask = (task) => {
                         v-model="task.startDate"
                         label="Início"
                         type="date"
-                        required
                     />
 
                     <AppInput
                         v-model="task.endDate"
                         label="Fim"
                         type="date"
-                        required
                     />
                 </div>
                 <AppButton type="submit">
@@ -179,7 +175,7 @@ const addTask = (task) => {
 
 .category-option {
     border: 1px solid #969696;
-    border-radius: 5px;
+    border-radius: 15px;
     color: #969696;
     padding: 8px 12px;
     cursor: pointer;
