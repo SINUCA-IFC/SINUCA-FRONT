@@ -43,7 +43,6 @@ export const useUserStore = defineStore('auth', () => {
 
   return {
     user, loggedIn,
-    isCliente, isVendedor, isGerente, isAdmin, canManage,
     login, register, logout, checkAuth
   };
 });
