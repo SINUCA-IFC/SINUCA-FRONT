@@ -1,19 +1,4 @@
 <script setup>
-// {
-//   "title": "string",
-//   "description": "string",
-//   "endDate": "2026-04-15",
-//   "startDate": "2026-04-15",
-//   "status": 1,
-//   "notification": true,
-//   "category": [
-//     0
-//   ],
-//   "user": [
-//     0
-//   ]
-// }
-
 import { useTaskStore } from '../stores/taskStore'
 const taskStore = useTaskStore()
 import { ref, onMounted } from 'vue'
@@ -23,12 +8,20 @@ const router = useRouter()
 import { useUserStore } from '@/stores/userStore'
 const userStore = useUserStore();
 
+import { usePostStore } from '@/stores/postStore'
+const postStore = usePostStore()
+
+
 onMounted(() => {
     userStore.checkAuth()
 })
 
 onMounted(() => {
     taskStore.getTasks()
+})
+
+onMounted(() => {
+    postStore.getPosts()
 })
 
 const novaTask = ref(
@@ -77,6 +70,17 @@ const Password = ref('')
 <input type="password" name="password" id="" v-model="Password">
 
 <button @click="userStore.login(Email, Password)">Login</button>
+
+<br>
+<br>
+<br>
+
+<h2>Postagens:</h2>
+<div v-for="p in postStore.posts" :key="p.id">
+    <h3>{{ p.title }}</h3>
+    <p>{{ p.content }}</p>
+    
+</div>
 </template>
 <style scoped>
 
