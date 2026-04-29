@@ -7,7 +7,8 @@ import AppButton from '@/components/forms/AppButton.vue';
 
 
 const taskStore = useTaskStore();
-const router = useRouter();
+
+const emits = defineEmits(['close'])
 
 // categorias
 const categories = ref(
@@ -52,7 +53,7 @@ const categories = ref(
     ]
 );
 
-const toogleCategory = (categoria) => {
+const toggleCategory = (categoria) => {
     const index = task.category.indexOf(categoria.id)
     if(index === -1) {
         task.category.push(categoria.id)
@@ -61,6 +62,20 @@ const toogleCategory = (categoria) => {
         task.category.splice(index, 1);
     }
 }
+
+// users estaticos por enquanto 
+const users = reactive([
+    {
+        id: 0,
+        name: 'Carlos Henrique Pereira',
+        matricula: '2024316712',
+    },
+    {
+        id: 1,
+        name: 'Pedro Gabriel Gonçalves',
+        matricula: '2024123456',
+    },
+]);
 
 // forma que o backend espera na request
 const task = reactive(
@@ -72,7 +87,8 @@ const task = reactive(
         status: 1,
         notification: false,
         category: [],
-        user: [1]
+        user: [1],
+        notification: false
     }
 )
 
@@ -88,7 +104,7 @@ const addTask = (task) => {
                 <span 
                     class="mdi mdi-close" 
                     style="color: #969696; font-size: 2rem;"
-                    @click="router.push('/delegacao')"
+                    @click="emits('close')"
                     ></span>
             </div>
 
@@ -109,12 +125,27 @@ const addTask = (task) => {
                         :class="['category-option', task.category.includes(c.id) ? 'active' : '']"
                         v-for="c in categories"
                         :key="c.id"
-                        @click="toogleCategory(c)"
+                        @click="toggleCategory(c)"
                         :style="task.category.includes(c.id) ? c.activeStyle : ''"
                         >
                         <p style="font-size: 0.9rem;"> <span :class="c.icon"></span> {{ c.name }}</p>
                     </div>
                 </div>
+
+                <!-- Selecionar resposável  -->
+                <div class="user-area">
+                    <label class="label-class">Responsável <span style="color: #FD151B;">*</span></label>
+                    <select class="select-class">
+                        <option 
+                            v-for="user in users"
+                            :value="user.id"
+                        >
+                            {{ user.name }} - {{ user.matricula }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Data de início e fim da tarefa -->
                 <div class="date-row">
                     <AppInput
                         v-model="task.startDate"
@@ -128,6 +159,23 @@ const addTask = (task) => {
                         type="date"
                     />
                 </div>
+
+                <!-- Notificações -->
+
+                <div :class="['notification-area', task.notification ? 'active-notification' : '']">
+                    <div class="title-area">
+                        <span :class="task.notification ? 'mdi mdi-bell-outline' : 'mdi mdi-bell-off-outline'"></span>
+                        <div>
+                            <h4 class="title-class">Notificações</h4>
+                            <p>{{ task.notification ? 'Receber notificações'  : 'Sem notificações'}}</p>
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" v-model="task.notification">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
                 <AppButton type="submit">
                 ADICIONAR
                 </AppButton>
@@ -137,15 +185,23 @@ const addTask = (task) => {
 </template>
 
 <style scoped>
+.form-create {
+    z-index: 100;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem 3rem;
+    background-color: #FFFFFF;
+
+}
+
 .date-row {
     display: flex;
     gap: 12px;
     margin-top: 1rem;
 }
 
-.date-row > * {
-    flex: 1;
-}
 
 .header-section {
     display: flex;
@@ -171,6 +227,7 @@ const addTask = (task) => {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    margin-bottom: 1rem;
 }
 
 .category-option {
@@ -205,4 +262,107 @@ const addTask = (task) => {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+.select-class {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #D9D9D9;
+    background-color: inherit;
+    border-radius: 5px;
+    font-family: 'Poppins';
+}
+
+.notification-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 15px 12px;
+    border: 2px solid #D9D9D9;
+    border-radius: 5px;
+    font-family: 'Poppins';
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+}
+
+.title-area {
+    display: flex;
+    align-items: center;
+}
+
+.title-area span {
+    font-size: 1.8rem;
+    margin: 0 1rem;
+    color: #969696;
+}
+
+.title-area p {
+    color: #969696;
+    font-size: 0.9rem;
+    margin-top: 0.4rem;
+}
+
+.title-class {
+    font-size: 1.rem;
+    font-weight: 500;
+}
+
+.active-notification{
+    display: flex;
+    width: 100%;
+    padding: 15px 12px;
+    border: 2px solid #01295F;
+    border-radius: 5px;
+    font-family: 'Poppins';
+    margin-bottom: 1rem;
+
+    & span {
+        color: #01295F;
+    }
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+    margin-right: 1rem;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    background-color: inherit;
+    border: 1px solid #969696;
+    border-radius: 25px;
+    width: 100%;
+    height: 100%;
+    transition: 0.3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 2.5px;
+    background-color: #969696;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+input:checked + .slider {
+    background-color: #01295F;
+}
+
+input:checked + .slider::before {
+    transform: translateX(25px);
+    background-color: white;
+}
 </style>
