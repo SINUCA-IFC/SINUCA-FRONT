@@ -20,4 +20,9 @@ export default class UserService {
     const response = await axios.get('/usuarios/me/');
     return response.data;
   }
+
+  async getUsers() {
+    const {data} = await axios.get('/usuarios/');
+    return data;
+  }
 }
