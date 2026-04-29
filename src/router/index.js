@@ -12,12 +12,12 @@ const router = createRouter({
     {
       path: '/delegacao',
       name: 'Delegacao',
-      component: () => import('../views/DelagationView.vue'),
+      component: () => import('../views/DelegationView.vue'),
     },
     {
       path: '/delegacao/nova-tarefa',
-      name: 'Criar-tarefa',
-      component: () => import('../views/CreateTaskView.vue')
+      name: 'nova-tarefa',
+      component: () => import('../views/DelegationView.vue'),
     },
     {
       path: '/p',
