@@ -1,13 +1,14 @@
 <script setup>
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { reactive, ref, onMounted } from 'vue'
 import { useTaskStore } from '@/stores/taskStore'
+import { useUserStore } from '@/stores/userStore'
 import AppInput from '@/components/forms/AppInput.vue'
 import AppButton from '@/components/forms/AppButton.vue'
 
-const taskStore = useTaskStore()
+const taskStore = useTaskStore();
+const userStore = useUserStore();
 
-const emits = defineEmits(['close'])
+const emits = defineEmits(['close']);
 
 // categorias
 const categories = ref([
@@ -47,7 +48,7 @@ const categories = ref([
     name: 'Outro',
     activeStyle: 'background-color: #01295F;',
   },
-])
+]);
 
 const toggleCategory = (categoria) => {
   const index = task.category.indexOf(categoria.id)
@@ -56,38 +57,31 @@ const toggleCategory = (categoria) => {
   } else {
     task.category.splice(index, 1)
   }
-}
-
-// users estaticos por enquanto
-const users = reactive([
-  {
-    id: 0,
-    name: 'Carlos Henrique Pereira',
-    matricula: '2024316712',
-  },
-  {
-    id: 1,
-    name: 'Pedro Gabriel Gonçalves',
-    matricula: '2024123456',
-  },
-])
+};
 
 // forma que o backend espera na request
 const task = reactive({
   title: '',
   description: '',
-  endDate: '00-00-0000',
-  startDate: '00-00-0000',
+  endDate: '',
+  startDate: '',
   status: 1,
   notification: false,
   category: [],
   user: [1],
   notification: false,
-})
+});
 
 const addTask = (task) => {
   taskStore.createTask(task)
-}
+};
+
+// users
+onMounted(() => {
+  userStore.getAllUsers()
+})
+
+
 </script>
 <template>
   <main>
@@ -135,7 +129,7 @@ const addTask = (task) => {
           <div class="user-area">
             <label class="label-class">Responsável <span style="color: #fd151b">*</span></label>
             <select class="select-class">
-              <option v-for="user in users" :value="user.id">
+              <option v-for="user in userStore.usuarios" :value="user.id">
                 {{ user.name }} - {{ user.matricula }}
               </option>
             </select>
