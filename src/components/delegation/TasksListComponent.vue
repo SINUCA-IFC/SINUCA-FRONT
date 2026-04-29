@@ -10,16 +10,19 @@ const router = useRouter();
 const taskStore = useTaskStore();
 const statusStore = useStatusStore();
 
+const emit = defineEmits(['openForm']);
+
 onMounted(() => {
-    taskStore.getTasks()
+    taskStore.getTasks();
 });
+
 </script>
 
 <template>
     <section class="list-section">
         <div class="header-title">
             <h4 style="font-weight: bolder; font-size: 1.2rem">Quadro de Tarefas</h4>
-            <AppButton @click="router.push('/delegacao/nova-tarefa')">Nova +</AppButton>
+            <AppButton @click="emit('openForm')">Nova +</AppButton>
         </div>
 
         <div class="tasks-list">

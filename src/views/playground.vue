@@ -1,27 +1,28 @@
 <script setup>
-// {
-//   "title": "string",
-//   "description": "string",
-//   "endDate": "2026-04-15",
-//   "startDate": "2026-04-15",
-//   "status": 1,
-//   "notification": true,
-//   "category": [
-//     0
-//   ],
-//   "user": [
-//     0
-//   ]
-// }
-
 import { useTaskStore } from '../stores/taskStore'
 const taskStore = useTaskStore()
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
+import { useUserStore } from '@/stores/userStore'
+const userStore = useUserStore();
+
+import { usePostStore } from '@/stores/postStore'
+const postStore = usePostStore()
+
+
+onMounted(() => {
+    userStore.checkAuth()
+    userStore.getAllUsers()
+})
+
 onMounted(() => {
     taskStore.getTasks()
+})
+
+onMounted(() => {
+    postStore.getPosts()
 })
 
 const novaTask = ref(
@@ -37,6 +38,7 @@ const novaTask = ref(
     }
 )
 
+
 function createTask() {
     taskStore.createTask(novaTask.value)
 }
@@ -44,6 +46,9 @@ function createTask() {
 function goToTask(id) {
   router.push({ name: 'playground-task', params: { id } })
 }
+
+const Email = ref('')
+const Password = ref('')
 
 </script>
 <template>
@@ -54,6 +59,37 @@ function goToTask(id) {
 
 <div v-for="task in taskStore.tasks" :key="task.id">
     <p @click="goToTask(task.id)">{{ task.title }}</p>  <button @click="taskStore.deleteTask(task.id)">X</button>
+</div>
+<br>
+<br><br><br>
+
+<h2>Login:</h2>
+
+<p>{{ userStore.loggedIn }}</p>
+
+<input type="email" name="email" id="" v-model="Email">
+<input type="password" name="password" id="" v-model="Password">
+
+<button @click="userStore.login(Email, Password)">Login</button>
+<button @click="userStore.logout">logout</button>
+
+<br>
+<br>
+<br>
+
+<h2>Postagens:</h2>
+<div v-for="p in postStore.posts" :key="p.id">
+    <h3>{{ p.title }}</h3>
+    <p>{{ p.content }}</p>
+    
+</div>
+<br>
+<br>
+<div>
+    <h2>Usuários:</h2>
+    <div v-for="u in userStore.usuarios" :key="u.id">
+        <p>{{ u.email }}</p>
+    </div>
 </div>
 </template>
 <style scoped>
