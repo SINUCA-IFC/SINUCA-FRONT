@@ -14,6 +14,7 @@ const postStore = usePostStore()
 
 onMounted(() => {
     userStore.checkAuth()
+    userStore.getAllUsers()
 })
 
 onMounted(() => {

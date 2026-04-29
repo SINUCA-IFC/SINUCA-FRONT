@@ -3,8 +3,9 @@ import router from '@/router';
 
 // Configura a baseURL usando a variável de ambiente
 
-// axios.defaults.baseURL = 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api'
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+axios.defaults.baseURL = 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api'
+
+// axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 
 // Adiciona um interceptor para incluir o token de autenticação

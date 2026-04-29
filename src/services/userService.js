@@ -25,4 +25,4 @@ export default class UserService {
     const {data} = await axios.get('/usuarios/');
     return data;
   }
-} 
+}
