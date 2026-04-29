@@ -14,6 +14,7 @@ const postStore = usePostStore()
 
 onMounted(() => {
     userStore.checkAuth()
+    userStore.getAllUsers()
 })
 
 onMounted(() => {
@@ -70,6 +71,7 @@ const Password = ref('')
 <input type="password" name="password" id="" v-model="Password">
 
 <button @click="userStore.login(Email, Password)">Login</button>
+<button @click="userStore.logout">logout</button>
 
 <br>
 <br>
@@ -80,6 +82,14 @@ const Password = ref('')
     <h3>{{ p.title }}</h3>
     <p>{{ p.content }}</p>
     
+</div>
+<br>
+<br>
+<div>
+    <h2>Usuários:</h2>
+    <div v-for="u in userStore.usuarios" :key="u.id">
+        <p>{{ u.email }}</p>
+    </div>
 </div>
 </template>
 <style scoped>

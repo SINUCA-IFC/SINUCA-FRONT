@@ -8,6 +8,8 @@ const userService = new UserService();
 export const useUserStore = defineStore('auth', () => {
   const user = ref({});
   const loggedIn = ref(false);
+  const usuarios = ref([]);
+  const carregando = ref(false);
 
   const login = async (email, password) => {
     const data = await userService.login(email, password);
@@ -41,8 +43,18 @@ export const useUserStore = defineStore('auth', () => {
     }
   }
 
+  async function getAllUsers() {
+    carregando.value = true;
+    try {
+          const data = await userService.getUsers();
+          usuarios.value = data.results;
+
+    } finally {
+      carregando.value = false;
+    }
+  }
   return {
-    user, loggedIn,
-    login, register, logout, checkAuth
+    user, loggedIn, usuarios, carregando,
+    login, register, logout, checkAuth, getAllUsers
   };
 });
