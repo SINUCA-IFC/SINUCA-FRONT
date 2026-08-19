@@ -9,6 +9,7 @@ import AppHeaderMob from '@/components/layout/mobile/AppHeaderMob.vue';
 import BannerComponent from '@/components/layout/BannerComponent.vue';
 import NavigationComponent from '@/components/delegation/NavigationComponent.vue';
 import TasksListComponent from '@/components/delegation/TasksListComponent.vue';
+import DocumentsListComponent from '@/components/delegation/DocumentsListComponent.vue';
 import CreatTaskModal from '@/components/delegation/modais/CreatTaskModal.vue';
 import AppTabFooter from '@/components/layout/mobile/AppTabFooter.vue';
 import ScheduleListComponent from '@/components/delegation/ScheduleListComponent.vue';
@@ -74,6 +75,7 @@ onMounted (() => {
         <ScheduleListComponent v-if="activeTab === 1" 
             
         />
+        <DocumentsListComponent v-if="activeTab === 2"/>
 
 
         <!-- MODAL -->

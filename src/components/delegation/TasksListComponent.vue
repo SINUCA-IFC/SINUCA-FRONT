@@ -28,7 +28,7 @@ onMounted(() => {
 <template>
     <section class="list-section">
         <div class="header-title">
-            <h4 style="font-weight: bolder; font-size: 1.2rem">Quadro de Tarefas</h4>
+            <h4 style="font-weight: bolder; font-size: 1.5rem">Quadro de Tarefas</h4>
             <AppButton @click="emit('openForm')">Nova +</AppButton>
         </div>
 
