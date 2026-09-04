@@ -123,7 +123,7 @@ onUnmounted(() => {
         {{ scheduleStore.schedule.description }}
       </p>
     </div>
-    <div class="docs">
+    <div class="docs" v-if="linkStore.links.length > 0">
       <h3><span class="mdi mdi-file-document-outline"></span> Documentos relacionados</h3>
       <div>
         <a v-for="link in linkStore.links" :key="link.id" :href="link.url" target="_blank">{{
@@ -195,7 +195,7 @@ onUnmounted(() => {
         {{ scheduleStore.schedule.description }}
       </p>
     </div>
-    <div class="docs">
+    <div class="docs" v-if="linkStore.link">
       <h3><span class="mdi mdi-file-document-outline"></span> Documentos relacionados</h3>
       <div>
         <a v-for="link in linkStore.links" :key="link.id" :href="link.url" target="_blank">{{
@@ -254,7 +254,64 @@ onUnmounted(() => {
       </p>
     </div>
 
-    <div class="docs">
+    <div class="docs" v-if="linkStore.link">
+      <h3><span class="mdi mdi-file-document-outline"></span> Documentos relacionados</h3>
+      <div>
+        <a v-for="link in linkStore.links" :key="link.id" :href="link.url" target="_blank">{{
+          link.url
+        }}</a>
+      </div>
+    </div>
+  </section>
+<section
+    v-else-if="scheduleStore.schedule.category == 4"
+    class="modal"
+    style="border-top: #FFB30F solid 1.8rem"
+  >
+    <div class="header">
+      <div class="title">
+        <h2>Apresentação cultural</h2>
+
+        <span
+          class="mdi mdi-close"
+          style="color: #969696; font-size: 2rem"
+          @click="emits('close')"
+        ></span>
+      </div>
+    </div>
+    <div class="topic">
+      <h4>Título da apresentação cultural</h4>
+      <h3>
+        {{ scheduleStore.schedule.title }}
+      </h3>
+    </div>
+    <div class="uldiv">
+      <ul class="schedules-infos">
+        <li>
+          <span class="mdi mdi-calendar-month-outline"></span>
+          {{ formatDate(scheduleStore.schedule.startDate) }}
+        </li>
+        <li>
+          <span class="mdi mdi-map-marker-outline"></span>
+          {{ scheduleStore.schedule.location }}
+        </li>
+        <li>
+          <span class="mdi mdi-clock-outline"></span>
+          {{ formatTime(scheduleStore.schedule.startDate) }} - {{ formatTime(scheduleStore.schedule.endDate) }}
+        </li>
+        <li>
+          <span class="mdi mdi-clock-outline"></span>
+          {{ scheduleStore.schedule.tipo }}
+        </li>
+      </ul>
+    </div>
+    <div class="descricao">
+      <h3>Sobre a apresentação cultural</h3>
+      <p>
+        {{ scheduleStore.schedule.description }}
+      </p>
+    </div>
+    <div class="docs" v-if="linkStore.link">
       <h3><span class="mdi mdi-file-document-outline"></span> Documentos relacionados</h3>
       <div>
         <a v-for="link in linkStore.links" :key="link.id" :href="link.url" target="_blank">{{
