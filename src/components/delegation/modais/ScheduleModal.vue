@@ -300,8 +300,13 @@ onUnmounted(() => {
           {{ formatTime(scheduleStore.schedule.startDate) }} - {{ formatTime(scheduleStore.schedule.endDate) }}
         </li>
         <li>
-          <span class="mdi mdi-clock-outline"></span>
-          {{ scheduleStore.schedule.tipo }}
+          <span class="mdi mdi-clock-outline" v-if="scheduleStore.schedule.tipo == 1">
+            Dança típica
+          </span>
+          <span class="mdi mdi-clock-outline" v-else>
+            Comida típica
+          </span>
+          
         </li>
       </ul>
     </div>
@@ -351,14 +356,17 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+  margin-bottom: 2rem;
 }
-
+.title h2 {
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  font-weight: 500;
+}
 .countrys {
   display: flex;
   justify-content: space-around;
   align-items: center;
   font-weight: 500;
-  margin: 1rem 0;
 }
 img {
   width: 5rem;
@@ -369,7 +377,7 @@ img {
   border: 2px solid #e0e0e0;
   padding: 1rem;
   border-radius: 10px;
-  margin: 1rem 0;
+  margin: 2rem 0 1.5rem 0;
 }
 .topic h4 {
   color: #01295f;
@@ -401,7 +409,7 @@ img {
 }
 
 .descricao {
-  margin: 1rem 0;
+  margin: 2rem 0;
 }
 
 .descricao h3 {

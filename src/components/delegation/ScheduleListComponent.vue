@@ -48,10 +48,15 @@ function openSchedule(scheduleId) {
             Mesa de cooperação
           </span>
 
+          <span style="color: #969696;" v-else-if="s.category == '4'" class="mdi mdi-drama-masks">
+            Apresentação cultural
+          </span>
+
           <p style="font-weight: 500">
             <span class="mdi mdi-calendar-blank" style="font-size: 1.05rem"></span>
             {{ formatDate(s.endDate) }}
           </p>
+          
         </div>
         <h3>
           {{ s.title }}
@@ -91,6 +96,10 @@ li:active{
 
 .schedule-item:has(.mdi-handshake-outline) {
   border-left: 0.9rem solid #849324;
+}
+
+.schedule-item:has(.mdi-drama-masks) {
+  border-left: 0.9rem solid #FFB30F;
 }
 
 .header-schedule {
