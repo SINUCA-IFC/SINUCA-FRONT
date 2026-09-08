@@ -8,6 +8,17 @@ export const useCountryStore = defineStore('country', () => {
     const countrys = ref([]);
     const country = ref();
 
+        //     {
+        //     "id": 1,
+        //     "name": "Brasil",
+        //     "political_name": "República Federativa do Brasil",
+        //     "flag": {
+        //         "url": "",
+        //         "description": "Bandeira do Brasil",
+        //         "uploaded_on": "2026-06-09T12:23:10.372821-03:00"
+        //     }
+        // },
+
     async function getCountrys() {
         const data = await countryService.getAllCountrys();
         countrys.value = data.results;

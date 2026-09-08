@@ -88,9 +88,10 @@ button {
 
 main {
 	padding: 1.5rem 1.5rem 7rem 1.5rem;
+
 }
 
 select,
 ::picker(select) {
   appearance: base-select;
-}	 
+}

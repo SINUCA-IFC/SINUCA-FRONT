@@ -5,7 +5,7 @@ const tabsNav = reactive([
     {
         id: 0,
         icon: 'mdi mdi-view-grid-outline',
-        name: 'Kaban',
+        name: 'Kanban',
     },
     {
         id: 1,

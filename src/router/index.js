@@ -28,9 +28,19 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/delegacao/schedule/:id',
+      component: () => import('../views/DelegationView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/bem-vindo',
       name: 'bem-vindo',
       component: () => import('../views/WelcomeView.vue')
+    },
+    {
+      path: "/mural",
+      name: "mural", 
+      component: () => import('../views/BoardView.vue')
     },
     {
       path: '/login',
@@ -53,6 +63,7 @@ const router = createRouter({
     {
       path: '/mural',
       name: 'mural',
+      component: () => import('../views/BoardView.vue')
     },
     {
       path: '/p',

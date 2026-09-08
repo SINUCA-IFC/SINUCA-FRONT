@@ -4,7 +4,8 @@ import { onMounted } from "vue";
 import { useScheduleStore } from "@/stores/scheduleStore";
 
 const scheduleStore = useScheduleStore();
-const schedules = ref()
+
+const emit = defineEmits(["openDetails"]);
 
 onMounted(() => {
   scheduleStore.getSchedules();
@@ -20,6 +21,10 @@ const formatDate = (dateString) => {
   return `${day}/${month}`;
 };
 
+function openSchedule(scheduleId) {
+    emit("openDetails", scheduleId)
+};
+
 </script>
 
 <template>
@@ -28,7 +33,7 @@ const formatDate = (dateString) => {
       <h4 style="font-weight: bolder; font-size: 1.5rem; margin-bottom: 1.5rem;">Cronograma</h4>
     </div>
     <ul>
-      <li v-for="s in scheduleStore.schedules" :key="s.id" class="schedule-item">
+      <li v-for="s in scheduleStore.schedules" :key="s.id" class="schedule-item" @click="openSchedule(String(s.id))">
         <div class="header-schedule">
         
           <span style="color: #969696;" v-if="s.category == '1'" class="mdi mdi-instagram">
@@ -43,10 +48,15 @@ const formatDate = (dateString) => {
             Mesa de cooperação
           </span>
 
+          <span style="color: #969696;" v-else-if="s.category == '4'" class="mdi mdi-drama-masks">
+            Apresentação cultural
+          </span>
+
           <p style="font-weight: 500">
             <span class="mdi mdi-calendar-blank" style="font-size: 1.05rem"></span>
             {{ formatDate(s.endDate) }}
           </p>
+          
         </div>
         <h3>
           {{ s.title }}
@@ -86,6 +96,10 @@ li:active{
 
 .schedule-item:has(.mdi-handshake-outline) {
   border-left: 0.9rem solid #849324;
+}
+
+.schedule-item:has(.mdi-drama-masks) {
+  border-left: 0.9rem solid #FFB30F;
 }
 
 .header-schedule {
