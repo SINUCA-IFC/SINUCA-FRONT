@@ -8,7 +8,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: () => import('../views/BoardView.vue'),
     }, 
     {
       path: '/delegacao',
