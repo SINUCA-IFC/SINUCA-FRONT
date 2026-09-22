@@ -1,23 +1,17 @@
 <script setup>
-function abrir () {
-    window.open("https://www.google.com", "_blank");
-}
+import { ref, onMounted } from 'vue';
+import { useLinkStore } from '@/stores/linkStore';
+
+const linkStore = useLinkStore();
+
+onMounted(() => {
+    linkStore.getLinks();
+});
+
+
 </script>
 <template>
-    <div class="geral" @click="abrir()">
-    <div class="separando">
-        <div class="span1">
-            <span class="mdi mdi-link-box-variant"></span>
-        </div>
-        <div class="textos">
-            <h5>Título sobre o link</h5>
-            <p>www.link.sinuca.com.br</p>
-        </div>
-    </div>
-        <div class="span2">
-            <span class="mdi mdi-open-in-new"></span>
-        </div>
-    </div>
+    
 </template>
 <style scoped>
 .geral {

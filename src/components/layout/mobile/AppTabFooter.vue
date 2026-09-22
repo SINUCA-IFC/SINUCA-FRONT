@@ -5,7 +5,7 @@ const route = useRoute();
 
 const tabsFooter = [
     {id: 1, name: 'História', icon: 'mdi mdi-book-open-page-variant-outline', path: '/historia'},
-    {id: 2, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/mural'},
+    {id: 2, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/'},
     {id: 3, name: 'Chat', icon: 'mdi mdi-chat-outline', path: '/chat'},
     {id: 4, name: 'Delegação', icon: 'mdi mdi-earth', path: '/delegacao'},
 ];

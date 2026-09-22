@@ -53,7 +53,7 @@ function openSchedule(scheduleId) {
           </span>
 
           <p style="font-weight: 500">
-            <span class="mdi mdi-calendar-blank" style="font-size: 1.05rem"></span>
+            <span class="mdi mdi-calendar-blank" style="font-size: 1.05rem; white-space: nowrap;"></span>
             {{ formatDate(s.endDate) }}
           </p>
           
