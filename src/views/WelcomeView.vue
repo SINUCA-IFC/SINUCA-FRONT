@@ -45,7 +45,14 @@ const selectUserType = ((id, title, icon, color) => {
 
 <template>
     <section class="container">
+        <div class="header">
+            <button @click="router.back()" class="back-btn">
+                <span class="mdi mdi-arrow-left-thin"></span>
+            </button>
         <img :src="LogoAzul" alt="logo sinuca" class="logo"/>
+
+        
+        </div>
         <h1>BEM-VINDO</h1>
         <p class="subtitle">Selecione como deseja acessar o sistema</p>
         <ul class="options-list">
@@ -77,11 +84,21 @@ const selectUserType = ((id, title, icon, color) => {
     background-size: cover;
     background-position: center;
 }
-    
+
+.logo {
+    max-width: 60px;
+    width: 100%;
+    height: auto;
+}
+
+h1 {
+    margin-top: 0.5rem;
+}
+
 .subtitle{
     width: 65%;
     color: #969696;
-    margin: 0.5rem auto;
+    margin: 0.7rem auto;
 }
 
 .options-list {
@@ -116,4 +133,60 @@ const selectUserType = ((id, title, icon, color) => {
 .option-item:active {
     transform: scale(0.98);
 }
+
+.back-btn {
+    background-color: inherit;
+    border: none;
+    font-size: 2.5rem;
+    position: absolute;
+    left: 2rem;
+    top: 2rem;
+}
+
+
+@media (min-width: 768px) {
+    .container {
+        background-image: url('/public/static/fundo-pc.png');
+    }
+   .options-list {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        max-width: 900px;
+        gap: 2rem;
+    }
+
+    .option-item {
+        width: 220px;
+        height: 160px;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .option-item h3 {
+        font-size: 1.5rem;
+    }
+
+    .option-item p {
+        font-size: 1rem;
+    }
+
+    .option-item span {
+        font-size: 2.5rem;
+    }
+
+    .subtitle {
+        font-size: 1.5rem;
+        margin: 2rem auto;
+    }
+
+    .back-btn {
+        font-size: 3rem;
+
+    }
+}
+
 </style>
