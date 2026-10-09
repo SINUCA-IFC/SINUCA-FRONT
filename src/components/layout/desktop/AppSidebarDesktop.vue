@@ -133,7 +133,7 @@ function logout() {
   width: var(--sidebar-width, 277px);
   display: flex;
   flex-direction: column;
-  padding: 2.2rem 2.2rem 2rem;
+  padding: 2rem 2.2rem 2rem;
   background-color: #01295f;
   color: #fff;
   overflow-y: auto;
@@ -152,8 +152,9 @@ function logout() {
 
 .divider {
   border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.35);
-  margin: 1.8rem 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.35);
+  margin: 1.5rem 0;
+
 }
 
 .group-title {
