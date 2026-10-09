@@ -21,6 +21,7 @@ const mainLinks = [
   //{ name: 'Como Funciona', icon: 'mdi mdi-help-circle', path: '/como-funciona' },
   { name: 'Chat', icon: 'mdi mdi-chat', path: '/chat' },
   { name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/mural' },
+  { name: 'Cronograma geral', icon: 'mdi mdi-calendar-month-outline', path: '/cronograma' },
 ]
 
 /* ------------------------------------------------------------------ */
@@ -123,6 +124,7 @@ function logout() {
 
 <style scoped>
 .sidebar {
+  box-sizing: border-box;
   position: fixed;
   top: 0;
   bottom: 0;

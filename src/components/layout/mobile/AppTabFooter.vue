@@ -1,16 +1,12 @@
 <script setup>
-import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 
 const tabsFooter = [
-    {id: 1, name: 'História', icon: 'mdi mdi-book-open-page-variant-outline', path: '/historia'},
-    {id: 2, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/'},
-    {id: 3, name: 'Chat', icon: 'mdi mdi-chat-outline', path: '/chat'},
-    {id: 4, name: 'Delegação', icon: 'mdi mdi-earth', path: '/delegacao'},
+    {id: 1, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/mural'},
+    {id: 2, name: 'Cronograma', icon: 'mdi mdi-calendar-month-outline', path: '/cronograma'},
 ];
 
-const currentRoute = ref(route.fullPath)
 </script>
 
 <template>
@@ -21,7 +17,7 @@ const currentRoute = ref(route.fullPath)
                     v-for="tab in tabsFooter"
                     :key="tab.id"
                     class="navtab-item"
-                    :class="currentRoute === tab.path ? 'active' : ''"
+                    :class="route.path === tab.path ? 'active' : ''"
                 >
                     <RouterLink :to="tab.path">
                         <span class="icon" :class="tab.icon"></span>
@@ -35,6 +31,7 @@ const currentRoute = ref(route.fullPath)
 
 <style scoped>
 footer {
+    z-index: 30;
     position: fixed;
     bottom: 0;
     right: 0;
@@ -48,7 +45,7 @@ footer {
 .navtabs-list {
     display: flex;
     justify-content: space-around;
-    padding: 1rem 0.5rem;
+    padding: 1rem 0.5rem calc(1rem + env(safe-area-inset-bottom, 0px));
 }
 
 .navtab-item span {
@@ -63,6 +60,12 @@ footer {
 }
 
 .navtab-item a{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 80px;
     color: #969696;
 }
 

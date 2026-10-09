@@ -1,0 +1,316 @@
+{
+  "demonstracao": false,
+  "fuso": "Horário de Brasília",
+  "dias": [
+    {
+      "id": "gastronomia-1",
+      "data": "2026-10-26",
+      "titulo": "Pré-evento",
+      "subtitulo": "Segunda-feira · Desafio gastronômico",
+      "atividades": [
+        {
+          "id": "gastronomia-1-1",
+          "inicio": "12:00",
+          "fim": "13:45",
+          "titulo": "Desafio gastronômico",
+          "categoria": "Programação geral",
+          "descricao": "Brasil; EUA; Irã; Timor Leste; Myanmar; Reino Unido; Argentina; China; Japão."
+        }
+      ]
+    },
+    {
+      "id": "gastronomia-2",
+      "data": "2026-10-27",
+      "titulo": "Pré-evento",
+      "subtitulo": "Terça-feira · Desafio gastronômico",
+      "atividades": [
+        {
+          "id": "gastronomia-2-1",
+          "inicio": "12:00",
+          "fim": "13:45",
+          "titulo": "Desafio gastronômico",
+          "categoria": "Programação geral",
+          "descricao": "França; Rússia; Equador; Cuba; Marrocos; Argélia; Venezuela; Guiana."
+        }
+      ]
+    },
+    {
+      "id": "dia-1",
+      "data": "2026-10-29",
+      "titulo": "Dia 1",
+      "subtitulo": "Quinta-feira",
+      "atividades": [
+        {
+          "id": "dia-1-1",
+          "inicio": "08:30",
+          "titulo": "Recepção e Abertura",
+          "categoria": "Programação geral"
+        },
+        {
+          "id": "dia-1-2",
+          "inicio": "08:50",
+          "titulo": "Discurso de Abertura Brasil",
+          "categoria": "Programação geral"
+        },
+        {
+          "id": "dia-1-3",
+          "inicio": "09:00",
+          "titulo": "Debate 1: EUA × Irã",
+          "categoria": "Debate"
+        },
+        {
+          "id": "dia-1-4",
+          "inicio": "09:30",
+          "titulo": "Apresentação Cultural: Equador",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-1-5",
+          "inicio": "09:40",
+          "titulo": "Debate 2: Timor Leste × Myanmar",
+          "categoria": "Debate"
+        },
+        {
+          "id": "dia-1-6",
+          "inicio": "10:10",
+          "titulo": "Apresentação Cultural: Marrocos",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-1-7",
+          "inicio": "10:20",
+          "titulo": "Debate 3: Reino Unido × Argentina",
+          "categoria": "Debate"
+        },
+        {
+          "id": "dia-1-8",
+          "inicio": "10:50",
+          "titulo": "Apresentação Cultural: Venezuela",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-1-9",
+          "inicio": "11:00",
+          "fim": "12:30",
+          "titulo": "1ª Rodada de Cooperação",
+          "categoria": "Mesas de Cooperação",
+          "descricao": "Mesa Palestina; Mesa Energia Atômica; Mesa FAO Sinuca/Sonua."
+        },
+        {
+          "id": "dia-1-10",
+          "inicio": "12:00",
+          "fim": "13:15",
+          "titulo": "Horário de Almoço",
+          "categoria": "Programação geral"
+        },
+        {
+          "id": "dia-1-11",
+          "inicio": "13:15",
+          "titulo": "Retorno ao auditório",
+          "categoria": "Programação geral"
+        },
+        {
+          "id": "dia-1-12",
+          "inicio": "13:30",
+          "titulo": "Apresentação Cultural: Argélia",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-1-13",
+          "inicio": "13:40",
+          "titulo": "Debate 4: China × Japão",
+          "categoria": "Debate"
+        },
+        {
+          "id": "dia-1-14",
+          "inicio": "14:10",
+          "titulo": "Apresentação Cultural: Cuba",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-1-15",
+          "inicio": "14:20",
+          "titulo": "Debate 5: França × Rússia",
+          "categoria": "Debate"
+        },
+        {
+          "id": "dia-1-16",
+          "inicio": "14:50",
+          "titulo": "Apresentação Cultural: Guiana",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-1-17",
+          "inicio": "15:00",
+          "titulo": "Apresentação Cultural: Reino Unido",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-1-18",
+          "inicio": "15:10",
+          "titulo": "Encerramento auditório",
+          "categoria": "Programação geral"
+        },
+        {
+          "id": "dia-1-19",
+          "inicio": "15:15",
+          "fim": "17:00",
+          "titulo": "2ª Rodada de Cooperação",
+          "categoria": "Mesas de Cooperação",
+          "descricao": "Mesa Palestina; Mesa Energia Atômica; Mesa FAO Sinuca/Sonua."
+        },
+        {
+          "id": "dia-1-20",
+          "inicio": "17:00",
+          "titulo": "Fim do 1º dia de evento",
+          "categoria": "Programação geral"
+        }
+      ]
+    },
+    {
+      "id": "dia-2",
+      "data": "2026-10-30",
+      "titulo": "Dia 2",
+      "subtitulo": "Sexta-feira",
+      "atividades": [
+        {
+          "id": "dia-2-1",
+          "inicio": "08:15",
+          "titulo": "Abertura do 2º dia",
+          "categoria": "Programação geral"
+        },
+        {
+          "id": "dia-2-2",
+          "inicio": "08:20",
+          "titulo": "Apresentação Cultural: EUA",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-3",
+          "inicio": "08:30",
+          "titulo": "Debate 6: Equador × Cuba",
+          "categoria": "Debate"
+        },
+        {
+          "id": "dia-2-4",
+          "inicio": "09:00",
+          "titulo": "Apresentação Cultural: Rússia",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-5",
+          "inicio": "09:10",
+          "titulo": "Apresentação Cultural: Argentina",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-6",
+          "inicio": "09:20",
+          "titulo": "Debate 7: Marrocos × Argélia",
+          "categoria": "Debate"
+        },
+        {
+          "id": "dia-2-7",
+          "inicio": "09:50",
+          "titulo": "Apresentação Cultural: Irã",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-8",
+          "inicio": "10:00",
+          "titulo": "Apresentação Cultural: Myanmar",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-9",
+          "inicio": "10:15",
+          "fim": "12:00",
+          "titulo": "3ª Rodada de Cooperação",
+          "categoria": "Mesas de Cooperação",
+          "descricao": "Mesa Palestina; Mesa Energia Atômica; Mesa FAO Sinuca/Sonua."
+        },
+        {
+          "id": "dia-2-10",
+          "inicio": "12:00",
+          "fim": "13:10",
+          "titulo": "Horário de Almoço",
+          "categoria": "Programação geral"
+        },
+        {
+          "id": "dia-2-11",
+          "inicio": "13:00",
+          "fim": "14:00",
+          "titulo": "4ª Rodada de Mesas de Cooperação",
+          "categoria": "Mesas de Cooperação",
+          "descricao": "Se necessário."
+        },
+        {
+          "id": "dia-2-12",
+          "inicio": "14:00",
+          "titulo": "Retorno ao auditório e Discurso do Secretário",
+          "categoria": "Programação geral"
+        },
+        {
+          "id": "dia-2-13",
+          "inicio": "14:10",
+          "titulo": "Apresentação Cultural: França",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-14",
+          "inicio": "14:20",
+          "titulo": "Debate 8: Venezuela × Guiana",
+          "categoria": "Debate"
+        },
+        {
+          "id": "dia-2-15",
+          "inicio": "14:50",
+          "titulo": "Apresentação Cultural: Timor Leste",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-16",
+          "inicio": "15:00",
+          "titulo": "Síntese da Mesa de Cooperação Palestina",
+          "categoria": "Mesas de Cooperação"
+        },
+        {
+          "id": "dia-2-17",
+          "inicio": "15:15",
+          "titulo": "Apresentação Cultural: Japão",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-18",
+          "inicio": "15:25",
+          "titulo": "Síntese da Mesa de Cooperação Energia Atômica",
+          "categoria": "Mesas de Cooperação"
+        },
+        {
+          "id": "dia-2-19",
+          "inicio": "15:40",
+          "titulo": "Apresentação Cultural: China",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-20",
+          "inicio": "15:50",
+          "titulo": "Apresentação Cultural: Brasil",
+          "categoria": "Apresentação cultural"
+        },
+        {
+          "id": "dia-2-21",
+          "inicio": "16:00",
+          "titulo": "Síntese da Mesa de Cooperação Sinuca/Sonua FAO",
+          "categoria": "Mesas de Cooperação"
+        },
+        {
+          "id": "dia-2-22",
+          "inicio": "16:15",
+          "titulo": "Encerramento e Autoavaliação",
+          "categoria": "Programação geral"
+        }
+      ]
+    }
+  ]
+}
