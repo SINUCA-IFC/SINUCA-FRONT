@@ -12,6 +12,7 @@ export const useLinkStore = defineStore('link', () => {
         name: '',
         url: '',
         country: 0,
+        categories: 0
     });
     
     const loading = ref(false);
