@@ -14,12 +14,19 @@ export const useUserStore = defineStore('auth', () => {
     foto: null,
     gang: null,
     matriculation: '',
+    role: null,  
     country: { id: null },
   })
   const loggedIn = ref(false)
   const users = ref([])
   const loading = ref(false)
-  const userType = ref()
+
+  //tipo
+  const userType = computed(() => user.value?.role)
+  const isOrganizer = computed(() => user.value?.role === 'organizer')
+  const isStudent = computed(() => user.value?.role === 'student')
+  const isAvailable = computed(() => user.value?.role === 'available')
+  
 
   const login = async (email, password) => {
     const data = await userService.login(email, password)
@@ -78,12 +85,15 @@ export const useUserStore = defineStore('auth', () => {
     loggedIn,
     users,
     loading,
+    userType,
+    isOrganizer,
+    isStudent,
+    isAvailable,
     login,
     register,
     logout,
     checkAuth,
     getAllUsers,
-    userType,
     uploadImage,
   }
 })
