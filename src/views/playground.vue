@@ -2,11 +2,12 @@
 import { useTaskStore } from '../stores/taskStore'
 import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
-import { useUserStore } from '@/stores/userStore'
-import { usePostStore } from '@/stores/postStore'
-import { useGangStore } from '@/stores/gangStore'
-import { useScheduleStore } from '@/stores/scheduleStore'
-import { useLinkStore } from '@/stores/linkStore'
+import { useUserStore } from '../stores/userStore'
+import { usePostStore } from '../stores/postStore'
+import { useGangStore } from '../stores/gangStore'
+import { useScheduleStore } from '../stores/scheduleStore'
+import { useLinkStore } from '../stores/linkStore'
+import { useMessageStore } from '../stores/messageStore'
 
 const router = useRouter();
 
@@ -16,7 +17,10 @@ const postStore = usePostStore();
 const gangStore = useGangStore();
 const scheduleStore = useScheduleStore();
 const linkStore = useLinkStore();
+const messageStore = useMessageStore();
 
+const t = ref('')
+const c = ref('')
 
 onMounted(() => {
     userStore.checkAuth()
@@ -46,6 +50,10 @@ onMounted(() => {
     linkStore.getLinks()
 })
 
+onMounted(() => {
+    messageStore.getMessages()
+})
+
 const novaTask = ref(
     {
         title: '',
@@ -68,23 +76,43 @@ function goToTask(id) {
   router.push({ name: 'playground-task', params: { id } })
 }
 
+
+
 const Email = ref('')
 const Password = ref('')
 
 </script>
 <template>
+
+    <nav style="margin: 4rem;">
+    <ul>
+    <li>
+    <a href="#task">taks</a>
+    </li>
+    <li>
+    <a href="#login">login</a>
+    </li>
+        <li>
+    <a href="#post">post</a>
+    </li>
+        <li>
+    <a href="#mensagem">mensagem</a>
+    </li>
+    </ul>
+    </nav>
+
 <input type="text" v-model="novaTask.title" placeholder="New task title">
 <input type="text" v-model="novaTask.description" placeholder="New task description">
 
 <button @click="createTask">Create Task</button>
 
-<div v-for="task in taskStore.tasks" :key="task.id">
+<div v-for="task in taskStore.tasks" :key="task.id" class="task">
     <p @click="goToTask(task.id)">{{ task.title }}</p>  <button @click="taskStore.deleteTask(task.id)">X</button>
 </div>
 <br>
 <br><br><br>
 
-<h2>Login:</h2>
+<h2 id="login">Login:</h2>
 
 <p>{{ userStore.loggedIn }}</p>
 
@@ -98,7 +126,7 @@ const Password = ref('')
 <br>
 <br>
 
-<h2>Postagens:</h2>
+<h2 id="post">Postagens:</h2>
 <div v-for="p in postStore.posts" :key="p.id">
     <h3>{{ p.title }}</h3>
     <p>{{ p.content }}</p>
@@ -116,7 +144,7 @@ const Password = ref('')
 <br><br><br>
 <div>
     <h2>Gangs:</h2>
-    <div v-for="g in gangStore.gangs" :key="g.id" class="gang">
+    <div v-for="g in gangStore.gangs" :key="g.id" id="gang">
         <p>{{ g.name }}</p>
         <p>{{ g.courses }}</p>
     </div>
@@ -124,7 +152,7 @@ const Password = ref('')
 <br><br><br>
 <div>
     <h2>Schedules:</h2>
-    <div v-for="s in scheduleStore.schedules" :key="s.id" class="schedule">
+    <div v-for="s in scheduleStore.schedules" :key="s.id" id="schedule">
         <p>{{ s.title }}</p>
         <p>{{ s.description }}</p>
     </div>
@@ -132,10 +160,25 @@ const Password = ref('')
 <br><br><br>
 <div>
     <h2>Links:</h2>
-    <div v-for="l in linkStore.links" :key="l.id" class="link">
+    <div v-for="l in linkStore.links" :key="l.id" id="link">
         <p>{{ l.name }}</p>
         <p>{{ l.url }}</p>
     </div>
+</div>
+<div id="mensagem">
+    <h2>Mensagens:</h2>
+    <div v-for="m in messageStore.messages" :key="m.id" id="mensagem">
+        <p>{{ m.text }}</p>
+        <p>{{ m.country }}</p>
+    </div>
+    <br>
+    <br>
+    <h2>Post Mensagem:</h2>
+    <div>
+        <input type="text" v-model="t" placeholder="Mensagem">
+        <input type="text" v-model="c" placeholder="País">
+    </div>
+    <button @click="messageStore.sendMessage(t, c)" && console.log(userStore.isOrganizer)>Post</button>
 </div>
 </template>
 <style scoped>

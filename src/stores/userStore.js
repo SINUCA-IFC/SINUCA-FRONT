@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { computed } from 'vue'
 
 import UserService from '../services/userService'
 
