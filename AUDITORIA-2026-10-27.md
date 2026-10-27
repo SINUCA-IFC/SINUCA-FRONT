@@ -2,9 +2,19 @@
 
 Data: **27/10/2026**, fuso America/Sao_Paulo. Escopo: **SINUCA-FRONT e SINUCA-BACK**.
 
-**Parecer: há bloqueadores para uso com participantes e dados reais.** O projeto compila e vários fluxos funcionam, mas a API permite elevação de privilégios, alterações anônimas em dados do evento e exposição de informações sensíveis. A interface também apresenta falhas em operações centrais. Esses problemas são relevantes mesmo para um evento pequeno.
+**Parecer: há bloqueadores para uso com participantes e dados reais.** O projeto compila e vários fluxos funcionam, mas a auditoria identificou elevação de privilégios, alterações anônimas em dados do evento e exposição de informações sensíveis. A interface também apresenta falhas em operações centrais. Esses problemas são relevantes mesmo para um evento pequeno. O acompanhamento abaixo distingue as correções posteriores do levantamento original.
 
-Nenhum código existente foi alterado. O banco original foi consultado somente para inspeção de estrutura e estatísticas. Foram adicionados apenas este relatório e os artefatos de auditoria. Não houve commit, publicação, rotação de credenciais ou operação contra a API pública.
+Na etapa de auditoria, nenhum código existente foi alterado. O banco original foi consultado somente para inspeção de estrutura e estatísticas. Foram adicionados apenas este relatório e os artefatos de auditoria. Não houve commit, publicação, rotação de credenciais ou operação contra a API pública. As evidências e revisões das seções seguintes descrevem essa etapa histórica.
+
+## Acompanhamento das correções
+
+### S01 — Corrigida no código local em 27/10/2026
+
+Em `SINUCA-BACK/core/serializers/user.py`, os campos `is_staff`, `is_superuser`, `is_active` e `last_login` passaram a ser explicitamente somente leitura. `id`, `groups`, `country` e `role` também foram declarados somente leitura, preservando e explicitando as restrições existentes. A API de perfis continua retornando esses dados, mas não os modifica; os campos administrativos são gerenciados pelo Django Admin. Campos somente leitura enviados na requisição são ignorados pelo DRF, portanto uma resposta 200 não indica que privilégios foram aceitos.
+
+Foram adicionados **oito testes de regressão** em `SINUCA-BACK/core/tests/test_user_privileges.py`, usando login JWT e banco de teste isolado. Antes da alteração, quatro falharam ao reproduzir concessão de privilégios por PATCH, PUT, edição de colega e criação de conta. Depois da alteração, **os oito passaram**, incluindo manutenção da edição de nome/e-mail, leitura de perfil, rejeição de anônimos e proteção do registro público contra injeção de privilégios. O acesso a outra delegação continua retornando 404 após a tentativa de autopromoção.
+
+Validação executada com `django test core.tests --settings=sinuca_audit_settings`, usando o ambiente temporário da auditoria. Nenhuma migração de modelo foi necessária e o banco original não foi alterado. A correção ainda não foi publicada e não reverte privilégios que eventualmente tenham sido concedidos antes dela. A autorização para editar outros campos de colegas, os vínculos de delegação no cadastro e os demais achados continuam pendentes.
 
 ## 1. Método, ambiente e limites
 
