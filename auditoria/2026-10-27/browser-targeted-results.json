@@ -1,0 +1,107 @@
+[
+  {
+    "name": "schedule_details_open",
+    "kind": "functional",
+    "confirmed": true,
+    "errors": []
+  },
+  {
+    "name": "schedule_shows_unrelated_delegation_documents",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "unrelated_document_count": 1,
+    "expected_doc_ids": [
+      1
+    ]
+  },
+  {
+    "name": "schedule_deep_link_reload_uses_null_id",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/api/cronogramas/null/",
+        "status": 404
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "email_verification_accepts_arbitrary_token",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "requests_since_token": []
+  },
+  {
+    "name": "student_invalid_matriculation_accepted",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "signup_creates_unassigned_and_javascript_error",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "url": "/delegacao",
+    "errors": [
+      "TypeError: Cannot read properties of undefined (reading 'length')\n    at ra.fn (http://127.0.0.1:4173/assets/RegisterView-GJaMVOoE.js:1:4252)\n    at Mi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:7350)\n    at get value (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:18938)\n    at Proxy.<anonymous> (http://127.0.0.1:4173/assets/RegisterView-GJaMVOoE.js:1:5767)\n    at po (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:39078)\n    at Ni.N [as fn] (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:48350)\n    at Ni.run (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:5937)\n    at Ni.runIfDirty (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:6247)\n    at Ln (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20835)\n    at Xi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22585)",
+      "TypeError: Cannot read properties of null (reading 'id')\n    at http://127.0.0.1:4173/assets/DelegationView-dymY1t-L.js:1:20894\n    at http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:30114\n    at Ln (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20827)\n    at ft (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20897)\n    at Ar.t.__weh.t.__weh (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:29994)\n    at Qi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22405)\n    at Xi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22714)"
+    ]
+  },
+  {
+    "name": "signup_errors_not_rendered",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 400,
+    "error_message_visible": false
+  },
+  {
+    "name": "invalid_refresh_leaves_authenticated_store_and_redirects_to_delegation",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "path": "/delegacao",
+    "refresh_requests": [
+      {
+        "method": "POST",
+        "path": "/api/token/refresh/",
+        "status": 401
+      }
+    ],
+    "token_removed": true
+  },
+  {
+    "name": "pwa_manifest_icon_paths_404",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "icons": [
+      {
+        "src": "../public/logo-sinuca.svg",
+        "status": 404,
+        "content_type": "text/html;charset=utf-8"
+      },
+      {
+        "src": "../public/logo-sinuca.svg",
+        "status": 404,
+        "content_type": "text/html;charset=utf-8"
+      },
+      {
+        "src": "../public/logo-sinuca.svg",
+        "status": 404,
+        "content_type": "text/html;charset=utf-8"
+      }
+    ]
+  },
+  {
+    "name": "browser_isolation",
+    "kind": "observation",
+    "confirmed": true,
+    "browser": "153.0.8010.36",
+    "external_api_calls": 0,
+    "blocked_external_hosts": [
+      "fonts.googleapis.com"
+    ],
+    "api_target": "127.0.0.1:8765",
+    "service_workers": "blocked for deterministic requests"
+  }
+]

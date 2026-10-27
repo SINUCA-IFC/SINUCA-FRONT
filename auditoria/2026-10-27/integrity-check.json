@@ -1,0 +1,14 @@
+{
+  "SINUCA-FRONT": {
+    "head": "3bba36e366ec1f6e86ccf8b7ba32391cb7ec0429",
+    "tracked_files": 72,
+    "modified_tracked_files": [],
+    "git_diff_exit_code": 0
+  },
+  "SINUCA-BACK": {
+    "head": "6440560cca6b222c1e829859d47dd638a7dfa338",
+    "tracked_files": 104,
+    "modified_tracked_files": [],
+    "git_diff_exit_code": 0
+  }
+}
