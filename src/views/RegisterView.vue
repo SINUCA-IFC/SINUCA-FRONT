@@ -68,7 +68,9 @@ const backStep = () => {
             :user-color="userColor"
 
         />
-        <img :src="odsShape" alt="ods shape" class="overlay-ods">
+        <div class="ods-decoration" aria-hidden="true">
+            <img :src="odsShape" alt="" class="overlay-ods">
+        </div>
     </section>
 </template>
 
@@ -95,14 +97,23 @@ const backStep = () => {
     font-size: 2.5rem;
 }
 
+.ods-decoration {
+    position: relative;
+    width: min(100%, 280px);
+    aspect-ratio: 163 / 50;
+    overflow: hidden;
+    margin: auto auto 0;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
 .overlay-ods {
     position: absolute;
-    bottom: 0;
+    top: 100%;
     left: 50%;
-    height: 250px;
-    width: auto;
-    transform: translate(-50%, 90px) rotate(90deg);
-    z-index: 1;
+    width: calc(100% * 90 / 163);
+    height: auto;
+    transform: translate(-50%, -50%) rotate(90deg);
 }
 
 @media (min-width: 768px) {
@@ -122,7 +133,7 @@ const backStep = () => {
         z-index: 0;
     }
 
-    .overlay-ods {
+    .ods-decoration {
         display: none;
     }
 
@@ -134,5 +145,9 @@ const backStep = () => {
     .back-btn {
         display: none;
     }
+}
+@media (max-width: 767px) {
+  .container { display: flex; flex-direction: column; height: auto; min-height: 100dvh; padding: 0 1rem; overflow: visible; }
+  .container > * { flex-shrink: 0; }
 }
 </style>

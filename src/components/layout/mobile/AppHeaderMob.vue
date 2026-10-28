@@ -24,6 +24,7 @@ defineProps({
 
 <style scoped>
 .header-class {
+    gap: 1rem;
     max-width: 100%;
     display: flex;
     justify-content: space-between;
@@ -36,9 +37,13 @@ defineProps({
 }
 
 .title{
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 1em;
 }
+
+.title h3 { font-size: clamp(1.1rem, 5vw, 1.5rem); line-height: 1.3; }
+.header-class > img { flex: 0 0 auto; width: 45px; height: 45px; object-fit: contain; }
 
 </style>

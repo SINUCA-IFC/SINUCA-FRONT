@@ -9,5 +9,3 @@ import DocumentItem from './DocumentItem.vue';
         link="https//www.onu.com"
     />
 </template>
-
-<style scoped></style>

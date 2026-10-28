@@ -505,4 +505,16 @@ input:checked + .slider::before {
 }
 }
 
+@media (max-width: 1023px) {
+  .task-modal { position: fixed; inset: 0; z-index: 100; padding: 0; }
+  .form-create { height: 85dvh; max-height: 100dvh; padding: 1.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); }
+  .header-section { gap: 1rem; }
+  .date-row { flex-wrap: wrap; }
+  .date-row > * { flex: 1 1 120px; min-width: 0; }
+  .notification-area { gap: 0.75rem; }
+  .title-area { min-width: 0; }
+  .title-area span { margin: 0 0.5rem 0 0; }
+  .switch { flex-shrink: 0; margin-right: 0; }
+  .user-option span { overflow-wrap: anywhere; min-width: 0; }
+}
 </style>
