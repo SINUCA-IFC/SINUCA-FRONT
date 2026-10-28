@@ -5,7 +5,7 @@ const route = useRoute();
 
 const tabsFooter = [
     {id: 1, name: 'História', icon: 'mdi mdi-book-open-page-variant-outline', path: '/historia'},
-    {id: 2, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/'},
+    {id: 2, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/mural'},
     {id: 3, name: 'Chat', icon: 'mdi mdi-chat-outline', path: '/chat'},
     {id: 4, name: 'Delegação', icon: 'mdi mdi-earth', path: '/delegacao'},
 ];
@@ -46,13 +46,14 @@ footer {
 }
 
 .navtabs-list {
-    display: flex;
-    justify-content: space-around;
-    padding: 1rem 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.25rem;
+    padding: 0.75rem 0.5rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
 }
 
 .navtab-item span {
-    font-size: 1.1rem;
+    font-size: clamp(0.7rem, 2.8vw, 0.95rem);
 }
 
 .navtab-item .icon{
@@ -63,6 +64,13 @@ footer {
 }
 
 .navtab-item a{
+    display: flex;
+    min-height: 44px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.4;
     color: #969696;
 }
 

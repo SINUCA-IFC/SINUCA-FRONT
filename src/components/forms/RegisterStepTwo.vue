@@ -140,4 +140,10 @@ function nextStep() {
     display: block;
   }
 }
+@media (max-width: 767px) {
+  .container-component { height: auto; min-height: 0; padding: 1.5rem 0; }
+  .forms-container { width: 100%; min-width: 0; padding: 1.25rem; }
+  .step-title { font-size: clamp(1.5rem, 7vw, 2rem); line-height: 1.4; }
+  .step-subtitle { line-height: 1.5; margin-bottom: 1.5rem; }
+}
 </style>

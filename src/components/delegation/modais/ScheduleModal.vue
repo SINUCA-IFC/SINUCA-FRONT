@@ -477,4 +477,15 @@ div.docs h3 {
   z-index: 9999;
 }
 }
+@media (max-width: 1023px) {
+  .schedule-modal { position: fixed; inset: 0; z-index: 100; padding: 0; }
+  .modal { width: calc(100% - 2rem); height: auto; max-height: 85dvh; padding: 1rem; }
+  .title { gap: 0.75rem; }
+  .title h2 { min-width: 0; }
+  .schedules-infos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .schedules-infos li { padding: 0.75rem 0.25rem; line-height: 1.5; }
+  .countrys { gap: 0.75rem; }
+  .countrys > div { min-width: 0; flex: 1; text-align: center; }
+  .docs a, .countrys h5 { overflow-wrap: anywhere; line-height: 1.5; }
+}
 </style>

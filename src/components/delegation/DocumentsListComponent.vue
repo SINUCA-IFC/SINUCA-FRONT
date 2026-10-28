@@ -86,4 +86,8 @@ div.span2 span {
     font-size: 1.5rem;
     color: #969696;
 }
+.separando, .textos { min-width: 0; }
+.geral { gap: 0.75rem; }
+.textos p, .textos h5 { overflow-wrap: anywhere; line-height: 1.5; }
+.span1, .span2 { flex-shrink: 0; }
 </style>
