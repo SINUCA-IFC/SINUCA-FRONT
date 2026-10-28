@@ -28,6 +28,12 @@ Foram adicionados **dez testes** em `core/tests/test_debug_security.py`: leitura
 
 O `.env` e as credenciais reais não foram alterados. `DEBUG=True` explícito continua ativando o debug: produção deve configurar `DEBUG=False`. A mudança ainda não foi publicada e não revoga credenciais que já tenham sido expostas; sua rotação continua necessária quando aplicável. As evidências antigas abaixo permanecem como registro da versão auditada.
 
+### Esclarecimento de requisitos de cadastro — 28/10/2026
+
+A equipe confirmou que o cadastro de alunos é público por decisão do produto. Os alunos devem permanecer registrados aguardando aprovação dos organizadores, que também os colocam em delegações. Novos organizadores devem ingressar por URLs privadas de convite. Os PDFs fornecidos descrevem propostas antigas e não substituem essas regras atuais, registradas em [referências documentais](docs/design/README.md).
+
+Portanto, **a abertura do cadastro não é, por si só, uma vulnerabilidade**. Em S05, o problema é o servidor aceitar a delegação escolhida pelo próprio solicitante e permitir acesso aos seus dados sem o fluxo previsto de aprovação e atribuição pela organização. Na revisão estática atual, não foi encontrado fluxo explícito de aprovação nem de convites. O esclarecimento não corresponde a uma correção implementada ou a uma nova rodada de testes; as evidências originais abaixo foram preservadas.
+
 ## 1. Método, ambiente e limites
 
 Revisão de configuração, modelos, serializers, views, permissões, rotas, autenticação, uploads, stores, serviços, componentes, scripts auxiliares, migrações e dependências. Os testes de escrita ocorreram em **SQLite novo e arquivos de mídia em `/tmp/sinuca-audit`**, com contas sintéticas de duas delegações: alunos, colega da mesma delegação, aluno sem país, organizador, avaliador e administrador.
