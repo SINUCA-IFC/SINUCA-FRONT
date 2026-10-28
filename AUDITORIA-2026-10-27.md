@@ -16,6 +16,18 @@ Foram adicionados **oito testes de regressão** em `SINUCA-BACK/core/tests/test_
 
 Validação executada com `django test core.tests --settings=sinuca_audit_settings`, usando o ambiente temporário da auditoria. Nenhuma migração de modelo foi necessária e o banco original não foi alterado. A correção ainda não foi publicada e não reverte privilégios que eventualmente tenham sido concedidos antes dela. A autorização para editar outros campos de colegas, os vínculos de delegação no cadastro e os demais achados continuam pendentes.
 
+### S02 — Correção local de configuração e diagnóstico em 28/10/2026
+
+Em `SINUCA-BACK/app/settings.py`, `DEBUG` passou a ser um booleano: somente `true`, `1`, `yes` e `on`, sem distinção de maiúsculas e com espaços externos removidos, ativam o diagnóstico. Ausência da variável, `False`, `0` e valores não reconhecidos o desativam. Foi removida a impressão de `DATABASES` e das demais configurações no startup.
+
+O filtro `app/debug.py`, configurado por `DEFAULT_EXCEPTION_REPORTER_FILTER`, estende a proteção padrão do Django para ocultar `CLOUDINARY_URL` nas páginas de diagnóstico e nos relatórios de erro. Isso também protege a configuração de armazenamento quando o debug é explicitamente ativado para desenvolvimento; os filtros existentes para senhas, chaves e tokens são preservados.
+
+As views de tarefas, cronogramas e documentos agora exigem `IsAuthenticated`. Consultas e tentativas de criação sem token retornam **401**, antes de acessar `AnonymousUser.country`, em vez dos erros 500 e das criações anônimas observadas nessas rotas. Usuários autenticados continuam recebendo somente os dados de seu país, e usuários sem país recebem listas vazias. Essa proteção resolve uma parte de S03; as permissões das demais rotas públicas e os papéis autorizados a escrever continuam pendentes.
+
+Foram adicionados **dez testes** em `core/tests/test_debug_security.py`: leitura de valores de DEBUG, ausência de impressão de segredos, resposta pública genérica de erro 500, ocultação de credenciais mesmo em diagnóstico de desenvolvimento, autenticação nas três rotas e manutenção do filtro por delegação. A execução completa de `core.tests`, com configuração temporária `sinuca_security_test_settings`, passou nos **18 testes**, incluindo os oito de S01. O banco utilizado foi SQLite em memória, e todas as credenciais dos testes eram sintéticas. Nenhum código ou dado de produção foi acessado para executar os testes.
+
+O `.env` e as credenciais reais não foram alterados. `DEBUG=True` explícito continua ativando o debug: produção deve configurar `DEBUG=False`. A mudança ainda não foi publicada e não revoga credenciais que já tenham sido expostas; sua rotação continua necessária quando aplicável. As evidências antigas abaixo permanecem como registro da versão auditada.
+
 ## 1. Método, ambiente e limites
 
 Revisão de configuração, modelos, serializers, views, permissões, rotas, autenticação, uploads, stores, serviços, componentes, scripts auxiliares, migrações e dependências. Os testes de escrita ocorreram em **SQLite novo e arquivos de mídia em `/tmp/sinuca-audit`**, com contas sintéticas de duas delegações: alunos, colega da mesma delegação, aluno sem país, organizador, avaliador e administrador.
