@@ -147,7 +147,7 @@ onMounted(() => {
 
 .section-title {
     font-weight: bolder;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
 }
 
 .header-actions {
@@ -252,11 +252,6 @@ onMounted(() => {
 
 /* ============================== DESKTOP ============================== */
 @media (min-width: 1024px) {
-    .section-title {
-        font-weight: 400;
-        font-size: 1.25rem;
-    }
-
     /* ----- filtro ----- */
     .filter {
         display: block;

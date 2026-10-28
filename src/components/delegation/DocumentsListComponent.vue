@@ -1,93 +1,83 @@
-<script setup>
+﻿<script setup>
+import { computed, onMounted, ref } from 'vue';
 import { useLinkStore } from '@/stores/linkStore';
-import { onMounted } from 'vue';
+import DocumentItem from './DocumentItem.vue';
+import AppButton from '../forms/AppButton.vue';
 
 const linkStore = useLinkStore();
+const error = ref('');
+
+const groups = computed(() => [
+    { id: 2, icon: 'mdi mdi-forum-outline', title: 'Documentos para Debate', category: 'debate' },
+    { id: 3, icon: 'mdi mdi-handshake-outline', title: 'Documentos para Mesa de cooperação', category: 'cooperation' },
+].map(group => ({
+    ...group,
+    documents: linkStore.links.filter(document => document.categories?.includes(group.id)),
+})));
 
 onMounted(() => {
-    linkStore.getLinks();
+    linkStore.getLinks()
 });
-
-function abrir (url) {
-        window.open(url, "_blank", "noopener,noreferrer");}
 </script>
 
 <template>
-    <div class="geral" v-for="link in linkStore.links" :key="link.id" @click="abrir(link.url)">
-    <div class="separando">
-        <div class="span1">
-            <span class="mdi mdi-link-box-variant"></span>
+    <section class="documents-section">
+        <h4 class="section-title">Documentos</h4>
+        <p v-if="linkStore.loading" class="default" role="status">Carregando documentos...</p>
+        <div v-else-if="error">
+            <p class="default">{{ error }}</p>
+            <AppButton @click="loadDocuments">Tentar novamente</AppButton>
         </div>
-        <div class="textos" >
-            <h5 >{{ link.name }}</h5>
-            <p>{{ link.url }}</p>
+        <div v-else class="documents-groups">
+            <section v-for="group in groups" :key="group.id" :class="['documents-group', group.category]">
+                <h5 class="group-title"> <span :class="group.icon" /> {{ group.title }}</h5>
+                <ul v-if="group.documents.length" class="documents-list">
+                    <li v-for="document in group.documents" :key="document.id">
+                        <DocumentItem
+                            :title="document.name || document.url"
+                            :link="document.url"
+                            :category="group.category"
+                        />
+                    </li>
+                </ul>
+                <p v-else class="default">Nenhum documento disponível nesta categoria.</p>
+            </section>
         </div>
-    </div>
-        <div class="span2">
-            <span class="mdi mdi-open-in-new"></span>
-        </div>
-    </div>
+    </section>
 </template>
 
 <style scoped>
-.geral {
+.documents-section, .documents-groups {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: white;
-    border-radius: 0.5rem;
-    padding: 2rem 1.2rem;
-    cursor: pointer;
-    transition: 
-        transform 0.15s ease,
-        box-shadow 0.15s ease,
-        background-color 0.15s ease;
-
-
-    -webkit-tap-highlight-color: transparent;
+    flex-direction: column;
+    gap: 2rem;
+    min-width: 0;
 }
 
-.geral:hover {
-    background-color: #fafafa;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
-}
-
-
-.geral:active {
-    transform: scale(0.98);
-    background-color: #f2f4f7;
-    box-shadow: none;
-}
-
-h5 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 2vw;
-}
-
-p {
-    font-size: 0.9rem;
-}
-
-div.span1 span {
-    color: #01295F;
-    font-size: 2.5rem;
-    margin-right: 3vw;
-
-}
-
-div.separando {
-    display: flex;
-    align-items: center;
-}
-
-div.span2 span {
+.section-title {
     font-size: 1.5rem;
-    color: #969696;
+    font-weight: bolder;
 }
-.separando, .textos { min-width: 0; }
-.geral { gap: 0.75rem; }
-.textos p, .textos h5 { overflow-wrap: anywhere; line-height: 1.5; }
-.span1, .span2 { flex-shrink: 0; }
+
+.group-title {
+    margin-bottom: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.debate .group-title { color: #01295F; }
+.cooperation .group-title { color: #849324; }
+
+.documents-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.default {
+    color: #969696;
+    line-height: 1.5;
+}
+
 </style>
