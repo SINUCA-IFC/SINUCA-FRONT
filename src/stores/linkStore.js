@@ -12,7 +12,7 @@ export const useLinkStore = defineStore('link', () => {
         name: '',
         url: '',
         country: 0,
-        categories: 0
+        categories: []
     });
     
     const loading = ref(false);
@@ -20,8 +20,15 @@ export const useLinkStore = defineStore('link', () => {
     async function getLinks() {
         loading.value = true;
         try {
-            const data = await linkService.getLinks();
-            links.value = data.results;
+            const documents = [];
+            let page = 1;
+            let data;
+            do {
+                data = await linkService.getLinks(page);
+                documents.push(...data.results);
+                page += 1;
+            } while (page <= data.total_pages);
+            links.value = documents;
         } finally {
             loading.value = false;
         }
@@ -52,6 +59,7 @@ export const useLinkStore = defineStore('link', () => {
     return {
         links,
         link,
+        loading,
         getLinks,
         getLink,
         createLink,
