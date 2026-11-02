@@ -1,5 +1,6 @@
 <script setup>
-import { onMounted, onUnmounted, computed, ref } from 'vue'
+import AppModal from '@/components/layout/AppModal.vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTaskStore } from '@/stores/taskStore'
 import { useUserStore } from '@/stores/userStore'
@@ -67,7 +68,6 @@ function deleteTask() {
 }
 
 onMounted(async () => {
-  document.body.style.overflow = 'hidden'
   userStore.getAllUsers()
   categoryStore.getCategories()
 
@@ -86,16 +86,10 @@ onMounted(async () => {
 
   initialTaskState.value = JSON.stringify(taskStore.task);
 })
-
-onUnmounted(() => {
-  document.body.style.overflow = ''
-})
 </script>
 
 <template>
-  <Teleport to="body">
-  <main class="task-modal">
-    <div class="background" @click="emits('close')"></div>
+  <AppModal @close="emits('close')">
     <section class="form-create">
       <div class="header-section">
         <h1 style="font-size: 1.7rem">{{ isEditMode ? 'Editar tarefa' : 'Nova tarefa' }}</h1>
@@ -195,8 +189,7 @@ onUnmounted(() => {
         </AppButton>
       </form>
     </section>
-  </main>
-  </Teleport>
+  </AppModal>
 </template>
 
 <style scoped>
@@ -227,17 +220,6 @@ onUnmounted(() => {
 .selectedStatus {
   background-color: #f7f9fc;
   font-weight: 500;
-}
-
-.background {
-  position: fixed;
-  z-index: 10;
-  top: 0;
-  left: 0;
-  backdrop-filter: blur(2px);
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
-  height: 100vh;
-  width: 100%;
 }
 
 .form-create {
@@ -466,20 +448,6 @@ input:checked + .slider::before {
 }
 
 @media (min-width: 1024px) {
-  .task-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-}
-
-.background {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
 
 .form-create {
   z-index: 1;
@@ -506,7 +474,6 @@ input:checked + .slider::before {
 }
 
 @media (max-width: 1023px) {
-  .task-modal { position: fixed; inset: 0; z-index: 100; padding: 0; }
   .form-create { height: 85dvh; max-height: 100dvh; padding: 1.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); }
   .header-section { gap: 1rem; }
   .date-row { flex-wrap: wrap; }

@@ -1,8 +1,9 @@
 <script setup>
+import AppModal from '@/components/layout/AppModal.vue'
 import { useScheduleStore } from '@/stores/scheduleStore'
 import { useCountryStore } from '@/stores/countryStore'
 import { useLinkStore } from '@/stores/linkStore'
-import { onMounted, ref, computed, onUnmounted, watch } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 
 const props = defineProps({
   scheduleId: String,
@@ -50,7 +51,6 @@ const loadSchedule = async () => {
 }
 
 onMounted(async () => {
-  document.body.style.overflow = 'hidden'
   await loadSchedule()
 })
 
@@ -75,16 +75,10 @@ const nameCategory = computed(() => {
 })
 
 const emits = defineEmits(['close'])
-
-onUnmounted(() => {
-  document.body.style.overflow = ''
-})
 </script>
 
 <template>
-  <Teleport to="body">
-  <main class="schedule-modal">
-  <div class="background" @click="emits('close')"></div>
+  <AppModal @close="emits('close')">
   <section
     v-if="scheduleStore.schedule.category == 1"
     class="modal"
@@ -327,22 +321,10 @@ onUnmounted(() => {
       </div>
     </div>
   </section>
-  </main>
-  </Teleport>
+  </AppModal>
 </template>
 
 <style scoped>
-.background {
-  position: fixed;
-  z-index: 10;
-  top: 0;
-  left: 0;
-  backdrop-filter: blur(2px);
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
-  height: 100vh;
-  width: 100%;
-}
-
 .modal {
   border-radius: 0.8rem;
   height: 400px;
@@ -453,32 +435,14 @@ div.docs h3 {
 }
 
 @media (min-width: 1024px) {
-.background {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-
-  background: rgba(0, 0, 0, 0.3);
-}
-
 .modal {
   z-index: 1;
   position: absolute;
   width: 50%;
   height: 80%;
 }
-
-.schedule-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-}
 }
 @media (max-width: 1023px) {
-  .schedule-modal { position: fixed; inset: 0; z-index: 100; padding: 0; }
   .modal { width: calc(100% - 2rem); height: auto; max-height: 85dvh; padding: 1rem; }
   .title { gap: 0.75rem; }
   .title h2 { min-width: 0; }
