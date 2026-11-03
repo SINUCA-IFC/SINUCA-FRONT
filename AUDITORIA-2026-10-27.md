@@ -28,6 +28,26 @@ Foram adicionados **dez testes** em `core/tests/test_debug_security.py`: leitura
 
 O `.env` e as credenciais reais não foram alterados. `DEBUG=True` explícito continua ativando o debug: produção deve configurar `DEBUG=False`. A mudança ainda não foi publicada e não revoga credenciais que já tenham sido expostas; sua rotação continua necessária quando aplicável. As evidências antigas abaixo permanecem como registro da versão auditada.
 
+### S03 — Escrita pública bloqueada em quatro recursos em 03/11/2026
+
+A permissão `IsOrganizerOrReadOnly`, em `SINUCA-BACK/core/permissions.py`, foi aplicada explicitamente às views de postagens, categorias, turmas e países. Consultas GET, HEAD e OPTIONS permanecem públicas. POST, PUT, PATCH e DELETE exigem organizador ou superusuário autenticado: visitantes recebem 401 e alunos, avaliadores ou contas apenas com `is_staff` recebem 403. Organizadores sem país também conseguem administrar esses recursos.
+
+Foram adicionados cinco testes em `core/tests/test_public_resource_permissions.py`, cobrindo as quatro rotas e a matriz de métodos e papéis. Antes da correção, os testes reproduziram 64 operações indevidamente permitidas. Depois da correção, as tentativas são bloqueadas e o banco permanece inalterado; os fluxos autorizados de criação, edição e exclusão continuam funcionando. O cadastro público permanece disponível, conforme a regra atual do produto.
+
+Cronogramas e documentos já exigem autenticação desde S02. A autorização de escrita nesses recursos compartilhados continua sendo uma pendência de S07. As permissões de upload/listagem de mídias de S08 também permanecem pendentes.
+
+### S04 — Respostas de tarefas e atribuição de responsáveis corrigidas em 03/11/2026
+
+Em `SINUCA-BACK/core/serializers/task.py`, `creator` e `user` do detalhe da tarefa agora usam um serializer explícito com somente `id`, `name` e `foto`. Hashes de senha, permissões, grupos, e-mail e matrícula deixaram de ser incluídos nessas representações. A proteção também vale para tarefas antigas com vínculos indevidos; não foi necessário alterar registros para evitar a exposição de hashes.
+
+Na criação e edição por POST, PUT e PATCH, contas sem privilégios globais só podem atribuir responsáveis da própria delegação. Atribuições a outra delegação ou a usuários sem delegação recebem 400 no campo `user`, antes de salvar qualquer parte da alteração. O acesso global de superusuários foi preservado. A validação considera a delegação atual da conta e não substitui o fluxo pendente de aprovação e atribuição pela organização em S05.
+
+Foram adicionados onze testes em `core/tests/test_task_security.py`, cobrindo dados retornados, vínculos antigos, rejeição de atribuições indevidas sem alterações parciais e criação/edição válidas por alunos e superusuários. Os cenários de vazamento e atribuição indevida falharam na versão anterior pelos comportamentos reproduzidos, antes da aplicação da correção.
+
+**Validação desta etapa:** a suíte completa executada a partir do backend passou nos **34 testes**, incluindo os 18 anteriores. Comando: `PYTHONPATH=/tmp/sinuca-security-check /tmp/sinuca-security-venv/bin/python -B -m django test --settings=sinuca_security_test_settings --noinput`. A configuração temporária usa SQLite em memória, credenciais sintéticas e armazenamento local em `/tmp`; o banco original e os serviços publicados não foram utilizados. `django check` não encontrou problemas, `makemigrations --check --dry-run` não encontrou alterações de modelo e `git diff --check` passou. Os avisos preexistentes de paginação sem ordenação estável continuam pendentes; o traceback de `/intentional-error/` é provocado pelo teste de diagnóstico de S02. Uma revisão independente dos 14 testes inicialmente adicionados não encontrou regressões; os dois testes adicionais verificam edições válidas por PUT/PATCH.
+
+As mudanças são locais e não foram publicadas. Não houve alteração de componentes do front, migração de banco, remoção de dados ou rotação de credenciais. S06 continua pendente: retirar os segredos e bases do material distribuído e substituir as credenciais efetivamente usadas quando aplicável. As evidências históricas da auditoria permanecem intactas.
+
 ### Esclarecimento de requisitos de cadastro — 28/10/2026
 
 A equipe confirmou que o cadastro de alunos é público por decisão do produto. Os alunos devem permanecer registrados aguardando aprovação dos organizadores, que também os colocam em delegações. Novos organizadores devem ingressar por URLs privadas de convite. Os PDFs fornecidos descrevem propostas antigas e não substituem essas regras atuais, registradas em [referências documentais](docs/design/README.md).
