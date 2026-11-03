@@ -15,6 +15,8 @@ import ScheduleListComponent from '../components/delegation/ScheduleListComponen
 import ScheduleModal from '../components/delegation/modais/ScheduleModal.vue';
 import DocumentsListComponent from '../components/delegation/DocumentsListComponent.vue';
 import NotesListComponent from '../components/delegation/NotesListComponent.vue';
+import LogoAzul from '/logo-azul.svg';
+import MascoteSinuca from '/static/sinuca-mascote.png';
 
 const countryStore = useCountryStore();
 const userStore = useUserStore();
@@ -107,17 +109,37 @@ onMounted(loadDelegation);
 </script>
 
 <template>
-    <AppLayout title="Delegação">
-        <section v-if="!hasDelegation" class="pending-approval" aria-live="polite">
-            <h1>{{ userStore.user.approval_pending ? 'Aguardando aprovação' : 'Nenhuma delegação vinculada' }}</h1>
-            <p v-if="userStore.user.approval_pending">Seu cadastro está registrado. Os organizadores precisam aprovar sua participação e atribuir uma delegação.</p>
-            <p v-else>Esta conta não possui uma delegação vinculada.</p>
-            <button type="button" :disabled="checkingApproval" @click="refreshApproval">
-                {{ checkingApproval ? 'Atualizando...' : 'Atualizar situação' }}
-            </button>
-            <button type="button" @click="logout">Sair</button>
+    <AppLayout v-if="!hasDelegation" class="esperando-apovar" title="Delegação">
+        <section class="pending-content">
+            <h1 id="pending-title">{{ userStore.user.approval_pending ? 'Em aguardo' : 'Sem delegação' }}</h1>
+            <p v-if="userStore.user.approval_pending" class="pending-description">
+                Seu cadastro está registrado. Aguarde a aprovação da organização e a atribuição da sua delegação.
+            </p>
+            <p v-else class="pending-description">
+                Esta conta não possui uma delegação vinculada. Consulte a organização para verificar seu vínculo.
+            </p>
+
+            <div class="pending-illustration" aria-hidden="true">
+                <img :src="MascoteSinuca" alt="" width="600" height="450" />
+            </div>
+
+            <p class="pending-welcome">Te esperamos no SINUCA</p>
+            <div class="pending-actions">
+                <button
+                    type="button"
+                    class="pending-refresh"
+                    :disabled="checkingApproval"
+                    :aria-busy="checkingApproval"
+                    @click="refreshApproval"
+                >
+                    <span class="mdi mdi-refresh" :class="{ 'is-spinning': checkingApproval }" aria-hidden="true"></span>
+                    {{ checkingApproval ? 'Atualizando...' : 'Atualizar situação' }}
+                </button>
+            </div>
         </section>
-        <main v-else>
+    </AppLayout>
+    <AppLayout v-else title="Delegação">
+        <main class="delegation-content">
             <BannerComponent 
                 :title="delegationCountry?.name"
                 :subtitle="delegationCountry?.political_name"
@@ -156,14 +178,152 @@ onMounted(loadDelegation);
 </template>
 
 <style scoped>
-.pending-approval {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 2rem;
+
+.esperando-apovar {
+    margin-bottom: 6rem;
 }
 
-main {
+.pending-logo {
+    order: 2;
+    display: inline-flex;
+    border-radius: 0.5rem;
+}
+
+.pending-logo img {
+    display: block;
+    width: 3.5rem;
+    height: auto;
+}
+
+.pending-exit,
+.pending-refresh {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    min-height: 48px;
+    padding: 0.75rem 1.125rem;
+    border: 0;
+    border-radius: 0.5rem;
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: background-color 150ms ease;
+}
+
+.pending-exit {
+    background-color: #e9eeed;
+    color: #01295f;
+}
+
+.pending-exit:hover {
+    background-color: #dfe7e5;
+}
+
+.pending-logo:focus-visible,
+.pending-exit:focus-visible,
+.pending-refresh:focus-visible {
+    outline: 3px solid #ffb30f;
+    outline-offset: 4px;
+}
+
+.pending-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 38rem;
+    margin-inline: auto;
+    padding-block: 2rem 1rem;
+    text-align: center;
+}
+
+.pending-content h1 {
+    max-width: 100%;
+    font-size: clamp(1.625rem, 5vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-wrap: balance;
+}
+
+.pending-description {
+    max-width: 36ch;
+    margin-top: 0.875rem;
+    color: #626e76;
+    font-size: 1rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+}
+
+.pending-illustration {
+    position: relative;
+    width: clamp(13rem, 58vw, 19rem);
+    aspect-ratio: 279 / 328;
+    margin-block: 1.25rem 0.5rem;
+    overflow: hidden;
+}
+
+.pending-illustration::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 16%;
+    width: 72%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: white;
+}
+
+.pending-illustration img {
+    position: absolute;
+    top: -14.79%;
+    left: -36.48%;
+    width: 189.69%;
+    height: 124.7%;
+    max-width: none;
+}
+
+.pending-welcome {
+    color: #626e76;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.pending-actions {
+    width: min(100%, 19rem);
+    margin-top: 1.5rem;
+}
+
+.pending-refresh {
+    width: 100%;
+    background-color: #01295f;
+    color: white;
+}
+
+.pending-refresh:hover:not(:disabled) {
+    background-color: #002453;
+}
+
+.pending-refresh:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}
+
+.is-spinning {
+    animation: pending-spin 1s linear infinite;
+}
+
+@keyframes pending-spin {
+    to { transform: rotate(360deg); }
+}
+
+.delegation-content {
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -171,11 +331,37 @@ main {
 
 
 @media (min-width: 1024px) {
-    main {
+    .esperando-apovar {
+        padding: 2rem 4rem;
+        background-image: linear-gradient(rgb(246 246 242 / 90%), rgb(246 246 242 / 90%)), url('/static/fundo-continente.svg');
+        background-position: center;
+        background-size: cover;
+    }
+
+    .esperando-apovar::after {
+        display: none;
+    }
+
+    .pending-logo { order: 0; }
+    .pending-logo img { width: 4.75rem; }
+    .pending-content { padding-block: 1rem; }
+    .pending-illustration { width: 20rem; }
+
+    .delegation-content {
         padding: 0;
         gap: 2.5rem;
         margin: 0 2rem;
     }
     
+}
+
+@media (max-height: 700px) {
+    .pending-content { padding-block: 1.25rem 0; }
+    .pending-illustration { width: 11.5rem; margin-block: 0.75rem; }
+    .pending-actions { margin-top: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .is-spinning { animation: none; }
 }
 </style>

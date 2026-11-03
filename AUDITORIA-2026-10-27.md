@@ -66,6 +66,16 @@ O [mapa completo de integração](docs/architecture/INTEGRACAO-FRONT-BACK.md) re
 
 As mudanças permanecem locais. Não houve publicação, rotação de credenciais ou alteração automática dos usuários existentes. Vínculos de país anteriores foram preservados e precisam ser conferidos pela organização, pois a versão antiga permitia escolhê-los no cadastro. As evidências de 27/10 continuam sendo o registro histórico da versão auditada.
 
+### Revisão solicitada: e-mail e tela de espera — 03/11/2026
+
+A equipe confirmou que a verificação de e-mail continua prevista. A interface original de `RegisterStepTwo.vue`, com campo de token, foi restaurada. O envio e a validação real do código foram registrados na [lista de afazeres](docs/AFAZERES.md), sem implementação de endpoints, campos ou serviços de e-mail nesta revisão. A etapa continua sendo um protótipo: preencher o campo permite avançar sem confirmação no servidor. As referências anteriores à remoção dessa etapa e o arquivo `s05-results.json` descrevem a versão histórica anterior à restauração.
+
+A espera por delegação ganhou uma página própria, fora do layout de menus privados. Foram consultados no Figma MCP os frames mobile `471:104` e desktop `741:160`, ambos de “Em aguardo”. A composição foi adaptada com o mascote original salvo localmente, tipografia e espaçamento responsivos, controles com altura mínima de 48 px, foco por teclado e atualização de situação. Contas de outros papéis sem país recebem “Sem delegação”, em vez de serem apresentadas como alunos aguardando aprovação.
+
+O controle S05 no servidor foi preservado: cadastro público cria aluno sem país, a organização aprova atribuindo `country`, e uma nova consulta de `/usuarios/me/` atualiza o front. A tela administrativa completa continua pendente. Nenhum código do backend, banco ou configuração de produção foi alterado nesta revisão.
+
+**Verificação desta revisão:** build de produção aprovado; oito verificações de navegador passaram, incluindo espera em 320×568, 390×844, 768×1024, 1024×768 e 1366×900, estado de organizador sem país, transição ao layout da delegação após atualizar o perfil e restauração da interface de token. Não houve transbordamento horizontal nem erros JavaScript nos cenários testados. As respostas da API foram simuladas e interceptadas; esses testes verificam a interface, sem repetir a integração com Django da etapa anterior. Evidências: [pending-ui-results.json](auditoria/2026-11-03/pending-ui-results.json), [celular](auditoria/2026-11-03/pending-ui-mobile.png) e [desktop](auditoria/2026-11-03/pending-ui-desktop.png).
+
 ### Esclarecimento de requisitos de cadastro — 28/10/2026
 
 A equipe confirmou que o cadastro de alunos é público por decisão do produto. Os alunos devem permanecer registrados aguardando aprovação dos organizadores, que também os colocam em delegações. Novos organizadores devem ingressar por URLs privadas de convite. Os PDFs fornecidos descrevem propostas antigas e não substituem essas regras atuais, registradas em [referências documentais](docs/design/README.md).

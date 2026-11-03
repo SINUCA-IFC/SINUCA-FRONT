@@ -2,7 +2,7 @@
 
 Data da análise: 28/10/2026.
 
-Este documento registra os materiais fornecidos pela equipe e sua relação com o código atual. A análise é documental e estática. **O arquivo Figma ainda não foi inspecionado por MCP**, portanto não foram avaliados seus frames, componentes, medidas, variantes ou interações. Não se trata de uma validação visual de fidelidade ao Figma.
+Este documento registra os materiais fornecidos pela equipe e sua relação com o código. A análise dos PDFs foi realizada em 28/10/2026. Em 03/11/2026, o acesso ao Figma MCP funcionou e foram consultadas a hierarquia do arquivo e as duas telas de espera descritas abaixo. A comparação completa de telas, componentes, variantes e interações continua pendente.
 
 ## Regras atuais de ingresso — confirmadas em 28/10/2026
 
@@ -27,7 +27,7 @@ As regras de validade e uso dos convites ainda não foram detalhadas. Como requi
 | --- | --- | --- |
 | Trabalho - Site SINUCA.docx.pdf | Artigo/resumo expandido sobre contexto, metodologia, estágio do projeto e continuidade; cinco páginas | [PDF original](<referencias/Trabalho - Site SINUCA.docx.pdf>) |
 | SINUCA - SITE.pdf | Especificação inicial, identidade visual, ideias de funcionalidades, proposta e diagrama de dados; três páginas | [PDF original](<referencias/SINUCA - SITE.pdf>) |
-| SINUCA - LAYOUT | Arquivo Figma indicado pela equipe; conteúdo ainda não consultado | [Abrir Figma](https://www.figma.com/design/SxdVw9n8771wtU9HICf8Jg/SINUCA---LAYOUT?node-id=0-1) |
+| SINUCA - LAYOUT | Consulta parcial via MCP: telas de espera mobile e desktop; restante da análise pendente | [Abrir Figma](https://www.figma.com/design/SxdVw9n8771wtU9HICf8Jg/SINUCA---LAYOUT?node-id=0-1) |
 
 Os dois PDFs foram copiados da pasta Downloads, sem alterações. As cópias foram comparadas aos originais por SHA-256:
 
@@ -103,7 +103,11 @@ O diagrama também apresenta campos de senha com `VARCHAR(20)`. Isso não descre
 
 ## Situação do acesso ao Figma MCP
 
-Foi encontrado um servidor chamado `figma` no arquivo local `~/.codex/config.toml`, apontando para `https://mcp.figma.com/mcp`. Entretanto, não há ferramentas Figma expostas nesta sessão. As tentativas de consultar o servidor retornaram:
+**Atualização em 03/11/2026:** foram consultados por `get_metadata` e `get_design_context` os frames [cadastro 4 — mobile](https://www.figma.com/design/SxdVw9n8771wtU9HICf8Jg/SINUCA---LAYOUT?node-id=471-104) e [Desktop — Cadastro 4](https://www.figma.com/design/SxdVw9n8771wtU9HICf8Jg/SINUCA---LAYOUT?node-id=741-160). Ambos apresentam a composição “Em aguardo”, com mascote, fundo creme, Poppins e identidade do SINUCA. Essa composição orientou a revisão responsiva da espera, mantendo os controles de atualização e saída da aplicação.
+
+O mascote original utilizado nessa revisão está preservado em [sinuca-mascote.png](../../public/static/sinuca-mascote.png), obtido do asset do frame mobile. O arquivo é servido localmente pela aplicação; não depende do link temporário de download do Figma. Nenhum projeto ou elemento remoto foi alterado.
+
+Na sessão de 28/10/2026, foi encontrado um servidor chamado `figma` no arquivo local `~/.codex/config.toml`, apontando para `https://mcp.figma.com/mcp`, mas não havia ferramentas Figma disponíveis. Naquela ocasião, as tentativas retornaram:
 
 ```text
 resources/list failed: unknown MCP server 'figma'
@@ -121,7 +125,7 @@ codex mcp login figma
 
 O login só precisa ser feito se a conexão exigir autenticação. Na extensão do Codex, a lista de MCP servers oferece a ação de autenticação quando necessária e uma opção para reiniciar a extensão após alterações. Em uma sessão que disponibilize as ferramentas Figma, a análise poderá consultar o arquivo e o nó `0:1` solicitados pela equipe.
 
-Continuam pendentes de acesso ao Figma: inventário de telas e seus estados, dimensões, espaçamentos, componentes reutilizáveis, estilos reais de tipografia, versões mobile/desktop, interações do protótipo e comparação visual com o front. Nenhum desses elementos foi inferido como se tivesse sido lido no arquivo remoto.
+Continua pendente o levantamento completo do arquivo: inventário de telas e estados, dimensões, espaçamentos, componentes reutilizáveis, tipografia, versões mobile/desktop, interações do protótipo e comparação visual com o front. A consulta dos dois frames de espera não representa uma análise completa do design.
 
 ## Uso na documentação de continuidade
 
@@ -130,3 +134,5 @@ Estes materiais já podem apoiar o contexto, os objetivos, o histórico das deci
 A [auditoria funcional e de segurança](../../AUDITORIA-2026-10-27.md) é uma fonte complementar sobre funcionamento e riscos. Os PDFs fornecidos não substituem os testes nem demonstram que uma funcionalidade descrita já foi concluída.
 
 Na etapa documental de 28/10/2026 foram adicionadas somente as referências e esta análise. A atualização de 03/11/2026 registra a correção posterior de S05, descrita na auditoria e no mapa de integração. Os PDFs e o projeto Figma não foram alterados.
+
+A verificação real de e-mail permanece prevista na [lista de afazeres](../AFAZERES.md). A restauração de sua interface é uma retomada do protótipo; envio e validação no servidor continuam pendentes.

@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-03",
+  "api": "synthetic responses intercepted in Chrome; no real API contacted",
+  "passed": 8,
+  "results": [
+    {
+      "check": "responsive pending student",
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "horizontalOverflow": false,
+      "minimumButtonHeight": 48,
+      "screenshot": "pending-ui-small-mobile.png"
+    },
+    {
+      "check": "responsive pending student",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "minimumButtonHeight": 48,
+      "screenshot": "pending-ui-mobile.png"
+    },
+    {
+      "check": "responsive pending student",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "horizontalOverflow": false,
+      "minimumButtonHeight": 48,
+      "screenshot": "pending-ui-tablet.png"
+    },
+    {
+      "check": "responsive pending student",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "horizontalOverflow": false,
+      "minimumButtonHeight": 48,
+      "screenshot": "pending-ui-small-desktop.png"
+    },
+    {
+      "check": "responsive pending student",
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "horizontalOverflow": false,
+      "minimumButtonHeight": 48,
+      "screenshot": "pending-ui-desktop.png"
+    },
+    {
+      "check": "organizer without country has distinct explanation"
+    },
+    {
+      "check": "refresh after assignment opens original delegation layout"
+    },
+    {
+      "check": "email token interface restored; local placeholder only, no verification backend implemented"
+    }
+  ],
+  "runtimeErrors": []
+}

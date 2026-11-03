@@ -112,7 +112,9 @@ A aprovação foi implementada junto à atribuição de delegação, aproveitand
 3. Escritas privadas por aluno sem delegação retornam 403 antes de salvar. As permissões de escrita de alunos já vinculados continuam sendo tema de S07.
 4. GET `/usuarios/pendentes/?page=1` permite a organizadores/superusuários conferir alunos ativos sem delegação, com identificação escolar. A lista exclui contas de outros papéis e superusuários.
 5. POST `/usuarios/{id}/aprovar/` recebe `{"country": 1}` e aprova somente aluno ativo ainda pendente. Valida o país e grava o vínculo condicionalmente, evitando sobrescrever uma atribuição concluída. Não altera papel, senha ou privilégios.
-6. O front permite atualizar a situação e carregar o país após a aprovação. O cadastro explica a análise pela organização e deixou de simular envio/validação de código por e-mail.
+6. O front permite atualizar a situação e carregar o país após a aprovação. Alunos sem país veem uma página própria de espera, sem os menus da delegação. Organizadores sem país recebem uma explicação diferente, sem serem apresentados como alunos aguardando aprovação.
+
+A pedido da equipe, a etapa original de código por e-mail foi restaurada após a primeira revisão de S05. A funcionalidade real continua prevista e está na [lista de afazeres](../AFAZERES.md). Atualmente o campo é apenas um protótipo local: qualquer texto permite avançar; não há envio, confirmação ou comprovante de e-mail validado no backend. A restauração não altera o controle de delegação e aprovação no servidor.
 
 Os wrappers de listagem/aprovação estão prontos e foram ligados ao `userStore`; **a tela administrativa completa de aprovação e os convites de organizadores continuam pendentes**. O cadastro público não cria organizadores. Matrículas inválidas e a confirmação real de e-mail não passaram a ser verificadas por esta mudança; a organização deve conferir a identidade antes de aprovar.
 
@@ -149,7 +151,7 @@ Adicionar `.env` ao `.gitignore` depois de ele já estar versionado não retira 
 - Leitura dos oito services, nove stores, inicialização/interceptores, consumidores Vue, serializers, views, permissões e rotas Django correspondentes.
 - Suíte completa de backend: **48 testes passaram**, com SQLite em memória e dados sintéticos, incluindo tentativas de escolher país no cadastro, aprovar sem autorização, acessar dados enquanto pendente e preservar isolamento após aprovação.
 - Build de produção do front com saída em `/tmp`, separado dos artefatos normais do projeto.
-- Teste no Chrome utilizando o build real: **sete cenários passaram em 1366×900 e sete em 390×844**, interceptando todas as chamadas da aplicação e encaminhando a API para o Django de teste em memória. Foram verificados cadastro, login pendente, rota direta, aprovação, wrappers administrativos e logout. A navegação normal não foi autorizada a escrever na API publicada. Evidências: [s05-results.json](../../auditoria/2026-11-03/s05-results.json).
+- Teste inicial de S05 no Chrome utilizando o build real: **sete cenários passaram em 1366×900 e sete em 390×844**, interceptando todas as chamadas da aplicação e encaminhando a API para o Django de teste em memória. Foram verificados cadastro, login pendente, rota direta, aprovação, wrappers administrativos e logout. A navegação normal não foi autorizada a escrever na API publicada. Evidências históricas dessa versão: [s05-results.json](../../auditoria/2026-11-03/s05-results.json). O cenário sobre a remoção da etapa de e-mail descreve a versão anterior à restauração solicitada pela equipe.
 - `django check` sem problemas e `makemigrations --check --dry-run` sem alterações de modelo. OpenAPI gerado e validado com zero erros e 22 avisos (nove únicos), incluindo inferência de tipos e nomes de componentes aninhados; a documentação automática ainda precisa de revisão.
 - A revisão independente do diff não apontou regressões no escopo de S05.
 
