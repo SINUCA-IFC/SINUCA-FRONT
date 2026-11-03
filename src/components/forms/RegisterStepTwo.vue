@@ -1,17 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue';
 import AppButton from './AppButton.vue';
-import AppInput from './AppInput.vue';
 
 const props = defineProps({
   userType: String,
   userIcon: String,
   userColor: String,
 })
-
-const token = ref('')
-
-const isDisabled = computed(() => token.value === '')
 
 const emit = defineEmits(['nextStep'])
 
@@ -22,7 +16,7 @@ function nextStep() {
 
 <template>
   <div class="container-component">
-    <h1 class="step-title">TOKEN DE VERIFICAÇÃO</h1>
+    <h1 class="step-title">APROVAÇÃO</h1>
     <h1 class="step-title2">REGISTRO</h1>
 
     <div class="forms-container">
@@ -32,18 +26,13 @@ function nextStep() {
       </div>
 
       <form @submit.prevent="nextStep" class="forms">
-        <AppInput 
-            label="Token"
-            type="text"
-            v-model="token"
-            required
-        />
-
-        <AppButton type="submit" :disabled="isDisabled">CONTINUAR</AppButton>
+        <p>Após concluir o cadastro, aguarde a aprovação dos organizadores e a atribuição da sua delegação.</p>
+        <p>O cadastro público é destinado a alunos. Organizadores devem utilizar um convite da equipe.</p>
+        <AppButton type="submit">CONTINUAR</AppButton>
       </form>
     </div>
 
-    <p class="step-subtitle">Digite o código enviado para o seu e-mail.</p>
+    <p class="step-subtitle">Seu cadastro será analisado pela organização.</p>
   </div>
 </template>
 

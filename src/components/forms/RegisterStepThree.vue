@@ -25,13 +25,14 @@ const previewUrl = ref(null);
 const selectedFile = ref(null);
 
 const requirements = computed(() => {
+  const matriculation = userStore.user.matriculation ?? ''
   return [
     {
       requirement: 'Digite uma matrícula válida',
       valid:
-        userStore.user.matriculation.length < 10 ||
-        userStore.user.matriculation.length > 10 ||
-        !/^[0-9]+$/.test(userStore.user.matriculation),
+        matriculation.length < 10 ||
+        matriculation.length > 10 ||
+        !/^[0-9]+$/.test(matriculation),
     },
   ]
 })
@@ -134,7 +135,8 @@ onMounted(() => {
           </select>
         </div>
 
-        <AppButton type="submit">CADASTRAR</AppButton>
+        <p v-if="errorMessage" role="alert">{{ errorMessage }}</p>
+        <AppButton type="submit" :disabled="loading">{{ loading ? 'CADASTRANDO...' : 'CADASTRAR' }}</AppButton>
       </form>
     </div>
 

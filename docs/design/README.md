@@ -15,9 +15,11 @@ A equipe informou que os PDFs estão desatualizados. Para cadastro e ingresso no
 
 Assim, cadastro público é uma decisão do produto. A proposta antiga de cadastro pela administração e credencial compartilhada por país foi substituída nesse fluxo.
 
-Na implementação revisada, o cadastro público já existe, mas cria usuários com `is_active=True` e aceita o campo `country` enviado pelo cliente. Não foi encontrado um fluxo explícito de aprovação de alunos ou de convites para organizadores. `is_active` sozinho não representa esse fluxo de aprovação. Essas etapas permanecem pendentes de implementação; esta documentação não as apresenta como concluídas.
+Na análise de 28/10/2026, o cadastro público criava usuários com `is_active=True` e aceitava o campo `country` enviado pelo cliente. Ainda não havia fluxo explícito de aprovação de alunos ou convites para organizadores. `is_active` sozinho não representa esse fluxo de aprovação.
 
-A política de login durante a espera e as regras de validade e uso dos convites ainda não foram detalhadas. Como requisito de segurança, o convite precisa ser validado pelo servidor antes de conceder o papel de organizador; esconder o endereço de uma página não constitui autorização.
+**Atualização de 03/11/2026:** S05 passou a criar alunos sem país e disponibilizar aprovação com atribuição de delegação exclusivamente pela organização ou superusuário. A escolha desta correção foi permitir login durante a espera, mostrando o estado pendente e bloqueando escritas privadas. A aprovação ocorre junto à atribuição do país, sem um estado separado de aprovado sem delegação. Os detalhes, limites e verificações estão no [mapa de integração](../architecture/INTEGRACAO-FRONT-BACK.md). A tela administrativa completa e os convites continuam pendentes.
+
+As regras de validade e uso dos convites ainda não foram detalhadas. Como requisito de segurança, o convite precisa ser validado pelo servidor antes de conceder o papel de organizador; esconder o endereço de uma página não constitui autorização.
 
 ## Materiais preservados
 
@@ -71,7 +73,7 @@ Há também um problema concreto em `base.css`: `font-weight: semibold` não é 
 
 | Tema | Materiais fornecidos | Código atual observado | Consequência para a continuidade |
 | --- | --- | --- | --- |
-| Criação de contas | A proposta antiga de cadastro pela administração foi substituída pela regra atual de cadastro público com aprovação | Existe `/cadastro`, mas não foi encontrado fluxo explícito de aprovação; o registro aceita país informado pelo cliente | Implementar aprovação e atribuição de delegação pelos organizadores conforme as regras atuais |
+| Criação de contas | A proposta antiga de cadastro pela administração foi substituída pela regra atual de cadastro público com aprovação | Desde S05, cadastro cria aluno sem país; API da organização aprova e atribui a delegação; front mostra a espera | Concluir a tela administrativa de aprovação; conferir vínculos de país anteriores à correção |
 | Conta individual ou compartilhada | A especificação inicial fala em conta por país; a regra atual registra alunos individualmente para aprovação e distribuição em delegações | O back representa pessoas individualmente e associa cada usuário a um país | Manter a conta individual; tratar a credencial por país do PDF como proposta histórica |
 | Privacidade do chat | O artigo, página 4, descreve comunicação privada entre um delegado específico e a organização | `Message` pertence a um país; alunos do mesmo país consultam o mesmo conjunto de mensagens | É necessário definir se a conversa é individual ou da delegação antes de considerar esse requisito atendido |
 | Notificações | O artigo prevê comunicação notificada | Existe um booleano de notificação em tarefas, mas não foi encontrada integração de entrega no fluxo revisado | O seletor visual não comprova entrega de notificações |
@@ -81,7 +83,7 @@ Há também um problema concreto em `base.css`: `font-weight: semibold` não é 
 | Histórico e mídias | Os materiais mencionam edições anteriores, história, imagens e eventualmente uma pasta do Drive | História está em construção; os componentes revisados não implementam uma galeria de edições | Não registrar esses recursos como entregues apenas porque aparecem na navegação |
 | Aplicativo móvel | O artigo fala em site e app móvel | Este repositório configura um front Vue com PWA | Confirmar se o PWA atende ao uso pretendido ou se existe outro aplicativo/repositório |
 
-Os PDFs permanecem como referências históricas. As regras atuais de ingresso acima substituem as propostas antigas sobre cadastro. Outras diferenças entre documentos e implementação ainda precisam ser confirmadas pela equipe. Nenhuma regra de negócio foi modificada no código nesta etapa.
+Os PDFs permanecem como referências históricas. As regras atuais de ingresso acima substituem as propostas antigas sobre cadastro. Outras diferenças entre documentos e implementação ainda precisam ser confirmadas pela equipe. A implementação posterior do fluxo de ingresso está registrada no acompanhamento de S05.
 
 ### Referências no código
 
@@ -127,4 +129,4 @@ Estes materiais já podem apoiar o contexto, os objetivos, o histórico das deci
 
 A [auditoria funcional e de segurança](../../AUDITORIA-2026-10-27.md) é uma fonte complementar sobre funcionamento e riscos. Os PDFs fornecidos não substituem os testes nem demonstram que uma funcionalidade descrita já foi concluída.
 
-Nesta etapa foram adicionadas somente as referências documentais e esta análise. Não foram modificados componentes, serviços, configurações da aplicação, modelos, banco ou o projeto Figma.
+Na etapa documental de 28/10/2026 foram adicionadas somente as referências e esta análise. A atualização de 03/11/2026 registra a correção posterior de S05, descrita na auditoria e no mapa de integração. Os PDFs e o projeto Figma não foram alterados.

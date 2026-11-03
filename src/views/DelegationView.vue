@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from '../stores/userStore';
 import { useCountryStore } from '../stores/countryStore';
@@ -19,6 +19,8 @@ import NotesListComponent from '../components/delegation/NotesListComponent.vue'
 const countryStore = useCountryStore();
 const userStore = useUserStore();
 const countryId = ref();
+const hasDelegation = computed(() => Boolean(userStore.user.country?.id));
+const checkingApproval = ref(false);
 
 // Cópia local do país da delegação. O ScheduleModal chama
 // countryStore.getCountry() para os países do debate, o que sobrescreve
@@ -52,6 +54,10 @@ const closeModal = () => {
 };
 
 const checkModalRoute = () => {
+    if (!hasDelegation.value) {
+        activeModal.value = null;
+        return;
+    }
     if (route.path.includes('/delegacao/nova-tarefa') || route.path.includes('/editar')) {
         activeModal.value = 'form-tarefa';
     } else if (route.path.includes('/delegacao/schedule/')) {
@@ -68,18 +74,50 @@ watch(
     }
 );
 
-onMounted (async () => {
-    countryId.value = userStore.user.country.id
+const loadDelegation = async () => {
+    countryId.value = userStore.user.country?.id
+    delegationCountry.value = null
+    if (!countryId.value) {
+        activeModal.value = null
+        return
+    }
     await countryStore.getCountry(countryId.value)
     delegationCountry.value = { ...countryStore.country }
 
     checkModalRoute()
-});
+};
+
+const refreshApproval = async () => {
+    checkingApproval.value = true
+    try {
+        await userStore.checkAuth()
+        if (!userStore.loggedIn) router.push('/bem-vindo')
+    } finally {
+        checkingApproval.value = false
+    }
+};
+
+const logout = () => {
+    userStore.logout()
+    router.push('/bem-vindo')
+};
+
+watch(() => userStore.user.country?.id, loadDelegation);
+onMounted(loadDelegation);
 </script>
 
 <template>
     <AppLayout title="Delegação">
-        <main>
+        <section v-if="!hasDelegation" class="pending-approval" aria-live="polite">
+            <h1>{{ userStore.user.approval_pending ? 'Aguardando aprovação' : 'Nenhuma delegação vinculada' }}</h1>
+            <p v-if="userStore.user.approval_pending">Seu cadastro está registrado. Os organizadores precisam aprovar sua participação e atribuir uma delegação.</p>
+            <p v-else>Esta conta não possui uma delegação vinculada.</p>
+            <button type="button" :disabled="checkingApproval" @click="refreshApproval">
+                {{ checkingApproval ? 'Atualizando...' : 'Atualizar situação' }}
+            </button>
+            <button type="button" @click="logout">Sair</button>
+        </section>
+        <main v-else>
             <BannerComponent 
                 :title="delegationCountry?.name"
                 :subtitle="delegationCountry?.political_name"
@@ -118,6 +156,13 @@ onMounted (async () => {
 </template>
 
 <style scoped>
+.pending-approval {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 2rem;
+}
+
 main {
     display: flex;
     flex-direction: column;
