@@ -1,4 +1,5 @@
 <script setup>
+import RelatedDocuments from '@/components/delegation/RelatedDocuments.vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import ScheduleService from '@/services/scheduleService'
 import CountryService from '@/services/countryService'
@@ -20,8 +21,18 @@ let requestId = 0
 const categories = {
   1: { name: 'Postagem', topic: 'Tema da postagem', about: 'Sobre a postagem', color: '#fd151b' },
   2: { name: 'Debate', topic: 'Tema do debate', about: 'Sobre o debate', color: '#01295f' },
-  3: { name: 'Mesa de cooperação', topic: 'Tema da mesa de cooperação', about: 'Sobre a mesa de cooperação', color: '#849324' },
-  4: { name: 'Apresentação cultural', topic: 'Título da apresentação cultural', about: 'Sobre a apresentação cultural', color: '#FFB30F' },
+  3: {
+    name: 'Mesa de cooperação',
+    topic: 'Tema da mesa de cooperação',
+    about: 'Sobre a mesa de cooperação',
+    color: '#849324',
+  },
+  4: {
+    name: 'Apresentação cultural',
+    topic: 'Título da apresentação cultural',
+    about: 'Sobre a apresentação cultural',
+    color: '#FFB30F',
+  },
 }
 
 const categoryId = computed(() => Number(schedule.value?.category))
@@ -42,9 +53,10 @@ async function loadSchedule() {
     const data = await scheduleService.getSchedule(props.scheduleId)
     if (currentRequest !== requestId) return
 
-    const participants = Number(data.category) === 2
-      ? await Promise.all((data.country || []).map(id => countryService.getCountry(id)))
-      : []
+    const participants =
+      Number(data.category) === 2
+        ? await Promise.all((data.country || []).map((id) => countryService.getCountry(id)))
+        : []
     if (currentRequest !== requestId) return
 
     schedule.value = data
@@ -59,15 +71,13 @@ async function loadSchedule() {
 }
 
 watch(() => props.scheduleId, loadSchedule, { immediate: true })
-onBeforeUnmount(() => { requestId += 1 })
-
+onBeforeUnmount(() => {
+  requestId += 1
+})
 </script>
 
 <template>
-  <section
-    class="modal"
-    :style="{ borderTop: '1.8rem solid ' + (category?.color || '#01295f') }"
-  >
+  <section class="modal" :style="{ borderTop: '1.8rem solid ' + (category?.color || '#01295f') }">
     <div class="header">
       <div class="title">
         <h2>{{ category?.name || 'Detalhes do cronograma' }}</h2>
@@ -98,52 +108,53 @@ onBeforeUnmount(() => { requestId += 1 })
       <p role="alert">{{ error }}</p>
       <button type="button" class="retry-button" @click="loadSchedule">Tentar novamente</button>
     </div>
-    <p v-else-if="!category" class="feedback" role="status">Categoria de cronograma desconhecida.</p>
+    <p v-else-if="!category" class="feedback" role="status">
+      Categoria de cronograma desconhecida.
+    </p>
     <template v-else>
-    <div class="topic">
-      <h4>{{ category.topic }}</h4>
-      <h3>{{ schedule.title }}</h3>
-    </div>
+      <div class="topic">
+        <h4>{{ category.topic }}</h4>
+        <h3>{{ schedule.title }}</h3>
+      </div>
 
-    <div class="uldiv">
-      <ul class="schedules-infos">
-        <li>
-          <span class="mdi mdi-calendar-month-outline"></span>
-          {{ formatDate(schedule.startDate) }}
-        </li>
-        <li v-if="categoryId === 1">
-          <span class="mdi mdi-calendar-month-outline"></span>
-          {{ formatDate(schedule.endDate) }}
-        </li>
-        <template v-else>
+      <div class="uldiv">
+        <ul class="schedules-infos">
           <li>
-            <span class="mdi mdi-map-marker-outline"></span>
-            {{ schedule.location }}
+            <span class="mdi mdi-calendar-month-outline"></span>
+            {{ formatDate(schedule.startDate) }}
           </li>
-          <li>
-            <span class="mdi mdi-clock-outline"></span>
-            {{ formatTime(schedule.startDate) }}
-            <template v-if="categoryId === 4">
-              - {{ formatTime(schedule.endDate) }}
-            </template>
+          <li v-if="categoryId === 1">
+            <span class="mdi mdi-calendar-month-outline"></span>
+            {{ formatDate(schedule.endDate) }}
           </li>
-          <li v-if="categoryId === 4">
-            <span class="mdi mdi-clock-outline"></span>
-            {{ schedule.tipo == 1 ? 'Dança típica' : 'Comida típica' }}
-          </li>
-          <li v-else>
-            <span class="mdi mdi-clock-outline"></span>
-            {{ formatTime(schedule.endDate) }}
-          </li>
-        </template>
-      </ul>
-    </div>
+          <template v-else>
+            <li>
+              <span class="mdi mdi-map-marker-outline"></span>
+              {{ schedule.location }}
+            </li>
+            <li>
+              <span class="mdi mdi-clock-outline"></span>
+              {{ formatTime(schedule.startDate) }}
+              <template v-if="categoryId === 4"> - {{ formatTime(schedule.endDate) }} </template>
+            </li>
+            <li v-if="categoryId === 4">
+              <span class="mdi mdi-clock-outline"></span>
+              {{ schedule.tipo == 1 ? 'Dança típica' : 'Comida típica' }}
+            </li>
+            <li v-else>
+              <span class="mdi mdi-clock-outline"></span>
+              {{ formatTime(schedule.endDate) }}
+            </li>
+          </template>
+        </ul>
+      </div>
 
-    <div class="descricao">
-      <h3>{{ category.about }}</h3>
-      <p>{{ schedule.description }}</p>
-    </div>
+      <div class="descricao">
+        <h3>{{ category.about }}</h3>
+        <p>{{ schedule.description }}</p>
+      </div>
 
+      <RelatedDocuments :documents="schedule.docs || []" />
     </template>
   </section>
 </template>
@@ -235,8 +246,13 @@ img {
   font-size: 0.9rem;
 }
 
-.feedback { line-height: 1.5; }
-.retry-button { margin-top: 1rem; cursor: pointer; }
+.feedback {
+  line-height: 1.5;
+}
+.retry-button {
+  margin-top: 1rem;
+  cursor: pointer;
+}
 .close-button {
   border: 0;
   padding: 0;
@@ -259,21 +275,44 @@ img {
 }
 
 @media (min-width: 1024px) {
-.modal {
-  z-index: 1;
-  position: absolute;
-  width: 50%;
-  height: 80%;
-}
+  .modal {
+    z-index: 1;
+    position: absolute;
+    width: 50%;
+    height: 80%;
+  }
 }
 @media (max-width: 1023px) {
-  .modal { width: calc(100% - 2rem); height: auto; max-height: 85dvh; padding: 1rem; }
-  .title { gap: 0.75rem; }
-  .title h2 { min-width: 0; }
-  .schedules-infos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .schedules-infos li { padding: 0.75rem 0.25rem; line-height: 1.5; }
-  .countrys { gap: 0.75rem; }
-  .countrys > div { min-width: 0; flex: 1; text-align: center; }
-  .countrys h5 { overflow-wrap: anywhere; line-height: 1.5; }
+  .modal {
+    width: calc(100% - 2rem);
+    height: auto;
+    max-height: 85dvh;
+    padding: 1rem;
+  }
+  .title {
+    gap: 0.75rem;
+  }
+  .title h2 {
+    min-width: 0;
+  }
+  .schedules-infos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .schedules-infos li {
+    padding: 0.75rem 0.25rem;
+    line-height: 1.5;
+  }
+  .countrys {
+    gap: 0.75rem;
+  }
+  .countrys > div {
+    min-width: 0;
+    flex: 1;
+    text-align: center;
+  }
+  .countrys h5 {
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+  }
 }
 </style>
