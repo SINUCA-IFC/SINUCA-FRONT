@@ -99,7 +99,9 @@ async function login() {
 
         </section>
 
-        <img :src="odsShape" alt="ods shape" class="overlay-ods">
+        <div class="ods-decoration" aria-hidden="true">
+            <img :src="odsShape" alt="" class="overlay-ods">
+        </div>
     </div>
 </template>
 
@@ -194,14 +196,23 @@ async function login() {
     color: #002453;
 }
 
+.ods-decoration {
+    position: relative;
+    width: min(100%, 280px);
+    aspect-ratio: 163 / 50;
+    overflow: hidden;
+    margin: auto auto 0;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
 .overlay-ods {
     position: absolute;
-    bottom: 0;
+    top: 100%;
     left: 50%;
-    height: 250px;
-    width: auto;
-    transform: translate(-50%, 90px) rotate(90deg);
-    z-index: 1;
+    width: calc(100% * 90 / 163);
+    height: auto;
+    transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .error-message {
@@ -237,7 +248,7 @@ a {
     }
 
     /* o ods-shape some no desktop, quem faz o recorte agora é o ::before */
-    .overlay-ods {
+    .ods-decoration {
         display: none;
     }
 
@@ -288,5 +299,12 @@ a {
     .imagemLogo {
         height: 80px;
     }
+}
+@media (max-width: 767px) {
+  .container { display: flex; flex-direction: column; height: auto; min-height: 100dvh; padding: 0 1rem; overflow: visible; }
+  .login-section { flex-shrink: 0; height: auto; min-height: 0; padding: 1.5rem 0; }
+  .login-area { width: 100%; padding: 1.25rem; }
+  .login-title { font-size: 2rem; line-height: 1.3; }
+  .login-subtitle { line-height: 1.5; }
 }
 </style>

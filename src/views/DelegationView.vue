@@ -11,7 +11,7 @@ import BannerComponent from '../components/layout/BannerComponent.vue';
 import NavigationComponent from '../components/delegation/NavigationComponent.vue';
 import TasksListComponent from '../components/delegation/TasksListComponent.vue';
 import CreatTaskModal from '../components/delegation/modais/CreatTaskModal.vue';
-import ScheduleListComponent from '../components/delegation/ScheduleListComponent.vue';
+import ScheduleListComponent from '../components/delegation/schedules/ScheduleListComponent.vue';
 import ScheduleModal from '../components/delegation/modais/ScheduleModal.vue';
 import DocumentsListComponent from '../components/delegation/DocumentsListComponent.vue';
 import NotesListComponent from '../components/delegation/NotesListComponent.vue';

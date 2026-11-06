@@ -189,4 +189,12 @@ h1 {
     }
 }
 
+@media (max-width: 767px) {
+  .container { height: auto; min-height: 100dvh; padding: 5rem 1rem 2rem; }
+  .options-list { width: 100%; max-width: 420px; gap: 1rem; }
+  .option-item { width: 100%; height: auto; min-height: 140px; padding: 1.25rem; }
+  .option-item h3 { font-size: 1.4rem; line-height: 1.4; }
+  .option-item p { line-height: 1.5; }
+  .subtitle { width: 100%; line-height: 1.5; }
+}
 </style>

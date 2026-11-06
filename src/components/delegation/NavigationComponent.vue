@@ -158,4 +158,12 @@ font-size: clamp(0.8rem, 2.5vw, 1rem);
         cursor: pointer;
     }
 }
+@media (max-width: 1023px) {
+  .container { height: auto; min-height: 4rem; padding: 0.75rem 2.25rem; }
+  .tabs-navigation { width: 100%; min-width: 0; }
+  .tabs-navigation li { flex: 1; min-width: 0; flex-wrap: wrap; white-space: normal; padding: 0.4rem 0.2rem; }
+  .tabs-navigation li h4 { white-space: normal; text-align: center; line-height: 1.4; }
+  span.mdi-chevron-left { left: 0.25rem; }
+  span.mdi-chevron-right { right: 0.25rem; }
+}
 </style>

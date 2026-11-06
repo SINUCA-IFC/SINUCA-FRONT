@@ -40,6 +40,8 @@ function toggle() {
 
 <style scoped>
 .card {
+    min-width: 0;
+    max-width: 100%;
     background-color: white;
     padding: 2rem 1.5rem;
     border-radius: 10px;
@@ -47,6 +49,8 @@ function toggle() {
 }
 
 .header-post {
+    min-width: 0;
+    line-height: 1.5;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -105,10 +109,16 @@ function toggle() {
 }
 
 .img-post {
+    display: block;
     width: 100%;
     height: auto;
     margin-top: 1rem;
     border-radius: 10px;
+}
+
+@media (max-width: 479px) {
+    .card { padding: 1.25rem 1rem; }
+    .post-desc { text-align: left; line-height: 1.6; }
 }
 
 @media (min-width: 1024px) {

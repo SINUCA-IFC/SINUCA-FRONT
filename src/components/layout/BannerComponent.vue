@@ -34,6 +34,8 @@ const props = defineProps({
 }
 
 .title-area {
+    flex: 1;
+    min-width: 0;
     padding: 1em;
 
     & .title {
@@ -47,6 +49,7 @@ const props = defineProps({
 }
 
 .title-row {
+    flex-wrap: wrap;
     display: flex;
     gap: 1rem;
     align-items: center;
@@ -62,8 +65,23 @@ const props = defineProps({
 }
 
 .ods-shape {
-    width: auto;
-    height: 160px;
+    flex: 0 1 28%;
+    width: 28%;
+    max-width: 120px;
+    height: auto;
+    max-height: 160px;
+    object-fit: contain;
+    align-self: center;
+}
+
+.title-area .title { line-height: 1.2; }
+.title-area .subtitle { line-height: 1.5; }
+
+@media (max-width: 479px) {
+    .title-area .title { font-size: 1.5rem; }
+    .title-area .subtitle { font-size: 0.85rem; }
+    .title-row { gap: 0.5rem; }
+    .title-icon { font-size: 1.4rem; }
 }
 
 /* ---------- DESKTOP: título solto no fundo, sem card e sem ilustração ---------- */

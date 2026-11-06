@@ -115,4 +115,8 @@ h3 {
     word-break: break-word;
 }
 
+@media (max-width: 1023px) {
+  .header-schedule { flex-wrap: wrap; gap: 0.75rem; line-height: 1.5; }
+  .schedule-item h3 { max-width: 100%; line-height: 1.5; }
+}
 </style>

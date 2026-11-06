@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export default class LinkService {
-    async getLinks() {
-        const { data } = await axios.get('/docs/');
+    async getLinks(page = 1) {
+        const { data } = await axios.get('/docs/', { params: { page } });
         return data;
     }
     async getLink(id) {

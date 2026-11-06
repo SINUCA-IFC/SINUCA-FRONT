@@ -36,6 +36,10 @@ const isDesktop = useIsDesktop()
 </template>
 
 <style scoped>
+.app-content, .content-inner {
+  min-width: 0;
+}
+
 .app-layout.is-desktop {
   --sidebar-width: 277px;
   min-height: 100vh;

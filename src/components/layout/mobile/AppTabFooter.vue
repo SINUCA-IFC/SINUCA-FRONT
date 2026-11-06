@@ -45,13 +45,14 @@ footer {
 }
 
 .navtabs-list {
-    display: flex;
-    justify-content: space-around;
-    padding: 1rem 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.25rem;
+    padding: 0.75rem 0.5rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
 }
 
 .navtab-item span {
-    font-size: 1.1rem;
+    font-size: clamp(0.7rem, 2.8vw, 0.95rem);
 }
 
 .navtab-item .icon{
@@ -62,6 +63,13 @@ footer {
 }
 
 .navtab-item a{
+    display: flex;
+    min-height: 44px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.4;
     color: #969696;
 }
 
