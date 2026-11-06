@@ -1,6 +1,28 @@
 # Afazeres do SINUCA
 
-Atualizado em 03/11/2026. Esta lista registra trabalho futuro; os itens abaixo não foram implementados nesta revisão.
+Atualizado em 06/11/2026. Esta lista registra trabalho futuro; os itens abaixo não foram implementados nesta revisão.
+
+## Ordem de trabalho durante o desenvolvimento
+
+Prioridades reorganizadas a pedido da equipe em 06/11/2026. A próxima etapa concentra-se nos fluxos funcionais da aplicação. S06, S07 e S08 ficam registrados na seção de preparação para publicação, sem execução nesta revisão.
+
+| Ordem | Correção ou task | Resultado esperado |
+| --- | --- | --- |
+| 1 | Corrigir criação, edição e exclusão de tarefas (F03–F06). | Converter datas opcionais vazias para `null`, aguardar a API antes de fechar o modal, mostrar erros, normalizar categorias e IDs e atualizar o quadro após salvar ou excluir. |
+| 2 | Tratar categorias sem estilo e postagens sem foto (F07/F08). | Usar apresentação padrão para evitar que dados válidos quebrem o formulário ou o mural. |
+| 3 | Implementar paginação nas listas (F11). | Permitir consultar todos os registros e definir ordenação estável no backend; esclarecer o alcance de filtros e contagens. |
+| 4 | Criar a tela administrativa de aprovação. | Listar alunos pendentes e atribuir uma delegação usando as APIs e os métodos de service/store existentes. |
+| 5 | Criar a tela de conta e configurações e corrigir o estado de sessão (F12). | Consultar/editar o perfil, sair pelo celular ou desktop e limpar a sessão após falha de renovação. Escopo detalhado abaixo. |
+| 6 | Corrigir cronogramas e documentos (F09/F10/F18). | Abrir atividades diretamente pela URL, mostrar somente os documentos vinculados e permitir salvar links com o país correto. |
+| 7 | Implementar a verificação real de e-mail. | Substituir a etapa de token simulada pelo fluxo integrado descrito abaixo. |
+| 8 | Completar convites e fluxos por papel (F02). | Validar convites de organizadores no servidor e definir as operações de organizadores e avaliadores. |
+| 9 | Corrigir navegação e validações complementares. | Revisar atalhos mobile (F16/F17), matrícula (F14), parâmetro de país em mensagens (F19), datas invertidas (F20) e página 404 (F26). |
+| 10 | Definir e implementar os próximos recursos do evento. | Priorizar chat, notas, histórico e notificações com a equipe; esses fluxos ainda têm integração incompleta ou inexistente (F23/F24). |
+
+- [ ] Separar a URL da API por ambiente para permitir desenvolvimento e testes com dados isolados.
+- [ ] Validar cada entrega com os papéis envolvidos e dados de teste, incluindo navegação mobile e desktop.
+
+Os IDs F e S remetem à auditoria. Esta ordem é de planejamento e não representa uma nova rodada de reprodução de todos os achados.
 
 ## Verificação real de e-mail — prioridade alta
 
@@ -16,10 +38,29 @@ A verificação de e-mail continua fazendo parte do cadastro. A interface origin
 
 Confirmar o e-mail comprova o acesso ao endereço. A aprovação dos organizadores e a atribuição de delegação continuam sendo etapas distintas dessa confirmação. Na implementação atual de S05, a aprovação da organização acontece junto à atribuição de `country`; a verificação de e-mail ainda não participa desse controle.
 
-## Pendências relacionadas
+## Tela de conta e configurações do usuário — prioridade média, antes do evento
 
-- [ ] Criar a tela administrativa para listar alunos pendentes e aprová-los com atribuição de país. As APIs e os métodos de service/store já existem.
-- [ ] Implementar convites de organizadores validados no servidor.
+Solicitada em 06/11/2026. Disponibilizar uma tela própria de conta, acessível pela navegação mobile e desktop, para consultar o perfil, editar configurações e sair da conta.
+
+- [ ] Definir a rota e os acessos à tela na navegação mobile e desktop.
+- [ ] Exibir os dados do usuário autenticado e permitir editar os campos de perfil autorizados pela API, com estados de carregamento, sucesso e erro.
+- [ ] Definir as demais configurações disponíveis; conectar cada opção ao comportamento e à persistência correspondentes.
+- [ ] Disponibilizar uma ação visível de logout, limpando tokens, perfil e dados privados dos stores e encaminhando para a entrada da aplicação.
+- [ ] Integrar o encerramento de sessão ao tratamento de expiração, evitando manter estado de usuário autenticado após falha de renovação.
+- [ ] Conferir navegação por teclado, uso no celular e troca de conta sem exibir dados da sessão anterior.
+
+País, papel e privilégios continuam sob controle da organização no servidor; a edição do próprio perfil deve respeitar essas restrições.
+
+## Antes da publicação — pendências registradas
+
+Executar estes itens na preparação para disponibilizar a aplicação ao público com dados reais. Permanecem pendentes; esta reorganização não os implementa nem altera sua gravidade.
+
+- [ ] **S06 — Segredos e bases versionados:** retirar `.env`, `db.sqlite3` e `dump.json` do conteúdo distribuído, fornecer configuração de exemplo sem segredos, eliminar o fallback de chave previsível e substituir credenciais afetadas que estejam em uso. Avaliar histórico e cópias com a equipe.
+- [ ] **S07 — Permissões de participantes:** restringir alterações de colegas e de cronogramas/documentos compartilhados por papel, ação e objeto, preservando o isolamento entre delegações. As correções anteriores de privilégios e responsáveis de tarefas já estão registradas na auditoria.
+- [ ] **S08 — Uploads e mídias:** definir propriedade e acesso à listagem, limites de tamanho/quantidade e cotas; oferecer um fluxo temporário e limitado para foto antes do cadastro.
+- [ ] Rever configuração de produção, dependências efetivamente instaladas e reprodução do ambiente de implantação.
+- [ ] Validar autorização, isolamento entre delegações e os fluxos principais em ambiente dedicado antes da liberação.
+
 - [ ] Conferir os vínculos de país de contas anteriores à correção do cadastro.
 
 Referências: [integração front/back](architecture/INTEGRACAO-FRONT-BACK.md) e [auditoria](../AUDITORIA-2026-10-27.md).

@@ -1,16 +1,15 @@
 <script setup>
-import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 
 const tabsFooter = [
     {id: 1, name: 'História', icon: 'mdi mdi-book-open-page-variant-outline', path: '/historia'},
-    {id: 2, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/'},
+    {id: 2, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/mural'},
     {id: 3, name: 'Chat', icon: 'mdi mdi-chat-outline', path: '/chat'},
     {id: 4, name: 'Delegação', icon: 'mdi mdi-earth', path: '/delegacao'},
 ];
 
-const currentRoute = ref(route.fullPath)
+const isTabActive = (path) => route.path === path || route.path.startsWith(`${path}/`)
 </script>
 
 <template>
@@ -21,7 +20,7 @@ const currentRoute = ref(route.fullPath)
                     v-for="tab in tabsFooter"
                     :key="tab.id"
                     class="navtab-item"
-                    :class="currentRoute === tab.path ? 'active' : ''"
+                    :class="{ active: isTabActive(tab.path) }"
                 >
                     <RouterLink :to="tab.path">
                         <span class="icon" :class="tab.icon"></span>
