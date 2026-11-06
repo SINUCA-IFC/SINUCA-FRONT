@@ -1,0 +1,309 @@
+{
+  "date": "2026-11-03",
+  "scope": "S05: cadastro público, aprovação e atribuição de delegação",
+  "backend": {
+    "tests": 48,
+    "result": "passed",
+    "database": "SQLite em memória",
+    "credentials": "sintéticas",
+    "check": "passed",
+    "model_changes": false
+  },
+  "frontend_build": {
+    "result": "passed",
+    "output": "/tmp/sinuca-s05-build"
+  },
+  "openapi": {
+    "errors": 0,
+    "warnings": 22,
+    "unique_warnings": 9
+  },
+  "production_api_accessed": false,
+  "existing_database_modified": false,
+  "browsers": {
+    "desktop": {
+      "width": 1366,
+      "height": 900,
+      "viewport": "desktop",
+      "passed": 7,
+      "results": [
+        "cadastro sem falsa verificação de e-mail",
+        "cadastro e login reais deixam aluno pendente sem consultar dados privados",
+        "rota direta de tarefa não abre formulário para pendente",
+        "aprovação e atualização liberam somente a delegação atribuída",
+        "store de alunos não acessa lista administrativa",
+        "service e store listam e aprovam aluno com autenticação de organizador",
+        "logout limpa sessão e restaura dados do formulário"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "path": "/api/turmas/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/registro/",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/registro/",
+          "status": 201
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/token/",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/token/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/usuarios/me/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/me/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/me/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/paises/1",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/tarefas/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/categorias/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/paises/1",
+          "status": 301
+        },
+        {
+          "method": "GET",
+          "path": "/api/tarefas/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/categorias/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/paises/1/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/paises/1/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/usuarios/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/categorias/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/usuarios/pendentes/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/pendentes/",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/me/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/pendentes/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/usuarios/5/aprovar/",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/usuarios/5/aprovar/",
+          "status": 200
+        }
+      ]
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "viewport": "mobile",
+      "passed": 7,
+      "results": [
+        "cadastro sem falsa verificação de e-mail",
+        "cadastro e login reais deixam aluno pendente sem consultar dados privados",
+        "rota direta de tarefa não abre formulário para pendente",
+        "aprovação e atualização liberam somente a delegação atribuída",
+        "store de alunos não acessa lista administrativa",
+        "service e store listam e aprovam aluno com autenticação de organizador",
+        "logout limpa sessão e restaura dados do formulário"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "path": "/api/turmas/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/registro/",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/registro/",
+          "status": 201
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/token/",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/token/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/usuarios/me/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/me/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/me/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/paises/1",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/tarefas/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/categorias/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/paises/1",
+          "status": 301
+        },
+        {
+          "method": "GET",
+          "path": "/api/tarefas/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/categorias/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/paises/1/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/paises/1/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/usuarios/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/categorias/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/usuarios/pendentes/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/pendentes/",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/me/",
+          "status": 200
+        },
+        {
+          "method": "GET",
+          "path": "/api/usuarios/pendentes/",
+          "status": 200
+        },
+        {
+          "method": "OPTIONS",
+          "path": "/api/usuarios/5/aprovar/",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/usuarios/5/aprovar/",
+          "status": 200
+        }
+      ]
+    }
+  }
+}

@@ -32,7 +32,7 @@ function nextStep() {
       </div>
 
       <form @submit.prevent="nextStep" class="forms">
-        <AppInput 
+        <AppInput
             label="Token"
             type="text"
             v-model="token"

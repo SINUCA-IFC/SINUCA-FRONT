@@ -1,0 +1,305 @@
+[
+  {
+    "name": "guest_root_mural",
+    "kind": "functional",
+    "confirmed": true,
+    "url": "/mural",
+    "card_count": 1,
+    "errors": []
+  },
+  {
+    "name": "post_expand",
+    "kind": "functional",
+    "confirmed": true
+  },
+  {
+    "name": "anonymous_delegation_redirect",
+    "kind": "functional",
+    "confirmed": true,
+    "url": "/bem-vindo"
+  },
+  {
+    "name": "browser_student_login",
+    "kind": "functional",
+    "confirmed": true,
+    "task_cards": 10,
+    "errors": []
+  },
+  {
+    "name": "front_tasks_truncated",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "visible": 10,
+    "database": 12,
+    "pagination_controls": 0
+  },
+  {
+    "name": "delegation_null_country_unassigned",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "url": "/delegacao",
+    "errors": [
+      "TypeError: Cannot read properties of null (reading 'id')\n    at http://127.0.0.1:4173/assets/DelegationView-dymY1t-L.js:1:20894\n    at http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:30114\n    at Ln (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20827)\n    at ft (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20897)\n    at Ar.t.__weh.t.__weh (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:29994)\n    at Qi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22405)\n    at Xi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22714)"
+    ]
+  },
+  {
+    "name": "delegation_null_country_organizer",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "url": "/delegacao",
+    "errors": [
+      "TypeError: Cannot read properties of null (reading 'id')\n    at http://127.0.0.1:4173/assets/DelegationView-dymY1t-L.js:1:20894\n    at http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:30114\n    at Ln (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20827)\n    at ft (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20897)\n    at Ar.t.__weh.t.__weh (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:29994)\n    at Qi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22405)\n    at Xi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22714)"
+    ]
+  },
+  {
+    "name": "delegation_null_country_evaluator",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "url": "/delegacao",
+    "errors": [
+      "TypeError: Cannot read properties of null (reading 'id')\n    at http://127.0.0.1:4173/assets/DelegationView-dymY1t-L.js:1:20894\n    at http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:30114\n    at Ln (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20827)\n    at ft (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20897)\n    at Ar.t.__weh.t.__weh (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:29994)\n    at Qi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22405)\n    at Xi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22714)"
+    ]
+  },
+  {
+    "name": "task_no_dates_closes_without_save",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "http_status": 400,
+    "modal_closed": true,
+    "error_visible": false,
+    "errors": [
+      "Request failed with status code 400"
+    ]
+  },
+  {
+    "name": "task_ui_create_valid",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "new_task_category_label_missing_until_reload",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "labels": [
+      ""
+    ]
+  },
+  {
+    "name": "task_edit_stale_card",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 200,
+    "old_title_still_visible": true,
+    "new_title_visible": false
+  },
+  {
+    "name": "task_delete_stale_card",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 204,
+    "deleted_in_database": true,
+    "card_still_visible": true
+  },
+  {
+    "name": "category_id_outside_style_map_crashes_modal",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "errors": [
+      "TypeError: Cannot read properties of undefined (reading 'activeStyle')\n    at http://127.0.0.1:4173/assets/DelegationView-dymY1t-L.js:1:8962\n    at tp (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:30789)\n    at Proxy.<anonymous> (http://127.0.0.1:4173/assets/DelegationView-dymY1t-L.js:1:8757)\n    at po (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:39078)\n    at Ni.N [as fn] (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:48350)\n    at Ni.run (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:5937)\n    at Ni.runIfDirty (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:6247)\n    at Ln (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20835)\n    at Xi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22585)"
+    ]
+  },
+  {
+    "name": "schedule_details_open",
+    "kind": "functional",
+    "confirmed": true,
+    "errors": []
+  },
+  {
+    "name": "schedule_shows_unrelated_delegation_documents",
+    "kind": "functional_bug",
+    "confirmed": false,
+    "unrelated_document_count": 0,
+    "expected_doc_ids": [
+      1
+    ]
+  },
+  {
+    "name": "schedule_deep_link_reload_uses_null_id",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "requests": [
+      {
+        "method": "GET",
+        "path": "/api/cronogramas/null/",
+        "status": 404
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "post_without_image_breaks_mural",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "errors": [
+      "TypeError: Cannot read properties of null (reading 'url')\n    at http://127.0.0.1:4173/assets/BoardView-DVVI6Qo3.js:1:1630\n    at tp (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:30789)\n    at http://127.0.0.1:4173/assets/BoardView-DVVI6Qo3.js:1:1519\n    at r (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22945)\n    at np (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:31335)\n    at Proxy.<anonymous> (http://127.0.0.1:4173/assets/AppLayout-DYZhUaKI.js:1:4408)\n    at po (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:39078)\n    at Ni.N [as fn] (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:48350)\n    at Ni.run (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:5937)\n    at Ni.runIfDirty (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:6247)"
+    ],
+    "card_count": 0
+  },
+  {
+    "name": "email_verification_accepts_arbitrary_token",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "requests_since_token": [
+      {
+        "method": "GET",
+        "path": "/api/turmas/",
+        "status": 200
+      }
+    ]
+  },
+  {
+    "name": "student_invalid_matriculation_accepted",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "signup_creates_unassigned_then_delegation_error",
+    "kind": "functional_bug",
+    "confirmed": false,
+    "url": "/delegacao",
+    "errors": [
+      "TypeError: Cannot read properties of undefined (reading 'length')\n    at ra.fn (http://127.0.0.1:4173/assets/RegisterView-GJaMVOoE.js:1:4252)\n    at Mi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:7350)\n    at get value (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:18938)\n    at Proxy.<anonymous> (http://127.0.0.1:4173/assets/RegisterView-GJaMVOoE.js:1:5767)\n    at po (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:39078)\n    at Ni.N [as fn] (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:48350)\n    at Ni.run (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:5937)\n    at Ni.runIfDirty (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:6247)\n    at Ln (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20835)\n    at Xi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22585)",
+      "TypeError: Cannot read properties of null (reading 'id')\n    at http://127.0.0.1:4173/assets/DelegationView-dymY1t-L.js:1:20894\n    at http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:30114\n    at Ln (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20827)\n    at ft (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:20897)\n    at Ar.t.__weh.t.__weh (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:29994)\n    at Qi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22405)\n    at Xi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:22714)"
+    ]
+  },
+  {
+    "name": "signup_errors_not_rendered",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 400,
+    "error_message_visible": false
+  },
+  {
+    "name": "mobile_delegation_render",
+    "kind": "functional",
+    "confirmed": true,
+    "horizontal_overflow": false,
+    "errors": []
+  },
+  {
+    "name": "mobile_mural_navigates_back_to_delegation",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "path": "/delegacao"
+  },
+  {
+    "name": "mobile_logout_absent",
+    "kind": "functional_bug",
+    "confirmed": true
+  },
+  {
+    "name": "placeholder_chat",
+    "kind": "limitation",
+    "confirmed": true
+  },
+  {
+    "name": "placeholder_historia",
+    "kind": "limitation",
+    "confirmed": true
+  },
+  {
+    "name": "playground_public_and_errors",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "statuses": [
+      {
+        "method": "GET",
+        "path": "/api/usuarios/",
+        "status": 401
+      },
+      {
+        "method": "GET",
+        "path": "/api/tarefas/",
+        "status": 500
+      },
+      {
+        "method": "GET",
+        "path": "/api/cronogramas/",
+        "status": 500
+      },
+      {
+        "method": "GET",
+        "path": "/api/docs/",
+        "status": 500
+      }
+    ]
+  },
+  {
+    "name": "no_404_view",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "app_text_length": 0
+  },
+  {
+    "name": "grades_placeholder",
+    "kind": "limitation",
+    "confirmed": true
+  },
+  {
+    "name": "signup_after_logout_password_undefined",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "errors": [
+      "TypeError: Cannot read properties of undefined (reading 'length')\n    at ra.fn (http://127.0.0.1:4173/assets/RegisterView-GJaMVOoE.js:1:777)\n    at Mi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:7350)\n    at get value (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:18938)\n    at ra.fn (http://127.0.0.1:4173/assets/RegisterView-GJaMVOoE.js:1:873)\n    at Mi (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:7350)\n    at get value (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:18938)\n    at Proxy.<anonymous> (http://127.0.0.1:4173/assets/RegisterView-GJaMVOoE.js:1:2532)\n    at po (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:39078)\n    at Ni.N [as fn] (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:48782)\n    at Ni.run (http://127.0.0.1:4173/assets/index-DNeDnl1Q.js:2:5937)"
+    ]
+  },
+  {
+    "name": "browser_expired_access_refresh",
+    "kind": "functional",
+    "confirmed": true,
+    "refresh_requests": [
+      {
+        "method": "POST",
+        "path": "/api/token/refresh/",
+        "status": 200
+      }
+    ],
+    "errors": []
+  },
+  {
+    "name": "pwa_manifest_icon_paths_404",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "icons": [
+      {
+        "src": "../public/logo-sinuca.svg",
+        "status": 404,
+        "content_type": "text/html;charset=utf-8"
+      },
+      {
+        "src": "../public/logo-sinuca.svg",
+        "status": 404,
+        "content_type": "text/html;charset=utf-8"
+      },
+      {
+        "src": "../public/logo-sinuca.svg",
+        "status": 404,
+        "content_type": "text/html;charset=utf-8"
+      }
+    ]
+  },
+  {
+    "name": "browser_isolation",
+    "kind": "observation",
+    "confirmed": true,
+    "browser": "153.0.8010.36",
+    "external_api_calls": 0,
+    "blocked_external_hosts": [
+      "fonts.googleapis.com"
+    ],
+    "api_target": "127.0.0.1:8765",
+    "service_workers": "blocked for deterministic requests"
+  }
+]

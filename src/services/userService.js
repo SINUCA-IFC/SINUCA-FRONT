@@ -25,4 +25,14 @@ export default class UserService {
     const {data} = await axios.get('/usuarios/');
     return data;
   }
+
+  async getPendingUsers(page = 1) {
+    const { data } = await axios.get('/usuarios/pendentes/', { params: { page } });
+    return data;
+  }
+
+  async approveUser(id, countryId) {
+    const { data } = await axios.post(`/usuarios/${id}/aprovar/`, { country: countryId });
+    return data;
+  }
 };
