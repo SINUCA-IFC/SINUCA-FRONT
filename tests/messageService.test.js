@@ -67,5 +67,86 @@ test('messages arriving during pagination do not duplicate existing messages', a
       results: (config.params.page === 1 ? [3, 2] : [2, 1]).map(message),
     })
   const messages = await new MessageService().getMessages(7)
-  assert.deepEqual(messages.map((item) => item.id), [1, 2, 3])
+  assert.deepEqual(
+    messages.map((item) => item.id),
+    [1, 2, 3],
+  )
+})
+
+test('conversation pages keep server priority and unread counts without duplicate countries', async () => {
+  const { default: MessageService } = await import('../src/services/messageService.js')
+  axios.defaults.adapter = async (config) => {
+    assert.equal(config.url, '/mensagens/conversas/')
+    return response(config, {
+      page: config.params.page,
+      total_pages: 2,
+      results:
+        config.params.page === 1
+          ? [
+              {
+                id: 8,
+                name: 'Brasil',
+                political_name: 'República do Brasil',
+                flag: null,
+                unread_count: 1,
+                last_message_at: '2026-11-11T10:00:00Z',
+              },
+              {
+                id: 3,
+                name: 'Colômbia',
+                political_name: 'República da Colômbia',
+                flag: null,
+                unread_count: 0,
+                last_message_at: '2026-11-11T11:00:00Z',
+              },
+            ]
+          : [
+              {
+                id: 3,
+                name: 'Colômbia',
+                political_name: 'República da Colômbia',
+                flag: null,
+                unread_count: 0,
+                last_message_at: '2026-11-11T11:00:00Z',
+              },
+              {
+                id: 1,
+                name: 'Sem mensagens',
+                political_name: 'País',
+                flag: null,
+                unread_count: 0,
+                last_message_at: null,
+              },
+            ],
+    })
+  }
+  const conversations = await new MessageService().getConversations()
+  assert.deepEqual(
+    conversations.map((item) => [item.id, item.unread_count]),
+    [
+      [8, 1],
+      [3, 0],
+      [1, 0],
+    ],
+  )
+})
+
+test('read receipt sends the last loaded message and its delegation', async () => {
+  const { default: MessageService } = await import('../src/services/messageService.js')
+  axios.defaults.adapter = async (config) => {
+    assert.equal(config.url, '/mensagens/lidas/')
+    assert.deepEqual(JSON.parse(config.data), { country: 7, last_message_id: 23 })
+    return response(config, { country: 7 })
+  }
+  await new MessageService().markAsRead(7, 23)
+})
+
+test('manual unread action targets the selected delegation', async () => {
+  const { default: MessageService } = await import('../src/services/messageService.js')
+  axios.defaults.adapter = async (config) => {
+    assert.equal(config.url, '/mensagens/nao-lidas/')
+    assert.deepEqual(JSON.parse(config.data), { country: 7 })
+    return response(config, { country: 7 })
+  }
+  await new MessageService().markAsUnread(7)
 })

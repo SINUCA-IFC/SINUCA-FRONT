@@ -1,16 +1,15 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BannerComponent from '@/components/layout/BannerComponent.vue'
 import DelegationChatList from '@/components/chat/DelegationChatList.vue'
 import MessageService from '@/services/messageService'
-import { useCountryStore } from '@/stores/countryStore'
 import { useUserStore } from '@/stores/userStore'
 
 const userStore = useUserStore()
-const countryStore = useCountryStore()
 const route = useRoute()
+const router = useRouter()
 const messageService = new MessageService()
 const messages = ref([])
 const draft = ref('')
@@ -22,6 +21,13 @@ const loadError = ref('')
 const sendError = ref('')
 const countriesLoading = ref(false)
 const countriesError = ref('')
+const conversations = ref([])
+const reading = ref(false)
+const markingUnread = ref(false)
+const readError = ref('')
+const lastReadMessageId = ref(0)
+// Um envio novo na tela não confirma mensagens intermediárias ainda não consultadas.
+const lastLoadedMessageId = ref(0)
 const isOrganizer = computed(() => userStore.user.role === 'organizer')
 const showingDelegations = computed(() => isOrganizer.value && !route.params.countryId)
 const countryId = computed(() =>
@@ -29,9 +35,10 @@ const countryId = computed(() =>
 )
 const country = computed(() =>
   isOrganizer.value
-    ? countryStore.countrys.find((item) => item.id === countryId.value)
+    ? conversations.value.find((item) => item.id === countryId.value)
     : userStore.user.country,
 )
+const hasReceivedMessages = computed(() => messages.value.some((message) => !message.is_mine))
 const canChat = computed(
   () =>
     userStore.loggedIn &&
@@ -42,7 +49,10 @@ const subtitle = computed(() => {
   if (showingDelegations.value) return 'Bate-papo com as delegações'
   return `Bate-papo com ${country.value?.name || 'a delegação'}`
 })
+// Cada número invalida as respostas antigas da operação correspondente.
 let requestNumber = 0
+let conversationNumber = 0
+let listRequestNumber = 0
 let refreshTimer
 let disposed = false
 
@@ -64,7 +74,9 @@ async function loadMessages(forceScroll = false) {
     const result = await messageService.getMessages(countryId.value)
     if (request !== requestNumber) return
     messages.value = result
+    lastLoadedMessageId.value = result.reduce((latest, message) => Math.max(latest, message.id), 0)
     if (forceScroll || nearBottom) await scrollToBottom()
+    await markVisibleMessagesRead()
   } catch {
     if (request === requestNumber)
       loadError.value = 'Não foi possível atualizar a conversa. Tente novamente.'
@@ -76,9 +88,57 @@ async function loadMessages(forceScroll = false) {
   }
 }
 
+async function markVisibleMessagesRead() {
+  if (disposed || document.visibilityState !== 'visible' || reading.value || markingUnread.value)
+    return
+  if (!countryId.value || !history.value || !messages.value.length) return
+  if (history.value.scrollHeight - history.value.scrollTop - history.value.clientHeight > 80) return
+
+  const lastId = lastLoadedMessageId.value
+  if (lastId <= lastReadMessageId.value) return
+  const conversation = conversationNumber
+  reading.value = true
+  readError.value = ''
+  try {
+    await messageService.markAsRead(countryId.value, lastId)
+    if (conversation === conversationNumber) lastReadMessageId.value = lastId
+  } catch {
+    if (conversation === conversationNumber)
+      readError.value = 'Não foi possível confirmar a leitura. Tente atualizar a conversa.'
+  } finally {
+    if (conversation === conversationNumber) reading.value = false
+  }
+}
+
+async function markAsUnread() {
+  if (!countryId.value || refreshing.value || reading.value || sending.value || markingUnread.value)
+    return
+  const conversation = conversationNumber
+  markingUnread.value = true
+  readError.value = ''
+  try {
+    await messageService.markAsUnread(countryId.value)
+    if (conversation === conversationNumber)
+      await router.push(isOrganizer.value ? '/chat' : '/mural')
+  } catch {
+    if (conversation === conversationNumber)
+      readError.value = 'Não foi possível marcar como não lida. Tente novamente.'
+  } finally {
+    if (conversation === conversationNumber) markingUnread.value = false
+  }
+}
+
 async function sendMessage() {
   const text = draft.value.trim()
-  if (!text || text.length > 2000 || sending.value || !canChat.value || !countryId.value) return
+  if (
+    !text ||
+    text.length > 2000 ||
+    sending.value ||
+    markingUnread.value ||
+    !canChat.value ||
+    !countryId.value
+  )
+    return
   const destination = countryId.value
   const sender = userStore.user.id
   sending.value = true
@@ -107,15 +167,35 @@ function handleEnter(event) {
   sendMessage()
 }
 
-async function loadCountries() {
+async function loadConversations() {
+  if (disposed || !isOrganizer.value || !canChat.value) return
+  const request = ++listRequestNumber
   countriesLoading.value = true
   countriesError.value = ''
   try {
-    await countryStore.getCountrys()
+    const result = await messageService.getConversations()
+    if (request === listRequestNumber) conversations.value = result
   } catch {
-    if (!disposed) countriesError.value = 'Não foi possível carregar as delegações.'
+    if (request === listRequestNumber)
+      countriesError.value = 'Não foi possível carregar as delegações.'
   } finally {
-    if (!disposed) countriesLoading.value = false
+    if (request === listRequestNumber) countriesLoading.value = false
+  }
+}
+
+function refreshVisibleChat() {
+  if (
+    document.visibilityState !== 'visible' ||
+    refreshing.value ||
+    sending.value ||
+    reading.value ||
+    markingUnread.value
+  )
+    return
+  if (showingDelegations.value) {
+    if (!countriesLoading.value) loadConversations()
+  } else {
+    loadMessages()
   }
 }
 
@@ -123,29 +203,38 @@ watch(
   [() => userStore.user.id, countryId, canChat],
   () => {
     requestNumber += 1
+    conversationNumber += 1
+    listRequestNumber += 1
     messages.value = []
     draft.value = ''
     loadError.value = ''
     sendError.value = ''
     loading.value = false
     refreshing.value = false
+    reading.value = false
+    markingUnread.value = false
+    lastReadMessageId.value = 0
+    lastLoadedMessageId.value = 0
+    readError.value = ''
+    conversations.value = []
+    if (isOrganizer.value) loadConversations()
     loadMessages(true)
   },
   { immediate: true },
 )
 
 onMounted(() => {
-  refreshTimer = setInterval(() => {
-    if (document.visibilityState === 'visible' && !refreshing.value && !sending.value)
-      loadMessages()
-  }, 10000)
-  if (isOrganizer.value) loadCountries()
+  refreshTimer = setInterval(refreshVisibleChat, 10000)
+  document.addEventListener('visibilitychange', refreshVisibleChat)
 })
 
 onUnmounted(() => {
   disposed = true
   requestNumber += 1
+  conversationNumber += 1
+  listRequestNumber += 1
   clearInterval(refreshTimer)
+  document.removeEventListener('visibilitychange', refreshVisibleChat)
 })
 </script>
 
@@ -180,26 +269,42 @@ onUnmounted(() => {
 
       <DelegationChatList
         v-else-if="showingDelegations"
-        :countries="countryStore.countrys"
-        :loading="countriesLoading"
+        :countries="conversations"
+        :loading="countriesLoading && !conversations.length"
         :error="countriesError"
-        @retry="loadCountries"
+        @retry="loadConversations"
       />
 
       <template v-else>
         <section class="chat-panel" aria-label="Conversa com a organização">
           <div class="conversation-tools">
-            <RouterLink v-if="isOrganizer" to="/chat" class="back-to-delegations">
+            <RouterLink
+              v-if="isOrganizer"
+              to="/chat"
+              class="back-to-delegations"
+              aria-label="Voltar às delegações"
+            >
               <span class="mdi mdi-arrow-left" aria-hidden="true"></span>
-              Delegações
+              Voltar
             </RouterLink>
-            <span v-if="isOrganizer && country">{{ country.name }}</span>
-            <span v-else class="visually-hidden">Mensagens da sua delegação e da organização</span>
+            <span class="visually-hidden">Mensagens da delegação e da organização</span>
+            <button
+              v-if="countryId"
+              type="button"
+              class="mark-unread-button"
+              :disabled="!hasReceivedMessages || refreshing || reading || sending || markingUnread"
+              aria-label="Marcar como não lida"
+              title="Marcar como não lida"
+              @click="markAsUnread"
+            >
+              <span class="mdi mdi-email-mark-as-unread" aria-hidden="true"></span>
+              Não lida
+            </button>
             <button
               v-if="countryId"
               type="button"
               class="refresh-button"
-              :disabled="refreshing || sending"
+              :disabled="refreshing || reading || sending || markingUnread"
               aria-label="Atualizar conversa"
               @click="loadMessages()"
             >
@@ -207,6 +312,7 @@ onUnmounted(() => {
             </button>
           </div>
           <p v-if="loadError" class="chat-error" role="alert">{{ loadError }}</p>
+          <p v-if="readError" class="chat-error read-error" role="alert">{{ readError }}</p>
           <div
             ref="history"
             class="message-history"
@@ -214,6 +320,7 @@ onUnmounted(() => {
             aria-label="Mensagens"
             aria-live="polite"
             aria-relevant="additions"
+            @scroll.passive="markVisibleMessagesRead"
           >
             <p v-if="!countryId" class="chat-empty">
               Selecione uma delegação para abrir a conversa.
@@ -264,13 +371,13 @@ onUnmounted(() => {
                 rows="1"
                 maxlength="2000"
                 placeholder="Mensagem"
-                :disabled="sending"
+                :disabled="sending || markingUnread"
                 @keydown.enter.exact="handleEnter"
               ></textarea>
               <button
                 type="submit"
                 class="send-button"
-                :disabled="sending || !draft.trim()"
+                :disabled="sending || markingUnread || !draft.trim()"
                 :aria-label="sending ? 'Enviando mensagem' : 'Enviar mensagem'"
               >
                 <span v-if="sending" class="mdi mdi-loading" aria-hidden="true"></span>
@@ -383,6 +490,20 @@ onUnmounted(() => {
   justify-content: flex-end;
   padding: 0.25rem 0.5rem 0;
   gap: 1rem;
+}
+.mark-unread-button {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #01295f;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
 }
 .back-to-delegations {
   display: flex;

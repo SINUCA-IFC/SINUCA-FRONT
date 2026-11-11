@@ -10,17 +10,28 @@ defineEmits(['retry'])
 <template>
   <nav class="delegation-conversations" aria-label="Conversas por delegação">
     <p v-if="loading" class="list-status" role="status">Carregando delegações...</p>
-    <div v-else-if="error" class="list-status">
+    <div v-if="error" class="list-status">
       <p role="alert">{{ error }}</p>
       <button type="button" @click="$emit('retry')">Tentar novamente</button>
     </div>
-    <p v-else-if="!countries.length" class="list-status">Nenhuma delegação cadastrada.</p>
-    <ul v-else class="delegation-list">
+    <p v-if="!loading && !error && !countries.length" class="list-status">
+      Nenhuma delegação cadastrada.
+    </p>
+    <ul v-if="countries.length" class="delegation-list">
       <li v-for="country in countries" :key="country.id">
         <RouterLink
           :to="{ name: 'chat', params: { countryId: country.id } }"
           class="delegation-card"
         >
+          <span
+            v-if="country.unread_count > 0"
+            class="unread-badge"
+            :class="{ 'unread-badge--many': country.unread_count > 99 }"
+            :aria-label="`${country.unread_count} mensagens não lidas`"
+          >
+            <img src="/static/chat-unread-badge.svg" alt="" aria-hidden="true" />
+            <span>{{ country.unread_count > 99 ? '99+' : country.unread_count }}</span>
+          </span>
           <div class="delegation-info">
             <h2>{{ country.name }}</h2>
             <p>{{ country.political_name }}</p>
@@ -69,6 +80,28 @@ defineEmits(['retry'])
   min-width: 0;
   overflow-wrap: anywhere;
 }
+.unread-badge {
+  display: grid;
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.unread-badge img {
+  position: absolute;
+}
+.unread-badge span {
+  position: relative;
+}
+.unread-badge--many {
+  font-size: 0.625rem;
+}
 .delegation-info h2 {
   font-size: 1.125rem;
   font-weight: 500;
@@ -105,15 +138,8 @@ defineEmits(['retry'])
 }
 @media (max-width: 359px) {
   .delegation-card {
-    grid-template-columns: minmax(0, 1fr) 40px;
-    gap: 0.75rem;
+    gap: 0.5rem;
     padding-right: 1rem;
-  }
-  .delegation-info {
-    grid-column: 1;
-  }
-  .delegation-flag {
-    grid-column: 2;
   }
 }
 </style>

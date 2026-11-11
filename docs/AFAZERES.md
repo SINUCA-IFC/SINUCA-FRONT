@@ -28,15 +28,24 @@ Os IDs F e S remetem à auditoria. Esta ordem é de planejamento e não represen
 
 ## Chat básico — concluído localmente em 11/11/2026
 
-A tela mobile e desktop usa os frames do Figma e a API existente. Alunos com delegação compartilham a conversa do seu país com a organização. Para organizadores, `/chat` apresenta cartões com nome, nome político e bandeira; selecionar um cartão abre `/chat/ID`, com opção de voltar à lista. Pendentes e avaliadores não acessam mensagens. A interface permite consultar o histórico, enviar texto e tentar novamente após falhas. Atualiza a conversa a cada dez segundos enquanto a página está visível e permite atualização manual. A API limita mensagens a 2.000 caracteres e rejeita filtros de país inválidos com erro 400. Não exige migração.
+A tela mobile e desktop usa os frames do Figma e a API existente. Alunos com delegação compartilham a conversa do seu país com a organização. Para organizadores, `/chat` apresenta cartões com nome, nome político, bandeira e contador de não lidas; selecionar um cartão abre `/chat/ID`, com opção de voltar à lista. A lista prioriza conversas não lidas e, dentro de cada grupo, a atividade mais recente. Cada usuário tem sua própria leitura. Pendentes e avaliadores não acessam mensagens. A interface permite consultar o histórico, enviar texto, marcar como não lida e tentar novamente após falhas. Atualiza a conversa e a lista a cada dez segundos enquanto a página está visível. A API limita mensagens a 2.000 caracteres e rejeita filtros de país inválidos com erro 400. O controle de leitura acrescenta a migração `core/0028_message_read`.
 
 - [ ] Validar o fluxo entre participantes e organizadores no ambiente dedicado, antes de publicar.
 - [ ] Confirmar com a equipe se haverá também conversa individual por aluno. O chat atual é compartilhado pela delegação.
-- [ ] Implementar contagem de mensagens não lidas por organizador e delegação, incluindo registro de leitura no servidor, antes de exibir os selos numéricos do Figma. A API atual não fornece essa contagem; a interface não exibe valores fictícios.
-- [ ] Definir notificações de mensagens, se necessárias. Não há entrega de notificações.
+- [x] Implementar contagem de mensagens não lidas por usuário e delegação, leitura automática, ação manual e ordenação no servidor. Detalhes em [leitura do chat](architecture/CHAT-LEITURA.md).
+- [ ] Aplicar a migração de leitura no ambiente que executará a nova API e validar o fluxo antes da publicação.
 - [ ] Reavaliar paginação e atualização conforme o volume real: a versão simples consulta todo o histórico, sem WebSocket.
 
 Contrato e verificações: [integração front/back](architecture/INTEGRACAO-FRONT-BACK.md#chat-por-delegação).
+
+## Notificações — trabalho futuro
+
+Solicitado em 11/11/2026. O contador do chat representa mensagens não lidas; a entrega de notificações ainda será desenvolvida.
+
+- [ ] Notificar novas postagens do mural: definir destinatários, preferências e o evento de publicação que gera o aviso.
+- [ ] Criar a central de notificações na aplicação, com listagem e estados lida/não lida. Definir quais eventos entram nela, incluindo mensagens, tarefas e cronogramas.
+- [ ] Definir e implementar os canais necessários, como avisos dentro do site, push do PWA ou e-mail, com permissão e preferência do usuário.
+- [ ] Evitar avisos duplicados e testar destinatários, leitura, falhas e novas tentativas. O campo de notificação já existente em tarefas não comprova entrega de avisos.
 
 ## Verificação real de e-mail — prioridade alta
 
