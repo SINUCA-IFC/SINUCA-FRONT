@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export default class PostService {
-    async getPosts() {
-        const { data } = await axios.get('/postagens/');
+    async getPosts(page = 1) {
+        const { data } = await axios.get('/postagens/', { params: { page } });
         return data;
     }
     async getPost(id) {

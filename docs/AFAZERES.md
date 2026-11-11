@@ -6,23 +6,46 @@ Atualizado em 11/11/2026. Esta lista registra trabalho futuro e identifica as co
 
 Prioridades reorganizadas a pedido da equipe em 06/11/2026. S07 e S08 receberam correções locais a pedido da equipe em 11/11/2026; ver [permissões e uploads](architecture/SEGURANCA-S07-S08.md). S06 continua na preparação para publicação.
 
+Em 11/11/2026 também foram concluídas localmente as correções de tarefas, categorias/fotos ausentes e paginação abaixo. Foram validadas com 74 testes no backend, 14 testes de services/stores, build e seis cenários de navegador com API simulada. Esta etapa não exige nova migração.
+
 | Ordem | Correção ou task | Resultado esperado |
 | --- | --- | --- |
-| 1 | Corrigir criação, edição e exclusão de tarefas (F03–F06). | Converter datas opcionais vazias para `null`, aguardar a API antes de fechar o modal, mostrar erros, normalizar categorias e IDs e atualizar o quadro após salvar ou excluir. |
-| 2 | Tratar categorias sem estilo e postagens sem foto (F07/F08). | Usar apresentação padrão para evitar que dados válidos quebrem o formulário ou o mural. |
-| 3 | Implementar paginação nas listas (F11). | Permitir consultar todos os registros e definir ordenação estável no backend; esclarecer o alcance de filtros e contagens. |
+| 1 | Concluído localmente: criação, edição e exclusão de tarefas (F03–F06). | Datas opcionais vazias viram `null`; validações são exibidas no formulário; respostas de escrita incluem categorias completas; IDs de rota são comparados corretamente. A espera pela API antes de fechar o modal foi preservada. |
+| 2 | Concluído localmente: categorias sem estilo e postagens sem foto (F07/F08). | Categorias novas recebem ícone e fundo padrão; postagem sem foto permanece visível, sem imagem. |
+| 3 | Concluído localmente: paginação nas listas (F11). | Oito stores percorrem todas as páginas antes de atualizar a lista. Filtros e contagens usam a coleção completa; as consultas do backend têm ordenação estável. A API de pendentes continua explicitamente paginada. |
 | 4 | Criar a tela administrativa de aprovação. | Listar alunos pendentes e atribuir uma delegação usando as APIs e os métodos de service/store existentes. |
 | 5 | Criar a tela de conta e configurações e corrigir o estado de sessão (F12). | Consultar/editar o perfil, sair pelo celular ou desktop e limpar a sessão após falha de renovação. Escopo detalhado abaixo. |
 | 6 | Corrigir cronogramas e documentos (F09/F10/F18). | Abrir atividades diretamente pela URL, mostrar somente os documentos vinculados e permitir salvar links com o país correto. |
 | 7 | Implementar a verificação real de e-mail. | Substituir a etapa de token simulada pelo fluxo integrado descrito abaixo. |
 | 8 | Completar convites e fluxos por papel (F02). | Validar convites de organizadores no servidor e definir as operações de organizadores e avaliadores. |
-| 9 | Corrigir navegação e validações complementares. | Revisar atalhos mobile (F16/F17), matrícula (F14), parâmetro de país em mensagens (F19), datas invertidas (F20) e página 404 (F26). |
-| 10 | Definir e implementar os próximos recursos do evento. | Priorizar chat, notas, histórico e notificações com a equipe; esses fluxos ainda têm integração incompleta ou inexistente (F23/F24). |
+| 9 | Corrigir navegação e validações complementares. | Revisar atalhos mobile (F16/F17), matrícula (F14), datas invertidas (F20) e página 404 (F26). O filtro de país em mensagens (F19) foi corrigido junto ao chat. |
+| 10 | Definir e implementar os próximos recursos do evento. | Priorizar notas, histórico e notificações com a equipe; esses fluxos ainda têm integração incompleta ou inexistente (F23/F24). O chat básico foi integrado; detalhes abaixo. |
 
 - [ ] Separar a URL da API por ambiente para permitir desenvolvimento e testes com dados isolados.
 - [ ] Validar cada entrega com os papéis envolvidos e dados de teste, incluindo navegação mobile e desktop.
 
 Os IDs F e S remetem à auditoria. Esta ordem é de planejamento e não representa uma nova rodada de reprodução de todos os achados.
+
+## Chat básico — concluído localmente em 11/11/2026
+
+A tela mobile e desktop usa os frames do Figma e a API existente. Alunos com delegação compartilham a conversa do seu país com a organização. Para organizadores, `/chat` apresenta cartões com nome, nome político, bandeira e contador de não lidas; selecionar um cartão abre `/chat/ID`, com opção de voltar à lista. A lista prioriza conversas não lidas e, dentro de cada grupo, a atividade mais recente. Cada usuário tem sua própria leitura. Pendentes e avaliadores não acessam mensagens. A interface permite consultar o histórico, enviar texto, marcar como não lida e tentar novamente após falhas. Atualiza a conversa e a lista a cada dez segundos enquanto a página está visível. A API limita mensagens a 2.000 caracteres e rejeita filtros de país inválidos com erro 400. O controle de leitura acrescenta a migração `core/0028_message_read`.
+
+- [ ] Validar o fluxo entre participantes e organizadores no ambiente dedicado, antes de publicar.
+- [ ] Confirmar com a equipe se haverá também conversa individual por aluno. O chat atual é compartilhado pela delegação.
+- [x] Implementar contagem de mensagens não lidas por usuário e delegação, leitura automática, ação manual e ordenação no servidor. Detalhes em [leitura do chat](architecture/CHAT-LEITURA.md).
+- [ ] Aplicar a migração de leitura no ambiente que executará a nova API e validar o fluxo antes da publicação.
+- [ ] Reavaliar paginação e atualização conforme o volume real: a versão simples consulta todo o histórico, sem WebSocket.
+
+Contrato e verificações: [integração front/back](architecture/INTEGRACAO-FRONT-BACK.md#chat-por-delegação).
+
+## Notificações — trabalho futuro
+
+Solicitado em 11/11/2026. O contador do chat representa mensagens não lidas; a entrega de notificações ainda será desenvolvida.
+
+- [ ] Notificar novas postagens do mural: definir destinatários, preferências e o evento de publicação que gera o aviso.
+- [ ] Criar a central de notificações na aplicação, com listagem e estados lida/não lida. Definir quais eventos entram nela, incluindo mensagens, tarefas e cronogramas.
+- [ ] Definir e implementar os canais necessários, como avisos dentro do site, push do PWA ou e-mail, com permissão e preferência do usuário.
+- [ ] Evitar avisos duplicados e testar destinatários, leitura, falhas e novas tentativas. O campo de notificação já existente em tarefas não comprova entrega de avisos.
 
 ## Verificação real de e-mail — prioridade alta
 

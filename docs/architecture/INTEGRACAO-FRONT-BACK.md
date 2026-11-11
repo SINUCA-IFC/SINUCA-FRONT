@@ -1,6 +1,6 @@
 # Integração entre front e back — SINUCA
 
-Revisão inicial: 03/11/2026; atualização de permissões e uploads em 11/11/2026. Escopo: os oito services, os nove stores, o cliente Axios, os consumidores Vue e as rotas da API Django dos dois repositórios locais. A análise dos contratos é estática, complementada pelos testes descritos ao final. Ela não equivale a testar cada operação em produção.
+Revisão inicial: 03/11/2026; atualização de permissões, uploads e chat em 11/11/2026. Escopo atual: os nove services, os nove stores, o cliente Axios, os consumidores Vue e as rotas da API Django dos dois repositórios locais. A análise dos contratos é estática, complementada pelos testes descritos abaixo. Ela não equivale a testar cada operação em produção.
 
 ## Como as camadas se relacionam
 
@@ -22,7 +22,7 @@ flowchart LR
 
 O service devolve `response.data`; ele não transforma os contratos nem conserva estado. O store mantém listas e objetos reativos para as telas. O back decide permissões, isolamento de delegações e persistência. Esconder um botão ou mudar `userType` no navegador não concede nem retira permissões do servidor.
 
-Em [main.js](../../src/main.js), o plugin Axios configura a mesma instância importada pelos services. [axios.js](../../src/plugins/axios.js) fixa a base na API publicada, acrescenta o access token salvo em `localStorage` e tenta renovar respostas 401. **Executar o front local normalmente ainda aponta para o back publicado.** Nos testes desta revisão, todas essas chamadas foram interceptadas e encaminhadas ao Django de teste em memória.
+Em [main.js](../../src/main.js), o plugin Axios configura a mesma instância importada pelos services. [axios.js](../../src/plugins/axios.js) fixa a base na API publicada, acrescenta o access token salvo em `localStorage` e tenta renovar respostas 401. **Executar o front local normalmente ainda aponta para o back publicado.** Na validação inicial de S05, essas chamadas foram interceptadas e encaminhadas ao Django de teste em memória. Os testes posteriores com API simulada estão identificados nas respectivas seções; nenhum teste desta revisão acessou a API publicada.
 
 Os caminhos abaixo começam com `/api`. O Axios combina tanto `/tarefas/` quanto `turmas/1` com a base `/api`; a ausência da primeira barra no segundo caso não remove o prefixo. Alguns métodos de detalhe omitem a barra final e provocam redirecionamento para a rota do Django com barra. Esse 301 foi observado em `/paises/1` no teste de navegador.
 
@@ -39,6 +39,7 @@ Os caminhos abaixo começam com `/api`. O Axios combina tanto `/tarefas/` quanto
 | [scheduleService](../../src/services/scheduleService.js), [scheduleStore](../../src/stores/scheduleStore.js) | `getSchedules`: GET `/cronogramas/`; `getSchedule`: GET `/cronogramas/{id}/`; `createSchedule`: POST; `updateSchedule`: PATCH; `deleteSchedule`: DELETE | Cronogramas e detalhe de atividade. Lista e modal usam os dados; playground possui chamadas de teste. O back restringe objetos por país, com exceção para superusuários. |
 | [linkService](../../src/services/linkService.js), [linkStore](../../src/stores/linkStore.js) | `getLinks`: GET `/docs/`; `getLink`: GET `/docs/{id}/`; `createLink`: POST; `updateLink`: PATCH; `deleteLink`: DELETE | Documentos representados por links. Lista de documentos, item, modal de cronograma e playground usam esse estado. O back restringe objetos por país, com exceção para superusuários. |
 | Sem service: [statusStore](../../src/stores/statusStore.js) | Nenhuma chamada HTTP | Calcula “a fazer”, “em andamento” e “concluído” filtrando a lista do `taskStore` pelos números 1, 2 e 3. Não grava mudanças de status no servidor. |
+| [messageService](../../src/services/messageService.js), sem store próprio | `getMessages(country)`: GET `/mensagens/?country=ID&page=N`; `sendMessage(text, country)`: POST `/mensagens/`; `getConversations()`: GET `/mensagens/conversas/`; `markAsRead(country, lastMessageId)`: POST `/mensagens/lidas/`; `markAsUnread(country)`: POST `/mensagens/nao-lidas/` | Estado local em `ChatView`: conversa, lista de delegações, rascunho, leitura e erros. Mensagens ficam em ordem cronológica; as conversas preservam a prioridade recebida do servidor. |
 
 `userStore.uploadImage` é uma exceção à separação: envia `FormData` diretamente pelo Axios para POST `/media/images/`, sem um service próprio. Agora exige login e não é usado pelo cadastro, que envia a foto junto ao registro. O refresh automático também é feito diretamente pelo interceptor, embora exista `userService.refreshToken`.
 
@@ -52,7 +53,7 @@ O [paginador](../../../SINUCA-BACK/app/pagination.py) devolve:
 {"page": 1, "page_size": 10, "total_pages": 2, "results": []}
 ```
 
-Por padrão são dez itens; `page_size` pode chegar a 100. As ações existentes de listagem extraem apenas `results`, sem percorrer páginas nem expor navegação. Isso afeta tarefas, colegas, postagens, cronogramas, links, países, categorias e turmas. O `statusStore` e os filtros visuais trabalham apenas sobre os itens carregados. A listagem administrativa nova aceita `page` e devolve o envelope completo ao chamador, além de atualizar `pendingUsers`.
+Por padrão são dez itens; `page_size` pode chegar a 100. Desde a correção de 11/11/2026, os services de listagem aceitam `page` e os stores usam `getAllPages(fetchPage)` para carregar tarefas, colegas, postagens, cronogramas, links, países, categorias e turmas até `total_pages`. A atribuição à store acontece somente quando todas as páginas foram recebidas; falhas preservam a lista anterior. O `statusStore`, filtros e contagens usam a coleção completa, sem novos controles de página na interface. As consultas do backend possuem ordenação explícita, com desempate por ID nos cronogramas. A listagem administrativa de pendentes continua aceitando `page` e devolvendo o envelope completo ao chamador, além de atualizar `pendingUsers`.
 
 ### Usuários, cadastro e sessão
 
@@ -71,11 +72,11 @@ O [serializer de tarefas](../../../SINUCA-BACK/core/serializers/task.py) usa tr�
 | --- | --- |
 | GET coleção | `id`, `title`, categorias como objetos, `endDate`, `status` |
 | GET detalhe | Dados da tarefa, categorias como objetos, criador e responsáveis como resumos `id/name/foto` |
-| POST/PATCH/PUT | Categorias e responsáveis como listas de IDs; a resposta de escrita também usa IDs nessas relações |
+| POST/PATCH/PUT | Entrada com categorias e responsáveis como listas de IDs; resposta no mesmo formato do detalhe, com categorias completas e resumos seguros de usuários |
 
 Uma criação válida precisa de título, status, pelo menos uma categoria e pelo menos um responsável. Essa obrigatoriedade das listas foi conferida nos campos efetivos do serializer. Datas de tarefa usam `YYYY-MM-DD` ou `null`; strings vazias não representam ausência de data para a API. O criador é definido pela sessão no servidor. Responsáveis precisam pertencer à delegação do solicitante, salvo o acesso global de superusuário.
 
-O modal converte relações do detalhe em IDs para editar. Porém o store insere a resposta de escrita diretamente no quadro, que espera categorias como objetos. Além disso, edição/exclusão com ID string da rota usam comparação estrita com IDs numéricos. Esses contratos ainda precisam ser normalizados.
+O modal converte relações do detalhe em IDs para editar. O service transforma datas opcionais vazias em `null`, sem alterar o formulário nem limpar campos omitidos em PATCH. A resposta de escrita já pode ser inserida no quadro, pois usa categorias como objetos. Edição/exclusão com ID string da rota comparam IDs normalizados como texto. O formulário exige categoria e responsável e mantém erros da API visíveis sem fechar o modal. O getter de estilo e os componentes de categoria usam ícone e fundo padrão para IDs desconhecidos; o mural aceita foto nula.
 
 ### Cronogramas e links
 
@@ -89,11 +90,31 @@ Postagens retornam título, conteúdo, data e foto como objeto ou `null`. Para a
 
 Países retornam `id`, `name`, `political_name` e `flag`, com `flag_attachment_key` para associação na escrita. Turmas usam `name` e `courses` (`INFO`, `AGRO` ou `QUIMI`). Categorias de tarefas possuem ID e nome; seus ícones não vêm da API, mas de um mapa fixo no front.
 
+## Chat por delegação
+
+Implementado em 11/11/2026 em [ChatView](../../src/views/ChatView.vue), com o layout compartilhado da aplicação. As rotas `/chat` e `/chat/ID` exigem login. O estado permanece na própria tela, sem adicionar um store ou biblioteca.
+
+- Alunos com delegação leem e escrevem somente na conversa do próprio país. Todos os participantes dessa delegação veem as mesmas mensagens, inclusive quando enviadas por outro aluno.
+- Organizadores veem em `/chat` a [lista de delegações](../../src/components/chat/DelegationChatList.vue), com cartões de nome, nome político e bandeira vindos da API. A lista percorre todas as páginas e oferece estados de carregamento, erro com nova tentativa e lista vazia. Abrir um cartão navega para `/chat/ID`; a conversa mostra o nome do país no banner e permite voltar à lista. Abrir a URL diretamente também funciona. Nenhuma consulta de mensagens ocorre enquanto a lista está aberta.
+- Pendentes e avaliadores recebem uma explicação na interface; a API nega leitura e escrita. Alunos continuam usando o país da própria conta, mesmo se alterarem o ID na URL. A permissão existente não concede exceção automática a superusuários sem papel/delegação compatíveis.
+- GET devolve `id`, `country`, `creator`, `creator_name`, `from_organization`, `text`, `created_at` e `is_mine`. O backend pagina por data decrescente, com desempate por ID; o service organiza o resultado completo do mais antigo para o mais novo e elimina duplicatas causadas por inserções entre páginas.
+- POST recebe `text` e `country`. O servidor define o autor e, para alunos, força a delegação da conta. O organizador precisa informar um país válido. Texto vazio ou com mais de 2.000 caracteres retorna 400. Filtro de país não inteiro ou não positivo retorna 400 para organizadores (F19).
+- Enter envia; Shift+Enter insere uma quebra de linha. O envio fica bloqueado enquanto aguarda a resposta. Falha de envio mantém o rascunho; falha de leitura preserva o histórico anterior. Mensagens são renderizadas como texto, sem interpretar HTML.
+- A atualização automática consulta a API a cada dez segundos, com a página visível e sem outra consulta ou envio em andamento. Há botão de atualização manual. Respostas antigas são ignoradas após troca de conversa, identidade ou saída da tela; a saída encerra o temporizador.
+
+A implementação usa consulta periódica de todo o histórico, adequada como versão inicial simples. Inclui contagem de não lidas e leitura por usuário, descritas em [CHAT-LEITURA.md](CHAT-LEITURA.md). Não inclui WebSocket, entrega de notificações ou conversa individual por aluno. Esses recursos e a estratégia para históricos grandes precisam ser definidos conforme o uso. O controle de leitura acrescenta o model `MessageRead` e exige a migração `core/0028_message_read`.
+
+O rodapé de organizadores usa a ordem Mural, Chat, História e Perfil do Figma; alunos mantêm a navegação anterior. O item Perfil reutiliza a rota `/delegacao` existente: a tela específica de conta continua prevista nos afazeres. O banner ganhou um slot opcional de subtítulo para a bandeira da conversa, preservando o texto padrão nas outras telas. Os selos numéricos recebem a contagem real de `GET /mensagens/conversas/`, ordenada no servidor antes da paginação. O service percorre as páginas e mantém essa ordem. As contagens ficam no estado local do chat, sem modificar o `countryStore` público.
+
+Validação inicial do chat: suíte completa com **82 testes de backend**, **18 testes de services/stores** (quatro do chat) e build passaram. `check` não apontou problemas e `makemigrations --check --dry-run` não identificou mudanças. **17 cenários no Chrome**, com APIs interceptadas e dados fictícios, cobriram seis tamanhos entre 320×568 e 1440×1024, histórico paginado, envio e nova tentativa, Enter/Shift+Enter, atualização automática, seleção de país no celular, respostas atrasadas, conversa vazia, saída durante carregamento e restrições de acesso. Não houve erros JavaScript nesses cenários. A API Django foi testada separadamente com SQLite em memória; não houve publicação nem escrita em banco real. A revisão independente não deixou bloqueios pendentes.
+
+Validação da correção da tela de organizadores: build e `npm test` passaram novamente. **25 cenários de chat no Chrome** verificaram também lista com doze países em duas páginas, cartões, abertura e retorno, URL direta, envio ao país aberto, troca rápida de conversa, lista vazia, falha de carregamento com nova tentativa e aluno tentando outro país pela URL. Foram usados seis tamanhos entre 320 e 1440 px; as capturas da lista em 440 e 1440 px foram inspecionadas. Outros **seis cenários de mural e tarefas** passaram após os ajustes no banner e na navegação. Todas as APIs foram simuladas, sem erros JavaScript nesses testes e sem acesso à produção. A revisão independente não apontou bloqueios. Esta correção adicional alterou somente o front e a documentação.
+
 ## APIs sem integração completa no front
 
 | API | Situação |
 | --- | --- |
-| GET/POST `/mensagens/`, GET `/mensagens/{id}/` | Existem no back, mas não há service/store de chat; a tela continua em construção. A API permite organizadores e alunos com delegação, não avaliadores. O filtro é por país; o chat não é individual por delegado. O superusuário não recebe exceção explícita nessa permissão de mensagens. |
+| GET `/mensagens/{id}/` | Disponível no backend. O chat integrado usa a coleção GET/POST descrita acima, sem precisar consultar cada mensagem individualmente. |
 | GET/POST `/media/images/` | Exige autenticação; lista somente arquivos próprios. Propriedade, limites e cotas estão descritos em [S07/S08](SEGURANCA-S07-S08.md). A foto do cadastro segue diretamente em `/registro/`. |
 | GET/POST `/media/documents/` | Não há service/store correspondente. É upload de PDF, diferente dos links de `/docs/`; a criação retorna metadados/chave de associação. A tela de documentos atual exibe URLs de links. |
 | POST `/token/verify/` | Existe no back, sem wrapper no front. O front verifica a sessão consultando `/usuarios/me/`. |
@@ -124,17 +145,15 @@ Alunos que já tinham país antes da correção mantêm o vínculo. Como a vers�
 
 | Prioridade | Problema e efeito | Referência |
 | --- | --- | --- |
-| Alta | Stores ignoram as páginas seguintes; filtros e contagens deixam dados de fora. | F11 da auditoria; todos os stores de listas |
-| Alta | Formulário de tarefa começa com datas vazias e relações vazias; a API rejeita esses valores. O modal fecha sem aguardar erro/sucesso. | F03; `taskStore` e `CreatTaskModal` |
-| Alta | Escrita de tarefa devolve IDs de categoria, enquanto o quadro espera objetos; IDs string também impedem atualização/exclusão local. | F04–F06; `taskStore` |
-| Alta | ID de categoria fora do mapa fixo pode quebrar seleção; postagem sem foto pode quebrar o mural. | F07/F08; `categoryStore`, modal e `BoardView` |
 | Média | O serializer de links agora aceita delegações, mas o formulário/store ainda precisa enviar uma lista válida em vez do placeholder `country: 0`. | F18 |
 | Média | Modal de cronograma exibe todos os links da delegação em vez de usar `schedule.docs`. Abertura direta da rota usa ID local nulo. | F09/F10 |
 | Média | Falha de refresh limpa tokens no interceptor, mas pode deixar `loggedIn` verdadeiro. O guard desvia novamente ao entrar. Logout também não revoga o refresh no servidor. | F12 e riscos de sessão |
 | Média | Outros stores de dados privados não são limpos pelo logout; convém invalidá-los ao trocar de conta para evitar estado antigo durante carregamentos. | `taskStore`, `scheduleStore`, `linkStore` |
-| Média | Fluxos administrativos, chat, notas e notificações têm integração incompleta ou inexistente. | F02, F23/F24 |
+| Média | Fluxos administrativos, notas e notificações têm integração incompleta ou inexistente. O chat básico está integrado; conversa individual e notificações continuam sem implementação. | F02, F23/F24 |
 
-A [auditoria](../../AUDITORIA-2026-10-27.md) contém os demais riscos, reproduções históricas e acompanhamentos. Esses problemas não foram corrigidos em conjunto com S05.
+A [auditoria](../../AUDITORIA-2026-10-27.md) contém os demais riscos, reproduções históricas e acompanhamentos. F03–F08 e F11 receberam correções locais em 11/11/2026, descritas acima. A tabela mantém apenas as pendências desse levantamento.
+
+Validação desta atualização: 74 testes de backend e 14 testes de services/stores passaram; `npm test` e o build também passaram. Seis cenários no Chrome, com API simulada e chamadas externas interceptadas, cobriram mural sem fotos com duas páginas em 390 px e 1366 px, cadastro de tarefa sem datas/categoria sem estilo, rejeição de gravação preservando formulário, edição e exclusão. Não houve erros JavaScript nesses cenários. Não houve execução contra a API publicada ou alteração do banco real; nenhuma migração adicional foi necessária.
 
 ## O que significa corrigir S06
 

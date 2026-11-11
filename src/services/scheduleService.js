@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export default class ScheduleService {
-    async getSchedules() {
-        const { data } = await axios.get('/cronogramas/');
+    async getSchedules(page = 1) {
+        const { data } = await axios.get('/cronogramas/', { params: { page } });
         return data;
     }
     async getSchedule(id) {

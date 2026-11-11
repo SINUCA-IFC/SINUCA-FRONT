@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { getCategoryStyle } from '@/utils/categoryStyle'
 const props = defineProps({
   modelValue: { type: [Number, String], default: null },
   categories: { type: Array, default: () => [] },
@@ -10,7 +11,7 @@ const filterOpen = ref(false)
 const selectedCategoryName = computed(
   () => props.categories.find((c) => c.id === props.modelValue)?.name,
 )
-const catInfo = (id) => props.categoryStyles[id] || {}
+const catInfo = (id) => getCategoryStyle(id, props.categoryStyles)
 function pickCategory(id) {
   emit('update:modelValue', id)
   filterOpen.value = false
