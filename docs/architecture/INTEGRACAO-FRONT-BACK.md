@@ -1,6 +1,6 @@
 # Integração entre front e back — SINUCA
 
-Revisão: 03/11/2026. Escopo: os oito services, os nove stores, o cliente Axios, os consumidores Vue e as rotas da API Django dos dois repositórios locais. A análise dos contratos é estática, complementada pelos testes descritos ao final. Ela não equivale a testar cada operação em produção.
+Revisão inicial: 03/11/2026; atualização de permissões e uploads em 11/11/2026. Escopo: os oito services, os nove stores, o cliente Axios, os consumidores Vue e as rotas da API Django dos dois repositórios locais. A análise dos contratos é estática, complementada pelos testes descritos ao final. Ela não equivale a testar cada operação em produção.
 
 ## Como as camadas se relacionam
 
@@ -40,7 +40,7 @@ Os caminhos abaixo começam com `/api`. O Axios combina tanto `/tarefas/` quanto
 | [linkService](../../src/services/linkService.js), [linkStore](../../src/stores/linkStore.js) | `getLinks`: GET `/docs/`; `getLink`: GET `/docs/{id}/`; `createLink`: POST; `updateLink`: PATCH; `deleteLink`: DELETE | Documentos representados por links. Lista de documentos, item, modal de cronograma e playground usam esse estado. O back restringe objetos por país, com exceção para superusuários. |
 | Sem service: [statusStore](../../src/stores/statusStore.js) | Nenhuma chamada HTTP | Calcula “a fazer”, “em andamento” e “concluído” filtrando a lista do `taskStore` pelos números 1, 2 e 3. Não grava mudanças de status no servidor. |
 
-`userStore.uploadImage` é uma exceção à separação: envia `FormData` diretamente pelo Axios para POST `/media/images/`, sem um service próprio. O refresh automático também é feito diretamente pelo interceptor, embora exista `userService.refreshToken`.
+`userStore.uploadImage` é uma exceção à separação: envia `FormData` diretamente pelo Axios para POST `/media/images/`, sem um service próprio. Agora exige login e não é usado pelo cadastro, que envia a foto junto ao registro. O refresh automático também é feito diretamente pelo interceptor, embora exista `userService.refreshToken`.
 
 ## Contratos que as telas precisam respeitar
 
@@ -57,7 +57,7 @@ Por padrão são dez itens; `page_size` pode chegar a 100. As ações existentes
 ### Usuários, cadastro e sessão
 
 - Login envia e-mail e senha e recebe `access` e `refresh`. Em seguida, o store consulta `/usuarios/me/` para obter o perfil real.
-- O cadastro público envia e-mail, nome, senha, turma (`gang`), matrícula e foto (`foto`, ID do upload). Cria sempre aluno sem país. `country`, papéis e privilégios não são aceitos como decisões do solicitante.
+- O cadastro público envia e-mail, nome, senha, turma (`gang`), matrícula e foto opcional (`foto`, arquivo) no mesmo `multipart/form-data`. Não há upload anônimo separado nem associação por ID no cadastro. JSON sem foto continua aceito. Cria sempre aluno sem país. `country`, papéis e privilégios não são aceitos como decisões do solicitante.
 - `/usuarios/me/` devolve `country` como objeto ou `null`, foto como objeto ou `null`, `role` e `approval_pending`. Esses campos de autorização são definidos pelo servidor. O perfil comum não devolve a senha nem matrícula/turma; a listagem administrativa de pendentes inclui matrícula e turma para conferência pela organização.
 - `userType` e a query de seleção de perfil alteram a apresentação do front. O papel efetivo continua sendo o recebido da API.
 - `register` continua fazendo login automaticamente. O aluno pendente recebe uma tela de espera, pode atualizar sua situação ou sair e não monta os componentes privados da delegação.
@@ -81,7 +81,7 @@ O modal converte relações do detalhe em IDs para editar. Porém o store insere
 
 Cronogramas usam datas com horário, `category` numérica, `country` como lista de IDs e `docs` como lista de IDs de links. `docs` pode ser vazia; `country` é obrigatória e não aceita lista vazia na criação. Categoria, título, descrição, início e fim também são obrigatórios. Os padrões com `[0]` no store são placeholders, não IDs válidos para criar dados reais.
 
-Links retornam `id`, `name`, `url` e `categories`. `categories` é derivada dos cronogramas relacionados e somente leitura. **O serializer atual de links não aceita `country`**, embora o store mantenha esse campo. Criar um link pelo service pode salvar um registro sem delegação, que não aparecerá nas consultas dos alunos. `country: 0` e `categories: 0` do estado inicial não descrevem o contrato real de escrita.
+Links retornam `id`, `name`, `url`, `categories` e `country`. `categories` é derivada dos cronogramas relacionados e somente leitura; `country` recebe uma lista de IDs de delegações. Alterações de links e cronogramas exigem organizador ou superusuário; esses papéis têm acesso a todas as delegações. Os demais usuários continuam restritos ao próprio país. Documentos precisam abranger todas as delegações da atividade que os utiliza. `country: 0` e `categories: 0` do estado inicial do store ainda não descrevem o contrato real de escrita.
 
 ### Postagens, fotos, países e turmas
 
@@ -94,7 +94,7 @@ Países retornam `id`, `name`, `political_name` e `flag`, com `flag_attachment_k
 | API | Situação |
 | --- | --- |
 | GET/POST `/mensagens/`, GET `/mensagens/{id}/` | Existem no back, mas não há service/store de chat; a tela continua em construção. A API permite organizadores e alunos com delegação, não avaliadores. O filtro é por país; o chat não é individual por delegado. O superusuário não recebe exceção explícita nessa permissão de mensagens. |
-| GET/POST `/media/images/` | Upload é usado diretamente pelo `userStore`; listagem não tem tela normal. Permissões, propriedade e limites permanecem pendentes de S08. |
+| GET/POST `/media/images/` | Exige autenticação; lista somente arquivos próprios. Propriedade, limites e cotas estão descritos em [S07/S08](SEGURANCA-S07-S08.md). A foto do cadastro segue diretamente em `/registro/`. |
 | GET/POST `/media/documents/` | Não há service/store correspondente. É upload de PDF, diferente dos links de `/docs/`; a criação retorna metadados/chave de associação. A tela de documentos atual exibe URLs de links. |
 | POST `/token/verify/` | Existe no back, sem wrapper no front. O front verifica a sessão consultando `/usuarios/me/`. |
 | GET `/schema/`, `/doc/`, `/redoc/`, raiz `/api/` | Documentação e descoberta da API, sem store. |
@@ -109,7 +109,7 @@ A aprovação foi implementada junto à atribuição de delegação, aproveitand
 
 1. POST `/registro/` é público e sempre cria aluno com `country=null`, mesmo se o solicitante enviar um país ou privilégios.
 2. Aluno pendente pode entrar e consultar o próprio status. Listas privadas de tarefas, colegas, cronogramas e links ficam vazias; detalhes de outra delegação retornam 404; mensagens retornam 403.
-3. Escritas privadas por aluno sem delegação retornam 403 antes de salvar. As permissões de escrita de alunos já vinculados continuam sendo tema de S07.
+3. Escritas privadas por aluno sem delegação retornam 403 antes de salvar. As permissões de alunos já vinculados foram restringidas em S07: perfil próprio e leitura dos recursos da delegação, com cronogramas/links administrados pela organização.
 4. GET `/usuarios/pendentes/?page=1` permite a organizadores/superusuários conferir alunos ativos sem delegação, com identificação escolar. A lista exclui contas de outros papéis e superusuários.
 5. POST `/usuarios/{id}/aprovar/` recebe `{"country": 1}` e aprova somente aluno ativo ainda pendente. Valida o país e grava o vínculo condicionalmente, evitando sobrescrever uma atribuição concluída. Não altera papel, senha ou privilégios.
 6. O front permite atualizar a situação e carregar o país após a aprovação. Alunos sem país veem uma página própria de espera, sem os menus da delegação. Organizadores sem país recebem uma explicação diferente, sem serem apresentados como alunos aguardando aprovação.
@@ -128,7 +128,7 @@ Alunos que já tinham país antes da correção mantêm o vínculo. Como a vers�
 | Alta | Formulário de tarefa começa com datas vazias e relações vazias; a API rejeita esses valores. O modal fecha sem aguardar erro/sucesso. | F03; `taskStore` e `CreatTaskModal` |
 | Alta | Escrita de tarefa devolve IDs de categoria, enquanto o quadro espera objetos; IDs string também impedem atualização/exclusão local. | F04–F06; `taskStore` |
 | Alta | ID de categoria fora do mapa fixo pode quebrar seleção; postagem sem foto pode quebrar o mural. | F07/F08; `categoryStore`, modal e `BoardView` |
-| Alta | Links criados sem país ficam fora das consultas dos alunos; permissões de alteração de colegas e recursos compartilhados precisam de revisão. | F18 e S07 |
+| Média | O serializer de links agora aceita delegações, mas o formulário/store ainda precisa enviar uma lista válida em vez do placeholder `country: 0`. | F18 |
 | Média | Modal de cronograma exibe todos os links da delegação em vez de usar `schedule.docs`. Abertura direta da rota usa ID local nulo. | F09/F10 |
 | Média | Falha de refresh limpa tokens no interceptor, mas pode deixar `loggedIn` verdadeiro. O guard desvia novamente ao entrar. Logout também não revoga o refresh no servidor. | F12 e riscos de sessão |
 | Média | Outros stores de dados privados não são limpos pelo logout; convém invalidá-los ao trocar de conta para evitar estado antigo durante carregamentos. | `taskStore`, `scheduleStore`, `linkStore` |
