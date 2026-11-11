@@ -8,6 +8,12 @@ Na etapa de auditoria, nenhum código existente foi alterado. O banco original f
 
 ## Acompanhamento das correções
 
+### F03–F08 e F11 — Correções locais concluídas em 11/11/2026
+
+O fluxo de tarefas normaliza datas opcionais, apresenta validações, compara IDs de rota corretamente e usa categorias completas nas respostas de escrita. O modal atual já aguardava a API; esse comportamento foi preservado. Categorias sem estilo recebem apresentação padrão e o mural aceita foto nula. Oito stores carregam todas as páginas antes de substituir suas listas; consultas correspondentes têm ordenação explícita no backend. A consulta de alunos pendentes continua explicitamente paginada.
+
+Validação: **74 testes de backend**, **14 testes de services/stores**, `npm test`, build e **seis cenários de navegador com API simulada** passaram. O mural sem fotos foi conferido em 390 px e 1366 px; criação, erro de gravação, edição e exclusão também foram exercitados. A revisão independente não encontrou regressões concretas. Não houve migração nova, alteração do banco real ou chamadas à API publicada. Detalhes no [mapa de integração](docs/architecture/INTEGRACAO-FRONT-BACK.md). Os resultados originais abaixo permanecem históricos.
+
 ### S07 e S08 — Correções locais concluídas em 11/11/2026
 
 S07 restringe edição de perfis e recursos da organização e valida o acesso das delegações aos documentos de atividades. Organizadores comuns não alteram contas administrativas. S08 exige autenticação nos uploads separados, restringe listagens e associações a arquivos próprios, aplica limites/cotas e envia a foto junto ao cadastro público. Arquivos são removidos se a gravação do registro falhar após o envio ao storage.

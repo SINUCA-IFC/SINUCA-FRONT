@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 import LinkService from '../services/linkService'
+import { getAllPages } from '@/services/pagination'
 
 const linkService = new LinkService()
 
@@ -20,15 +21,7 @@ export const useLinkStore = defineStore('link', () => {
     async function getLinks() {
         loading.value = true;
         try {
-            const documents = [];
-            let page = 1;
-            let data;
-            do {
-                data = await linkService.getLinks(page);
-                documents.push(...data.results);
-                page += 1;
-            } while (page <= data.total_pages);
-            links.value = documents;
+            links.value = await getAllPages(page => linkService.getLinks(page));
         } finally {
             loading.value = false;
         }

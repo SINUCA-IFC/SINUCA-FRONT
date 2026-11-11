@@ -52,7 +52,7 @@ O [paginador](../../../SINUCA-BACK/app/pagination.py) devolve:
 {"page": 1, "page_size": 10, "total_pages": 2, "results": []}
 ```
 
-Por padrão são dez itens; `page_size` pode chegar a 100. As ações existentes de listagem extraem apenas `results`, sem percorrer páginas nem expor navegação. Isso afeta tarefas, colegas, postagens, cronogramas, links, países, categorias e turmas. O `statusStore` e os filtros visuais trabalham apenas sobre os itens carregados. A listagem administrativa nova aceita `page` e devolve o envelope completo ao chamador, além de atualizar `pendingUsers`.
+Por padrão são dez itens; `page_size` pode chegar a 100. Desde a correção de 11/11/2026, os services de listagem aceitam `page` e os stores usam `getAllPages(fetchPage)` para carregar tarefas, colegas, postagens, cronogramas, links, países, categorias e turmas até `total_pages`. A atribuição à store acontece somente quando todas as páginas foram recebidas; falhas preservam a lista anterior. O `statusStore`, filtros e contagens usam a coleção completa, sem novos controles de página na interface. As consultas do backend possuem ordenação explícita, com desempate por ID nos cronogramas. A listagem administrativa de pendentes continua aceitando `page` e devolvendo o envelope completo ao chamador, além de atualizar `pendingUsers`.
 
 ### Usuários, cadastro e sessão
 
@@ -71,11 +71,11 @@ O [serializer de tarefas](../../../SINUCA-BACK/core/serializers/task.py) usa tr�
 | --- | --- |
 | GET coleção | `id`, `title`, categorias como objetos, `endDate`, `status` |
 | GET detalhe | Dados da tarefa, categorias como objetos, criador e responsáveis como resumos `id/name/foto` |
-| POST/PATCH/PUT | Categorias e responsáveis como listas de IDs; a resposta de escrita também usa IDs nessas relações |
+| POST/PATCH/PUT | Entrada com categorias e responsáveis como listas de IDs; resposta no mesmo formato do detalhe, com categorias completas e resumos seguros de usuários |
 
 Uma criação válida precisa de título, status, pelo menos uma categoria e pelo menos um responsável. Essa obrigatoriedade das listas foi conferida nos campos efetivos do serializer. Datas de tarefa usam `YYYY-MM-DD` ou `null`; strings vazias não representam ausência de data para a API. O criador é definido pela sessão no servidor. Responsáveis precisam pertencer à delegação do solicitante, salvo o acesso global de superusuário.
 
-O modal converte relações do detalhe em IDs para editar. Porém o store insere a resposta de escrita diretamente no quadro, que espera categorias como objetos. Além disso, edição/exclusão com ID string da rota usam comparação estrita com IDs numéricos. Esses contratos ainda precisam ser normalizados.
+O modal converte relações do detalhe em IDs para editar. O service transforma datas opcionais vazias em `null`, sem alterar o formulário nem limpar campos omitidos em PATCH. A resposta de escrita já pode ser inserida no quadro, pois usa categorias como objetos. Edição/exclusão com ID string da rota comparam IDs normalizados como texto. O formulário exige categoria e responsável e mantém erros da API visíveis sem fechar o modal. O getter de estilo e os componentes de categoria usam ícone e fundo padrão para IDs desconhecidos; o mural aceita foto nula.
 
 ### Cronogramas e links
 
@@ -124,17 +124,15 @@ Alunos que já tinham país antes da correção mantêm o vínculo. Como a vers�
 
 | Prioridade | Problema e efeito | Referência |
 | --- | --- | --- |
-| Alta | Stores ignoram as páginas seguintes; filtros e contagens deixam dados de fora. | F11 da auditoria; todos os stores de listas |
-| Alta | Formulário de tarefa começa com datas vazias e relações vazias; a API rejeita esses valores. O modal fecha sem aguardar erro/sucesso. | F03; `taskStore` e `CreatTaskModal` |
-| Alta | Escrita de tarefa devolve IDs de categoria, enquanto o quadro espera objetos; IDs string também impedem atualização/exclusão local. | F04–F06; `taskStore` |
-| Alta | ID de categoria fora do mapa fixo pode quebrar seleção; postagem sem foto pode quebrar o mural. | F07/F08; `categoryStore`, modal e `BoardView` |
 | Média | O serializer de links agora aceita delegações, mas o formulário/store ainda precisa enviar uma lista válida em vez do placeholder `country: 0`. | F18 |
 | Média | Modal de cronograma exibe todos os links da delegação em vez de usar `schedule.docs`. Abertura direta da rota usa ID local nulo. | F09/F10 |
 | Média | Falha de refresh limpa tokens no interceptor, mas pode deixar `loggedIn` verdadeiro. O guard desvia novamente ao entrar. Logout também não revoga o refresh no servidor. | F12 e riscos de sessão |
 | Média | Outros stores de dados privados não são limpos pelo logout; convém invalidá-los ao trocar de conta para evitar estado antigo durante carregamentos. | `taskStore`, `scheduleStore`, `linkStore` |
 | Média | Fluxos administrativos, chat, notas e notificações têm integração incompleta ou inexistente. | F02, F23/F24 |
 
-A [auditoria](../../AUDITORIA-2026-10-27.md) contém os demais riscos, reproduções históricas e acompanhamentos. Esses problemas não foram corrigidos em conjunto com S05.
+A [auditoria](../../AUDITORIA-2026-10-27.md) contém os demais riscos, reproduções históricas e acompanhamentos. F03–F08 e F11 receberam correções locais em 11/11/2026, descritas acima. A tabela mantém apenas as pendências desse levantamento.
+
+Validação desta atualização: 74 testes de backend e 14 testes de services/stores passaram; `npm test` e o build também passaram. Seis cenários no Chrome, com API simulada e chamadas externas interceptadas, cobriram mural sem fotos com duas páginas em 390 px e 1366 px, cadastro de tarefa sem datas/categoria sem estilo, rejeição de gravação preservando formulário, edição e exclusão. Não houve erros JavaScript nesses cenários. Não houve execução contra a API publicada ou alteração do banco real; nenhuma migração adicional foi necessária.
 
 ## O que significa corrigir S06
 

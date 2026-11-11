@@ -6,11 +6,13 @@ Atualizado em 11/11/2026. Esta lista registra trabalho futuro e identifica as co
 
 Prioridades reorganizadas a pedido da equipe em 06/11/2026. S07 e S08 receberam correções locais a pedido da equipe em 11/11/2026; ver [permissões e uploads](architecture/SEGURANCA-S07-S08.md). S06 continua na preparação para publicação.
 
+Em 11/11/2026 também foram concluídas localmente as correções de tarefas, categorias/fotos ausentes e paginação abaixo. Foram validadas com 74 testes no backend, 14 testes de services/stores, build e seis cenários de navegador com API simulada. Esta etapa não exige nova migração.
+
 | Ordem | Correção ou task | Resultado esperado |
 | --- | --- | --- |
-| 1 | Corrigir criação, edição e exclusão de tarefas (F03–F06). | Converter datas opcionais vazias para `null`, aguardar a API antes de fechar o modal, mostrar erros, normalizar categorias e IDs e atualizar o quadro após salvar ou excluir. |
-| 2 | Tratar categorias sem estilo e postagens sem foto (F07/F08). | Usar apresentação padrão para evitar que dados válidos quebrem o formulário ou o mural. |
-| 3 | Implementar paginação nas listas (F11). | Permitir consultar todos os registros e definir ordenação estável no backend; esclarecer o alcance de filtros e contagens. |
+| 1 | Concluído localmente: criação, edição e exclusão de tarefas (F03–F06). | Datas opcionais vazias viram `null`; validações são exibidas no formulário; respostas de escrita incluem categorias completas; IDs de rota são comparados corretamente. A espera pela API antes de fechar o modal foi preservada. |
+| 2 | Concluído localmente: categorias sem estilo e postagens sem foto (F07/F08). | Categorias novas recebem ícone e fundo padrão; postagem sem foto permanece visível, sem imagem. |
+| 3 | Concluído localmente: paginação nas listas (F11). | Oito stores percorrem todas as páginas antes de atualizar a lista. Filtros e contagens usam a coleção completa; as consultas do backend têm ordenação estável. A API de pendentes continua explicitamente paginada. |
 | 4 | Criar a tela administrativa de aprovação. | Listar alunos pendentes e atribuir uma delegação usando as APIs e os métodos de service/store existentes. |
 | 5 | Criar a tela de conta e configurações e corrigir o estado de sessão (F12). | Consultar/editar o perfil, sair pelo celular ou desktop e limpar a sessão após falha de renovação. Escopo detalhado abaixo. |
 | 6 | Corrigir cronogramas e documentos (F09/F10/F18). | Abrir atividades diretamente pela URL, mostrar somente os documentos vinculados e permitir salvar links com o país correto. |
