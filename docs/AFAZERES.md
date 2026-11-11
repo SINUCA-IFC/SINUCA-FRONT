@@ -1,10 +1,10 @@
 # Afazeres do SINUCA
 
-Atualizado em 06/11/2026. Esta lista registra trabalho futuro; os itens abaixo não foram implementados nesta revisão.
+Atualizado em 11/11/2026. Esta lista registra trabalho futuro e identifica as correções já concluídas.
 
 ## Ordem de trabalho durante o desenvolvimento
 
-Prioridades reorganizadas a pedido da equipe em 06/11/2026. A próxima etapa concentra-se nos fluxos funcionais da aplicação. S06, S07 e S08 ficam registrados na seção de preparação para publicação, sem execução nesta revisão.
+Prioridades reorganizadas a pedido da equipe em 06/11/2026. S07 e S08 receberam correções locais a pedido da equipe em 11/11/2026; ver [permissões e uploads](architecture/SEGURANCA-S07-S08.md). S06 continua na preparação para publicação.
 
 | Ordem | Correção ou task | Resultado esperado |
 | --- | --- | --- |
@@ -53,11 +53,11 @@ País, papel e privilégios continuam sob controle da organização no servidor;
 
 ## Antes da publicação — pendências registradas
 
-Executar estes itens na preparação para disponibilizar a aplicação ao público com dados reais. Permanecem pendentes; esta reorganização não os implementa nem altera sua gravidade.
+Executar os itens ainda não marcados na preparação para disponibilizar a aplicação ao público com dados reais. S07/S08 foram corrigidos localmente em 11/11/2026, mas exigem implantação e validação no ambiente publicado.
 
 - [ ] **S06 — Segredos e bases versionados:** retirar `.env`, `db.sqlite3` e `dump.json` do conteúdo distribuído, fornecer configuração de exemplo sem segredos, eliminar o fallback de chave previsível e substituir credenciais afetadas que estejam em uso. Avaliar histórico e cópias com a equipe.
-- [ ] **S07 — Permissões de participantes:** restringir alterações de colegas e de cronogramas/documentos compartilhados por papel, ação e objeto, preservando o isolamento entre delegações. As correções anteriores de privilégios e responsáveis de tarefas já estão registradas na auditoria.
-- [ ] **S08 — Uploads e mídias:** definir propriedade e acesso à listagem, limites de tamanho/quantidade e cotas; oferecer um fluxo temporário e limitado para foto antes do cadastro.
+- [x] **S07 — Permissões de participantes:** alterações de colegas e de cronogramas/documentos restritas por papel e objeto; organizadores comuns não alteram contas administrativas. Validado localmente; publicação pendente.
+- [x] **S08 — Uploads e mídias:** autenticação, arquivos próprios, limites de tamanho/quantidade e cotas. Foto enviada junto ao cadastro, sem upload anônimo separado. Aplicação da migração e configuração de cache/proxy na implantação continuam pendentes.
 - [ ] Rever configuração de produção, dependências efetivamente instaladas e reprodução do ambiente de implantação.
 - [ ] Validar autorização, isolamento entre delegações e os fluxos principais em ambiente dedicado antes da liberação.
 

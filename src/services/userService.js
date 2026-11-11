@@ -12,7 +12,11 @@ export default class UserService {
   }
 
   async register(email, name, password, gang, matriculation, foto) {
-    const response = await axios.post('/registro/', { email, name, password, gang, matriculation, foto });
+    const formData = new FormData();
+    for (const [field, value] of Object.entries({ email, name, password, gang, matriculation, foto })) {
+      if (value !== null && value !== undefined) formData.append(field, value);
+    }
+    const response = await axios.post('/registro/', formData);
     return response.data;
   }
 
