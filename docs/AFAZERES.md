@@ -18,13 +18,25 @@ Em 11/11/2026 também foram concluídas localmente as correções de tarefas, ca
 | 6 | Corrigir cronogramas e documentos (F09/F10/F18). | Abrir atividades diretamente pela URL, mostrar somente os documentos vinculados e permitir salvar links com o país correto. |
 | 7 | Implementar a verificação real de e-mail. | Substituir a etapa de token simulada pelo fluxo integrado descrito abaixo. |
 | 8 | Completar convites e fluxos por papel (F02). | Validar convites de organizadores no servidor e definir as operações de organizadores e avaliadores. |
-| 9 | Corrigir navegação e validações complementares. | Revisar atalhos mobile (F16/F17), matrícula (F14), parâmetro de país em mensagens (F19), datas invertidas (F20) e página 404 (F26). |
-| 10 | Definir e implementar os próximos recursos do evento. | Priorizar chat, notas, histórico e notificações com a equipe; esses fluxos ainda têm integração incompleta ou inexistente (F23/F24). |
+| 9 | Corrigir navegação e validações complementares. | Revisar atalhos mobile (F16/F17), matrícula (F14), datas invertidas (F20) e página 404 (F26). O filtro de país em mensagens (F19) foi corrigido junto ao chat. |
+| 10 | Definir e implementar os próximos recursos do evento. | Priorizar notas, histórico e notificações com a equipe; esses fluxos ainda têm integração incompleta ou inexistente (F23/F24). O chat básico foi integrado; detalhes abaixo. |
 
 - [ ] Separar a URL da API por ambiente para permitir desenvolvimento e testes com dados isolados.
 - [ ] Validar cada entrega com os papéis envolvidos e dados de teste, incluindo navegação mobile e desktop.
 
 Os IDs F e S remetem à auditoria. Esta ordem é de planejamento e não representa uma nova rodada de reprodução de todos os achados.
+
+## Chat básico — concluído localmente em 11/11/2026
+
+A tela mobile e desktop usa os frames do Figma e a API existente. Alunos com delegação compartilham a conversa do seu país com a organização. Para organizadores, `/chat` apresenta cartões com nome, nome político e bandeira; selecionar um cartão abre `/chat/ID`, com opção de voltar à lista. Pendentes e avaliadores não acessam mensagens. A interface permite consultar o histórico, enviar texto e tentar novamente após falhas. Atualiza a conversa a cada dez segundos enquanto a página está visível e permite atualização manual. A API limita mensagens a 2.000 caracteres e rejeita filtros de país inválidos com erro 400. Não exige migração.
+
+- [ ] Validar o fluxo entre participantes e organizadores no ambiente dedicado, antes de publicar.
+- [ ] Confirmar com a equipe se haverá também conversa individual por aluno. O chat atual é compartilhado pela delegação.
+- [ ] Implementar contagem de mensagens não lidas por organizador e delegação, incluindo registro de leitura no servidor, antes de exibir os selos numéricos do Figma. A API atual não fornece essa contagem; a interface não exibe valores fictícios.
+- [ ] Definir notificações de mensagens, se necessárias. Não há entrega de notificações.
+- [ ] Reavaliar paginação e atualização conforme o volume real: a versão simples consulta todo o histórico, sem WebSocket.
+
+Contrato e verificações: [integração front/back](architecture/INTEGRACAO-FRONT-BACK.md#chat-por-delegação).
 
 ## Verificação real de e-mail — prioridade alta
 
