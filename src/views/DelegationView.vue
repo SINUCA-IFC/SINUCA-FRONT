@@ -99,8 +99,8 @@ const refreshApproval = async () => {
     }
 };
 
-const logout = () => {
-    userStore.logout()
+const logout = async () => {
+    await userStore.logout()
     router.push('/bem-vindo')
 };
 

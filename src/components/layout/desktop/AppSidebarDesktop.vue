@@ -39,9 +39,8 @@ function openTab(tab) {
 
 const isActivePath = (path) => route.path === path || route.path.startsWith(`${path}/`)
 
-function logout() {
-  // TODO: troque pela sua ação real de logout.
-  if (typeof userStore.logout === 'function') userStore.logout()
+async function logout() {
+  if (typeof userStore.logout === 'function') await userStore.logout()
   router.push('/login')
 }
 </script>
