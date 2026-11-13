@@ -77,7 +77,7 @@ export const useUserStore = defineStore('auth', () => {
 
   async function approveUser(id, countryId) {
     const approved = await userService.approveUser(id, countryId)
-    pendingUsers.value = pendingUsers.value.filter(user => String(user.id) !== String(id))
+    pendingUsers.value = pendingUsers.value.filter((user) => String(user.id) !== String(id))
     return approved
   }
 
@@ -88,8 +88,12 @@ export const useUserStore = defineStore('auth', () => {
     return axios.post('media/images/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
-  } 
+  }
 
+  async function updateProfile(changes) {
+    const updated = await userService.updateProfile(user.value.id, changes)
+    user.value = { ...user.value, ...updated }
+  }
 
   return {
     user,
@@ -106,5 +110,6 @@ export const useUserStore = defineStore('auth', () => {
     approveUser,
     userType,
     uploadImage,
+    updateProfile,
   }
 })

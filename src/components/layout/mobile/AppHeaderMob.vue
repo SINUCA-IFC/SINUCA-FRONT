@@ -1,5 +1,9 @@
 <script setup>
 import LogoSinuca from '/logo-sinuca.svg'
+import UserAvatar from '../UserAvatar.vue'
+import { useUserStore } from '../../../stores/userStore'
+
+const userStore = useUserStore()
 
 defineProps({
     title: {
@@ -18,6 +22,9 @@ defineProps({
             <h3>{{ title }}</h3>
         </div>
     
+        <RouterLink to="/perfil" class="profile-link" aria-label="Abrir meu perfil">
+            <UserAvatar :src="userStore.user.foto?.url" :alt="userStore.user.name || 'Foto de perfil'" />
+        </RouterLink>
         <img :src="LogoSinuca" alt="logo" width="auto" height="45px">
     </header>
 </template>
@@ -44,6 +51,7 @@ defineProps({
 }
 
 .title h3 { font-size: clamp(1.1rem, 5vw, 1.5rem); line-height: 1.3; }
+.profile-link { display: flex; flex-shrink: 0; margin-left: auto; padding: 0.25rem; border-radius: 50%; }
 .header-class > img { flex: 0 0 auto; width: 45px; height: 45px; object-fit: contain; }
 
 </style>
