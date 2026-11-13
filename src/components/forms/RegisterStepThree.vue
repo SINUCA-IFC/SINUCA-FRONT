@@ -50,22 +50,19 @@ async function register() {
   errorMessage.value = ''
 
   try {
-    if(selectedFile.value) {
-      const response = await userStore.uploadImage(selectedFile.value);
-      console.log('UPLOAD RESPONSE:', response.data)
-      userStore.user.foto = response.data.id
-    }
     await userStore.register(
       userStore.user.email,
       userStore.user.name,
       userStore.user.password,
       userStore.user.gang,
       userStore.user.matriculation,
-      userStore.user.foto,
+      selectedFile.value,
     )
     router.push('/')
   } catch (err) {
-    errorMessage.value = 'Erro ao cadastrar. Verifique suas credenciais'
+    errorMessage.value = err.response?.status === 429
+      ? 'Muitas tentativas. Aguarde um minuto e tente novamente.'
+      : err.response?.data?.foto?.[0] || 'Erro ao cadastrar. Verifique os dados e envie uma foto JPEG ou PNG de até 5 MiB.'
   } finally {
     loading.value = false
   }

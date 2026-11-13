@@ -38,7 +38,7 @@ function openTab(tab) {
   if (route.path !== '/delegacao') router.push('/delegacao')
 }
 
-const isActivePath = (path) => route.path === path
+const isActivePath = (path) => route.path === path || route.path.startsWith(`${path}/`)
 
 function logout() {
   userStore.logout()

@@ -12,15 +12,12 @@ export default class UserService {
   }
 
   async register(email, name, password, gang, matriculation, foto) {
-    const response = await axios.post('/registro/', {
-      email,
-      name,
-      password,
-      gang,
-      matriculation,
-      foto,
-    })
-    return response.data
+    const formData = new FormData();
+    for (const [field, value] of Object.entries({ email, name, password, gang, matriculation, foto })) {
+      if (value !== null && value !== undefined) formData.append(field, value);
+    }
+    const response = await axios.post('/registro/', formData);
+    return response.data;
   }
 
   async getUser() {
@@ -33,9 +30,9 @@ export default class UserService {
     return data
   }
 
-  async getUsers() {
-    const { data } = await axios.get('/usuarios/')
-    return data
+  async getUsers(page = 1) {
+    const {data} = await axios.get('/usuarios/', { params: { page } });
+    return data;
   }
 
   async getPendingUsers(page = 1) {

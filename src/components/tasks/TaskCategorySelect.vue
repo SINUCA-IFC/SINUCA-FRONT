@@ -1,10 +1,13 @@
 <script setup>
+import { getCategoryStyle } from '@/utils/categoryStyle'
+
 const props = defineProps({
   modelValue: { type: Array, default: () => [] },
   categories: { type: Array, default: () => [] },
   categoryStyles: { type: Object, default: () => ({}) },
 })
 const emit = defineEmits(['update:modelValue'])
+const catInfo = (id) => getCategoryStyle(id, props.categoryStyles)
 function toggleCategory(category) {
   emit(
     'update:modelValue',
@@ -25,10 +28,10 @@ function toggleCategory(category) {
       :key="c.id"
       @click="toggleCategory(c)"
       :aria-pressed="modelValue.includes(c.id)"
-      :style="modelValue.includes(c.id) ? (categoryStyles[c.id] || {}).activeStyle : ''"
+      :style="modelValue.includes(c.id) ? catInfo(c.id).activeStyle : ''"
     >
       <p style="font-size: 0.9rem">
-        <span :class="(categoryStyles[c.id] || {})?.icon"></span>
+        <span :class="catInfo(c.id).icon"></span>
         {{ c.name }}
       </p>
     </button>

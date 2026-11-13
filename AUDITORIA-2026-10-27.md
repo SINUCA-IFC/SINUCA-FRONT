@@ -8,6 +8,20 @@ Na etapa de auditoria, nenhum código existente foi alterado. O banco original f
 
 ## Acompanhamento das correções
 
+### F03–F08 e F11 — Correções locais concluídas em 11/11/2026
+
+O fluxo de tarefas normaliza datas opcionais, apresenta validações, compara IDs de rota corretamente e usa categorias completas nas respostas de escrita. O modal atual já aguardava a API; esse comportamento foi preservado. Categorias sem estilo recebem apresentação padrão e o mural aceita foto nula. Oito stores carregam todas as páginas antes de substituir suas listas; consultas correspondentes têm ordenação explícita no backend. A consulta de alunos pendentes continua explicitamente paginada.
+
+Validação: **74 testes de backend**, **14 testes de services/stores**, `npm test`, build e **seis cenários de navegador com API simulada** passaram. O mural sem fotos foi conferido em 390 px e 1366 px; criação, erro de gravação, edição e exclusão também foram exercitados. A revisão independente não encontrou regressões concretas. Não houve migração nova, alteração do banco real ou chamadas à API publicada. Detalhes no [mapa de integração](docs/architecture/INTEGRACAO-FRONT-BACK.md). Os resultados originais abaixo permanecem históricos.
+
+### S07 e S08 — Correções locais concluídas em 11/11/2026
+
+S07 restringe edição de perfis e recursos da organização e valida o acesso das delegações aos documentos de atividades. Organizadores comuns não alteram contas administrativas. S08 exige autenticação nos uploads separados, restringe listagens e associações a arquivos próprios, aplica limites/cotas e envia a foto junto ao cadastro público. Arquivos são removidos se a gravação do registro falhar após o envio ao storage.
+
+A suíte completa passou em **72 testes do backend**, com banco e mídia isolados; **dois testes do service de cadastro** e o build do frontend também passaram. Os avisos anteriores de paginação e o diagnóstico intencional de S02 permanecem. A revisão independente confirmou a correção do caso de arquivo órfão. `check` não encontrou problemas e não há alterações de modelo além da migração criada.
+
+Detalhes, limites operacionais e instrução de migração: [permissões e uploads](docs/architecture/SEGURANCA-S07-S08.md). A migração ainda deve ser aplicada no ambiente de execução; não houve alteração do banco real, publicação ou execução de S06. As reproduções antigas abaixo continuam sendo evidências históricas.
+
 ### S01 — Corrigida no código local em 27/10/2026
 
 Em `SINUCA-BACK/core/serializers/user.py`, os campos `is_staff`, `is_superuser`, `is_active` e `last_login` passaram a ser explicitamente somente leitura. `id`, `groups`, `country` e `role` também foram declarados somente leitura, preservando e explicitando as restrições existentes. A API de perfis continua retornando esses dados, mas não os modifica; os campos administrativos são gerenciados pelo Django Admin. Campos somente leitura enviados na requisição são ignorados pelo DRF, portanto uma resposta 200 não indica que privilégios foram aceitos.

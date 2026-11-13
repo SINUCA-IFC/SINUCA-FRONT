@@ -24,7 +24,7 @@ const props = defineProps({
                         <img v-if="CountryFlagUrl" class="country-flag country-flag-mobile" :src="CountryFlagUrl" :alt="`Bandeira do país ${title}`">
                         <slot name="title-action" />
                     </div>
-                    <p v-if="subtitle" class="subtitle">{{ subtitle }}</p>
+                    <p v-if="subtitle || $slots.subtitle" class="subtitle"><slot name="subtitle">{{ subtitle }}</slot></p>
                 </div>
                 <span v-if="icon" :class="icon" class="title-icon"></span>
                 <img class="country-flag country-flag-desktop" v-if="CountryFlagUrl" :src="CountryFlagUrl" :alt="`Bandeira do país ${title}`">

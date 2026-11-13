@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import UserService from '../services/userService'
+import { getAllPages } from '@/services/pagination'
 
 const userService = new UserService()
 
@@ -62,8 +63,7 @@ export const useUserStore = defineStore('auth', () => {
   async function getAllUsers() {
     loading.value = true
     try {
-      const data = await userService.getUsers()
-      users.value = data.results
+      users.value = await getAllPages(page => userService.getUsers(page))
     } finally {
       loading.value = false
     }

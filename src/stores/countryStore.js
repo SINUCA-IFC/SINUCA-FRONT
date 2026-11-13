@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import CountryService from "@/services/countryService";
+import { getAllPages } from '@/services/pagination';
 
 const countryService = new CountryService();
 
@@ -20,8 +21,7 @@ export const useCountryStore = defineStore('country', () => {
         // },
 
     async function getCountrys() {
-        const data = await countryService.getAllCountrys();
-        countrys.value = data.results;
+        countrys.value = await getAllPages(page => countryService.getAllCountrys(page));
     }
 
     async function getCountry(id) {

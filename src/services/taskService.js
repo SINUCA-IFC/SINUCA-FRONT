@@ -1,5 +1,13 @@
 import axios from 'axios'
 
+function taskPayload(task) {
+  const payload = { ...task }
+  for (const field of ['startDate', 'endDate']) {
+    if (Object.hasOwn(payload, field)) payload[field] = payload[field] || null
+  }
+  return payload
+}
+
 export default class TaskService {
   async getAssignedTasks(userId) {
     if (userId == null) return []
@@ -29,8 +37,8 @@ export default class TaskService {
     }
     return assigned
   }
-  async getTasks() {
-    const { data } = await axios.get('/tarefas/')
+  async getTasks(page = 1) {
+    const { data } = await axios.get('/tarefas/', { params: { page } })
     return data
   }
   async getTask(id) {
@@ -38,11 +46,11 @@ export default class TaskService {
     return data
   }
   async createTask(task) {
-    const { data } = await axios.post('/tarefas/', task)
+    const { data } = await axios.post('/tarefas/', taskPayload(task))
     return data
   }
   async updateTask(id, task) {
-    const { data } = await axios.patch(`/tarefas/${id}/`, task)
+    const { data } = await axios.patch(`/tarefas/${id}/`, taskPayload(task))
     return data
   }
   async deleteTask(id) {

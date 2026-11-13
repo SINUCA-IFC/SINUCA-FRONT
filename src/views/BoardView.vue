@@ -38,7 +38,7 @@ onMounted(() => {
                     :title="post.title"
                     :date="formatDate(post.created_at)"
                     :description="post.content"
-                    :image-url="post.foto.url"
+                    :image-url="post.foto?.url"
                 />
             </section>
         </main>

@@ -48,9 +48,10 @@ const router = createRouter({
       component: () => import('../views/RegisterView.vue')
     },
     {
-      path: '/chat',
+      path: '/chat/:countryId(\\d+)?',
       name: 'chat',
-      component: () => import('../views/ChatView.vue')
+      component: () => import('../views/ChatView.vue'),
+      meta: { requiresAuth: true },
     },
     {
       path: '/historia',
