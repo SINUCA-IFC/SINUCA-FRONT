@@ -1,6 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router'
 const route = useRoute()
+defineProps({ taskId: [String, Number], readOnly: Boolean })
 import AppModal from '@/components/layout/AppModal.vue'
 import TaskDetails from '@/components/tasks/TaskDetails.vue'
 const emit = defineEmits(['close'])
@@ -9,8 +10,9 @@ const emit = defineEmits(['close'])
 <template>
   <AppModal @close="emit('close')">
     <TaskDetails
-      :key="route.params.id || 'new'"
-      :task-id="route.params.id"
+      :key="taskId || route.params.id || 'new'"
+      :task-id="taskId || route.params.id"
+      :read-only="readOnly"
       @close="emit('close')"
     />
   </AppModal>

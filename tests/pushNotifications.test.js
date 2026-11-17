@@ -52,12 +52,15 @@ test('post push payload becomes a mural notification', () => {
 })
 
 test('permission prompt appears only for an authenticated undecided supported browser', () => {
-  assert.equal(pushPayload.shouldShowPushPrompt({
-    loggedIn: true,
-    supported: true,
-    permission: 'default',
-    dismissed: false,
-  }), true)
+  assert.equal(
+    pushPayload.shouldShowPushPrompt({
+      loggedIn: true,
+      supported: true,
+      permission: 'default',
+      dismissed: false,
+    }),
+    true,
+  )
   for (const hiddenState of [
     { loggedIn: false, supported: true, permission: 'default', dismissed: false },
     { loggedIn: true, supported: false, permission: 'default', dismissed: false },
@@ -76,12 +79,57 @@ test('post notification click refreshes posts and navigates to mural', async () 
       payload: { event: 'post_created', data: { post_id: 12, url: '/mural' } },
     },
     {
-      refreshPosts: async () => { actions.push('refresh') },
-      navigate: async target => { actions.push(`navigate:${target}`) },
+      refreshPosts: async () => {
+        actions.push('refresh')
+      },
+      navigate: async (target) => {
+        actions.push(`navigate:${target}`)
+      },
     },
   )
 
   assert.deepEqual(actions, ['refresh', 'navigate:/mural'])
+})
+
+test('notification targets support tasks and chat and reject external destinations', () => {
+  assert.equal(
+    pushPayload.getPushTarget({ event: 'task_assigned', data: { task_id: 9 } }),
+    '/delegacao?task=9',
+  )
+  assert.equal(
+    pushPayload.getPushTarget({ event: 'task_overdue', data: { task_id: 9 } }),
+    '/delegacao?task=9',
+  )
+  assert.equal(
+    pushPayload.getPushTarget({ event: 'message_created', data: { url: '/chat/7' } }),
+    '/chat/7',
+  )
+  for (const url of ['https://evil.test', '//evil.test', '/\\evil.test', '/login', '/chat/7#bad']) {
+    assert.equal(pushPayload.getPushTarget({ event: 'post_created', data: { url } }), '/mural')
+  }
+})
+
+test('task and chat clicks refresh their resource and navigate despite refresh failure', async () => {
+  for (const [event, target] of [
+    ['task_assigned', '/delegacao?task=4'],
+    ['message_created', '/chat'],
+  ]) {
+    const calls = []
+    await pushPayload.handlePushNotificationClick(
+      { type: 'PUSH_NOTIFICATION_CLICKED', payload: { event, data: { task_id: 4 } } },
+      {
+        refreshTasks: async () => {
+          calls.push('task')
+          throw new Error('offline')
+        },
+        refreshChat: async () => {
+          calls.push('chat')
+        },
+        navigate: async (path) => calls.push(path),
+      },
+    )
+    assert.deepEqual(calls, [event === 'task_assigned' ? 'task' : 'chat', target])
+  }
 })
 
 const originalAdapter = axios.defaults.adapter
@@ -97,9 +145,9 @@ function defineGlobal(name, value) {
 function createLocalStorage() {
   const values = new Map()
   return {
-    getItem: key => values.has(key) ? values.get(key) : null,
+    getItem: (key) => (values.has(key) ? values.get(key) : null),
     setItem: (key, value) => values.set(key, String(value)),
-    removeItem: key => values.delete(key),
+    removeItem: (key) => values.delete(key),
   }
 }
 
@@ -107,7 +155,10 @@ function respond(config, data, status = 200) {
   return { config, data, status, statusText: 'OK', headers: {} }
 }
 
-function installPushBrowser({ permission = 'granted', endpoint = 'https://push.example.test/browser' } = {}) {
+function installPushBrowser({
+  permission = 'granted',
+  endpoint = 'https://push.example.test/browser',
+} = {}) {
   let currentSubscription = null
   let subscribeOptions = null
   let unsubscribeCalls = 0
@@ -126,7 +177,7 @@ function installPushBrowser({ permission = 'granted', endpoint = 'https://push.e
   }
   const pushManager = {
     getSubscription: async () => currentSubscription,
-    subscribe: async options => {
+    subscribe: async (options) => {
       subscribeOptions = options
       currentSubscription = subscription
       return subscription
@@ -140,7 +191,9 @@ function installPushBrowser({ permission = 'granted', endpoint = 'https://push.e
   })
   return {
     subscription,
-    setCurrentSubscription: value => { currentSubscription = value },
+    setCurrentSubscription: (value) => {
+      currentSubscription = value
+    },
     getSubscribeOptions: () => subscribeOptions,
     getUnsubscribeCalls: () => unsubscribeCalls,
   }
@@ -169,7 +222,7 @@ test('unsupported browser skips subscription without calling the API', async () 
   delete globalThis.navigator
   delete globalThis.Notification
   let apiCalls = 0
-  axios.defaults.adapter = async config => {
+  axios.defaults.adapter = async (config) => {
     apiCalls += 1
     return respond(config, {})
   }
@@ -200,7 +253,7 @@ test('VAPID base64url conversion produces the expected bytes', () => {
 test('granted browser subscription is registered in the authenticated API', async () => {
   const browser = installPushBrowser()
   const requests = []
-  axios.defaults.adapter = async config => {
+  axios.defaults.adapter = async (config) => {
     requests.push(config)
     if (config.url === '/vapid-public-key/') return respond(config, { publicKey: 'AQIDBA' })
     return respond(config, { endpoint: browser.subscription.endpoint }, 201)
@@ -221,7 +274,9 @@ test('unsubscribe clears browser and local state when API removal fails', async 
   const browser = installPushBrowser()
   browser.setCurrentSubscription(browser.subscription)
   localStorage.setItem('push_endpoint', browser.subscription.endpoint)
-  axios.defaults.adapter = async () => { throw new Error('API unavailable') }
+  axios.defaults.adapter = async () => {
+    throw new Error('API unavailable')
+  }
 
   await pushService.unsubscribeFromPush()
 
@@ -229,13 +284,75 @@ test('unsubscribe clears browser and local state when API removal fails', async 
   assert.equal(localStorage.getItem('push_endpoint'), null)
 })
 
+test('logout cleans local endpoint even if worker registration fails', async () => {
+  installPushBrowser()
+  navigator.serviceWorker.ready = Promise.reject(new Error('registration failed'))
+  localStorage.setItem('push_endpoint', 'https://push.test/old')
+  axios.defaults.adapter = async (config) => respond(config, {})
+  await pushService.unsubscribeFromPush()
+  assert.equal(localStorage.getItem('push_endpoint'), null)
+})
+
+test('logout waits for an in-flight registration before deleting the subscription', async () => {
+  const browser = installPushBrowser()
+  browser.setCurrentSubscription(browser.subscription)
+  const actions = []
+  let finishRegistration
+  axios.defaults.adapter = (config) => {
+    if (config.method === 'post')
+      return new Promise((resolve) => {
+        finishRegistration = () => {
+          actions.push('registered')
+          resolve(respond(config, {}))
+        }
+      })
+    actions.push('deleted')
+    return Promise.resolve(respond(config, {}))
+  }
+  const subscribe = pushService.subscribeToPush()
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  const unsubscribe = pushService.unsubscribeFromPush()
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  assert.deepEqual(actions, [])
+  finishRegistration()
+  await Promise.all([subscribe, unsubscribe])
+  assert.deepEqual(actions, ['registered', 'deleted'])
+  assert.equal(localStorage.getItem('push_endpoint'), null)
+})
+
+test('logout closes notifications belonging to the previous session', async () => {
+  installPushBrowser()
+  const registration = await navigator.serviceWorker.ready
+  let closed = 0
+  registration.getNotifications = async () => [{ close: () => closed++ }]
+  await pushService.unsubscribeFromPush()
+  assert.equal(closed, 1)
+})
+
+test('missing worker registration has a bounded wait for login synchronization and logout', async (t) => {
+  installPushBrowser()
+  navigator.serviceWorker.ready = new Promise(() => {})
+  t.mock.timers.enable({ apis: ['setTimeout'] })
+  const sync = pushService.syncPushSubscription()
+  t.mock.timers.tick(5001)
+  assert.equal(await sync, null)
+
+  localStorage.setItem('push_endpoint', 'https://push.test/old')
+  axios.defaults.adapter = async (config) => respond(config, {})
+  const logout = pushService.unsubscribeFromPush()
+  t.mock.timers.tick(5001)
+  await logout
+  assert.equal(localStorage.getItem('push_endpoint'), null)
+})
+
 test('login synchronizes a previously granted browser permission', async () => {
   const browser = installPushBrowser()
   const requests = []
-  axios.defaults.adapter = async config => {
+  axios.defaults.adapter = async (config) => {
     requests.push(config.url)
     if (config.url === '/token/') return respond(config, { access: 'access', refresh: 'refresh' })
-    if (config.url === '/usuarios/me/') return respond(config, { id: 7, email: 'user@example.test' })
+    if (config.url === '/usuarios/me/')
+      return respond(config, { id: 7, email: 'user@example.test' })
     if (config.url === '/vapid-public-key/') return respond(config, { publicKey: 'AQIDBA' })
     return respond(config, { endpoint: browser.subscription.endpoint }, 201)
   }
@@ -246,7 +363,12 @@ test('login synchronizes a previously granted browser permission', async () => {
 
   assert.equal(store.loggedIn, true)
   assert.equal(localStorage.getItem('push_endpoint'), browser.subscription.endpoint)
-  assert.deepEqual(requests, ['/token/', '/usuarios/me/', '/vapid-public-key/', '/push-subscriptions/'])
+  assert.deepEqual(requests, [
+    '/token/',
+    '/usuarios/me/',
+    '/vapid-public-key/',
+    '/push-subscriptions/',
+  ])
 })
 
 test('logout clears the session even when push cleanup fails', async () => {
@@ -255,7 +377,9 @@ test('logout clears the session even when push cleanup fails', async () => {
   localStorage.setItem('access_token', 'access')
   localStorage.setItem('refresh_token', 'refresh')
   localStorage.setItem('push_endpoint', browser.subscription.endpoint)
-  axios.defaults.adapter = async () => { throw new Error('API unavailable') }
+  axios.defaults.adapter = async () => {
+    throw new Error('API unavailable')
+  }
   const { useUserStore } = await import('../src/stores/userStore.js')
   const store = useUserStore()
   store.loggedIn = true
@@ -274,7 +398,7 @@ test('Axios sends the current push endpoint with API requests', async () => {
   localStorage.setItem('push_endpoint', 'https://push.example.test/current')
   await import('../src/plugins/axios.js')
   let requestHeaders
-  axios.defaults.adapter = async config => {
+  axios.defaults.adapter = async (config) => {
     requestHeaders = config.headers
     return respond(config, {})
   }

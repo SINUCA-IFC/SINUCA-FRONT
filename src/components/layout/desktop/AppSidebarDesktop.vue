@@ -4,10 +4,13 @@ import { useRoute, useRouter } from 'vue-router'
 import LogoSinuca from '/logo-sinuca.svg'
 import { useUserStore } from '../../../stores/userStore'
 import { useDelegationTabs } from '../../../composables/useDelegationTabs'
+import { useChatStore } from '@/stores/chatStore'
+import UnreadBadge from '@/components/chat/UnreadBadge.vue'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const chatStore = useChatStore()
 const { tabs, activeTab, setTab } = useDelegationTabs()
 
 
@@ -107,6 +110,8 @@ async function logout() {
             :class="{ active: isActivePath(link.path) }"
           >
             <span :class="link.icon"></span>
+            <UnreadBadge v-if="link.path === '/chat'" :count="chatStore.unreadCount"
+              :label="userStore.user.role === 'organizer' ? 'países com mensagens não lidas' : 'mensagens não lidas'" />
             {{ link.name }}
           </RouterLink>
         </li>

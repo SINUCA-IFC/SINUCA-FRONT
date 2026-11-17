@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { formatShortDate } from '@/utils/date'
 import { getCategoryStyle } from '@/utils/categoryStyle'
 const props = defineProps({
@@ -8,6 +9,7 @@ const props = defineProps({
   categoryStyles: { type: Object, default: () => ({}) },
 })
 const emit = defineEmits(['open'])
+const route = useRoute()
 const catInfo = (id) => getCategoryStyle(id, props.categoryStyles)
 const catName = (c) => c.name ?? props.categories.find((x) => x.id === c.id)?.name ?? ''
 const taskDate = computed(() => formatShortDate(props.task.endDate || props.task.startDate))
@@ -16,6 +18,8 @@ const taskDate = computed(() => formatShortDate(props.task.endDate || props.task
 <template>
   <li
     class="task-card"
+    :id="`task-${task.id}`"
+    :class="{ 'task-card--highlighted': String(route.query.task) === String(task.id) }"
     role="button"
     tabindex="0"
     @click="emit('open', task.id)"
@@ -52,6 +56,7 @@ const taskDate = computed(() => formatShortDate(props.task.endDate || props.task
 </template>
 
 <style scoped>
+.task-card--highlighted { outline: 3px solid #ffb30f; outline-offset: 3px; }
 .task-card {
   display: flex;
   flex-direction: column;

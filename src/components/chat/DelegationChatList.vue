@@ -1,4 +1,5 @@
 <script setup>
+import UnreadBadge from './UnreadBadge.vue'
 defineProps({
   countries: { type: Array, default: () => [] },
   loading: Boolean,
@@ -23,15 +24,7 @@ defineEmits(['retry'])
           :to="{ name: 'chat', params: { countryId: country.id } }"
           class="delegation-card"
         >
-          <span
-            v-if="country.unread_count > 0"
-            class="unread-badge"
-            :class="{ 'unread-badge--many': country.unread_count > 99 }"
-            :aria-label="`${country.unread_count} mensagens não lidas`"
-          >
-            <img src="/static/chat-unread-badge.svg" alt="" aria-hidden="true" />
-            <span>{{ country.unread_count > 99 ? '99+' : country.unread_count }}</span>
-          </span>
+          <UnreadBadge :count="country.unread_count" class="country-unread" />
           <div class="delegation-info">
             <h2>{{ country.name }}</h2>
             <p>{{ country.political_name }}</p>
@@ -80,27 +73,9 @@ defineEmits(['retry'])
   min-width: 0;
   overflow-wrap: anywhere;
 }
-.unread-badge {
-  display: grid;
-  position: relative;
+.country-unread {
   grid-column: 1;
   grid-row: 1;
-  place-items: center;
-  width: 23px;
-  height: 23px;
-  color: #fff;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  line-height: 1;
-}
-.unread-badge img {
-  position: absolute;
-}
-.unread-badge span {
-  position: relative;
-}
-.unread-badge--many {
-  font-size: 0.625rem;
 }
 .delegation-info h2 {
   font-size: 1.125rem;

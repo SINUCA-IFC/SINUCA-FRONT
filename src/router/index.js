@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
+import { getPushTarget } from '@/services/pushNotificationPayload';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -86,18 +87,19 @@ router.beforeEach(async (to) => {
   }
 
   if(authStore.loggedIn && (to.name === "login" || to.name === "bem-vindo")) {
+    if (to.query.redirect) return getPushTarget({ data: { url: to.query.redirect } });
     return { name: "home" };
   };
 
   if(to.name === "login") {
     const { title, icon, color } = to.query;
     if(!title || !icon || !color) {
-      return { name: 'bem-vindo' };
+      return { name: 'bem-vindo', query: { redirect: to.query.redirect } };
     }
   }
 
   if (to.meta.requiresAuth && !authStore.loggedIn) {
-    return { name: 'bem-vindo'}
+    return { name: 'bem-vindo', query: { redirect: to.fullPath } }
   }
 
 });

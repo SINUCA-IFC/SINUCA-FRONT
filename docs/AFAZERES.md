@@ -38,52 +38,23 @@ A tela mobile e desktop usa os frames do Figma e a API existente. Alunos com del
 
 Contrato e verificações: [integração front/back](architecture/INTEGRACAO-FRONT-BACK.md#chat-por-delegação).
 
-## Notificações push — prioridade atual
+## Notificações push — implementação concluída, publicação pendente
 
-Escopo definido em 13/11/2026. A implementação seguirá o fluxo da Unidade 8 do material de Desenvolvimento para Dispositivos Móveis: Web Push, VAPID, Service Worker customizado com `injectManifest`, uma subscription por navegador, integração com login/logout e pedido de permissão não intrusivo.
+Implementação ampliada em 17/11/2026, baseada na Unidade 8: Web Push, VAPID, Service Worker customizado com `injectManifest`, inscrição por navegador e integração com login/logout.
 
-Eventos deste ciclo:
+- [x] Notificar novas postagens para usuários ativos inscritos, excluindo o navegador de origem.
+- [x] Notificar responsáveis recém-adicionados às tarefas, sem repetir avisos para quem já estava atribuído.
+- [x] Comando `notify_overdue_tasks`: notificar responsáveis de tarefas com prazo anterior ao dia atual e não concluídas. Registro único por tarefa, responsável e prazo; sem envio bem-sucedido, permite tentar na próxima execução.
+- [x] Notificar o outro lado do chat: alunos da delegação recebem mensagens da organização; organizadores recebem mensagens dos alunos. O corpo do push não contém o texto privado.
+- [x] Criar inscrições autenticadas, chave pública VAPID e serviço de envio com exclusão de origem, timeout e desativação de endpoints expirados.
+- [x] Completar Service Worker, banner “Ativar”/“Agora não”, recebimento, clique e retorno ao destino depois de autenticar.
+- [x] Compartilhar indicadores no desktop/celular: mensagens não lidas para delegados; países com não lidas para organizadores. Reutilizar o símbolo da lista de países e manter atualização sem depender de push.
+- [x] Limpar inscrições/notificações na saída e ignorar respostas antigas de conversas/tarefas ao trocar de conta. Não armazenar respostas autenticadas da API no Service Worker.
+- [x] Cobrir eventos, isolamento, falhas, prazos, contadores e cliques com testes automatizados; gerar build PWA.
+- [ ] Publicar back/front com HTTPS e par VAPID válido, aplicar migrações `0029`/`0030` e configurar execução diária de `notify_overdue_tasks`.
+- [ ] Validar entrega real em duas sessões/navegadores e testar cliques com sessão ativa e expirada.
 
-- `post_created`: avisar todos os usuários ativos que tenham uma subscription autorizada quando uma postagem for publicada.
-- `task_assigned`: avisar somente os usuários adicionados como responsáveis em uma criação ou edição de tarefa. Não repetir o aviso para responsáveis que já estavam atribuídos.
-- `task_overdue`: avisar cada responsável uma única vez quando `endDate` ficar anterior à data atual e a tarefa ainda não estiver concluída. Tarefas sem prazo não geram esse evento.
-
-O endpoint da sessão que iniciou uma ação será enviado no header `X-Push-Endpoint` e excluído da distribuição, conforme o material de referência. Perfil, autenticação por e-mail, central interna de notificações, push de chat e push de cronograma ficam fora deste ciclo. O booleano `Task.notification` existente não representa subscription, entrega ou leitura de push.
-
-### Backend
-
-- [ ] Adicionar a biblioteca de Web Push e configurar `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` e contato VAPID por variáveis de ambiente. Somente a chave pública pode ser enviada ao front.
-- [ ] Criar o modelo `PushSubscription`, vinculado ao usuário, com endpoint único, chaves `p256dh` e `auth`, datas de criação/atualização e estado ativo. Criar e aplicar a migração.
-- [ ] Criar `GET /api/vapid-public-key/`, público, retornando somente a chave pública.
-- [ ] Criar `POST /api/push-subscriptions/`, autenticado, para criar ou atualizar a subscription do navegador atual.
-- [ ] Criar `DELETE /api/push-subscriptions/`, autenticado, para remover somente uma subscription pertencente ao usuário atual.
-- [ ] Criar um serviço único de envio Web Push. Ele deve montar payload JSON pequeno, excluir `X-Push-Endpoint` e desativar endpoints expirados após respostas 404 ou 410.
-- [ ] Emitir `post_created` após a postagem ser salva com sucesso. Uma falha no Push Service não pode desfazer a postagem.
-- [ ] Emitir `task_assigned` após a tarefa ser salva, calculando a diferença entre responsáveis anteriores e novos. Uma falha no push não pode desfazer a tarefa.
-- [ ] Criar registro idempotente da entrega de atraso por tarefa e responsável, impedindo `task_overdue` duplicado.
-- [ ] Criar um comando Django para localizar tarefas vencidas e emitir `task_overdue`. Agendar sua execução diária no ambiente publicado; Web Push não executa verificações futuras sozinho.
-- [ ] Definir payloads com `event`, título, corpo e dados mínimos de navegação: ID da postagem ou da tarefa. Não enviar conteúdo privado desnecessário.
-
-### Frontend
-
-- [ ] Alterar `vite.config.js` de `generateSW` para `injectManifest`, mantendo o manifesto e o cache necessários.
-- [ ] Criar `src/sw.js` com precache, lifecycle, handlers `push` e `notificationclick` e conteúdo específico para `post_created`, `task_assigned` e `task_overdue`.
-- [ ] Ao clicar na notificação, focar uma janela existente ou abrir a aplicação. Encaminhar o usuário para o mural ou para a tarefa correspondente.
-- [ ] Criar `usePushNotifications` para detectar suporte, pedir permissão, converter a chave VAPID, criar a subscription e registrar/remover a subscription no backend.
-- [ ] Adicionar `X-Push-Endpoint` às requisições quando a subscription atual existir.
-- [ ] Integrar subscription ao login quando a permissão já estiver concedida. Integrar unsubscribe ao logout sem bloquear a saída se o Push Service falhar.
-- [ ] Criar um prompt próprio para solicitar permissão somente após login e somente enquanto `Notification.permission === 'default'`. Oferecer “Ativar” e “Agora não”.
-- [ ] Escutar mensagens do Service Worker no `App.vue` para atualizar mural ou tarefas após o clique em uma notificação.
-- [ ] Não armazenar respostas autenticadas da API em cache compartilhado. Limpar estado de notificação e caches privados na troca de conta.
-
-### Testes e publicação
-
-- [ ] Testar propriedade e isolamento das subscriptions, chave pública, autenticação, exclusão da sessão de origem e remoção de endpoints expirados.
-- [ ] Testar destinatários de postagem, diferença de responsáveis e idempotência do atraso. Incluir tarefa sem prazo, concluída, prazo alterado e múltiplos responsáveis.
-- [ ] Testar permissão concedida, negada, navegador sem suporte, subscribe, unsubscribe, login, logout e clique em cada tipo de notificação.
-- [ ] Validar em duas sessões e em navegadores diferentes. Confirmar que a sessão de origem não recebe o próprio evento.
-- [ ] Configurar HTTPS, variáveis VAPID, migrações e agendamento do comando de atrasos no ambiente publicado.
-- [ ] Documentar rotação das chaves VAPID. Uma troca invalida subscriptions existentes e exige nova inscrição.
+Operação, testes e mudanças acumuladas desde os CHORE: [notificações](NOTIFICACOES.md) e `SINUCA-BACK/docs/NOTIFICACOES.md`. Perfil, e-mail, central interna de notificações e push de cronograma continuam fora deste ciclo. O booleano legado `Task.notification` não representa inscrição, entrega ou leitura.
 
 ## Verificação real de e-mail — prioridade alta
 

@@ -1,6 +1,6 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useTaskStore } from '../../stores/taskStore'
 import { useStatusStore } from '../../stores/statusStore'
 import { UseCategoryStore } from '../../stores/categoryStore.js'
@@ -12,11 +12,22 @@ const taskStore = useTaskStore()
 const statusStore = useStatusStore()
 const categoryStore = UseCategoryStore()
 const router = useRouter()
+const route = useRoute()
 
 const emit = defineEmits(['openForm'])
 
 /* ---------- filtro por categoria (visível só no desktop) ---------- */
 const selectedCategory = ref(null)
+
+watch(() => [route.query.task, taskStore.tasks], async () => {
+  const taskId = Number(route.query.task)
+  if (!Number.isSafeInteger(taskId) || taskId <= 0) return
+  selectedCategory.value = null
+  await nextTick()
+  const card = document.getElementById(`task-${taskId}`)
+  card?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  card?.focus({ preventScroll: true })
+}, { immediate: true })
 
 const applyFilter = (list) => {
   if (selectedCategory.value === null) return list
