@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 import ScheduleService from '../services/scheduleService'
+import { getAllPages } from '@/services/pagination'
 
 const scheduleService = new ScheduleService()
 
@@ -24,8 +25,7 @@ export const useScheduleStore = defineStore('schedule', () => {
   async function getSchedules() {
     loading.value = true
     try {
-      const data = await scheduleService.getSchedules()
-      schedules.value = data.results
+      schedules.value = await getAllPages(page => scheduleService.getSchedules(page))
     } finally {
       loading.value = false
     }

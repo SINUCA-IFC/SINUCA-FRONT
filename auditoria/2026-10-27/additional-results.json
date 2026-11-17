@@ -1,0 +1,56 @@
+[
+  {
+    "name": "debug_false_string_exposes_traceback_and_cloudinary_secret",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 500,
+    "traceback_visible": true,
+    "cloudinary_credentials_visible": true,
+    "DEBUG_value": "False",
+    "DEBUG_truthy": true
+  },
+  {
+    "name": "anonymous_update_delete_turmas_valid_length",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "patch_status": 200,
+    "delete_status": 204
+  },
+  {
+    "name": "anonymous_pdf_over_3MiB_accepted",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201,
+    "bytes": 3145744
+  },
+  {
+    "name": "login_no_application_throttling",
+    "kind": "observation",
+    "confirmed": true,
+    "statuses": [
+      401,
+      401,
+      401,
+      401,
+      401,
+      401,
+      401,
+      401
+    ]
+  },
+  {
+    "name": "task_null_dates_accepted",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "student_extracts_admin_password_hash_via_task_assignee",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "create_status": 201,
+    "detail_status": 200,
+    "admin_hash_returned": true,
+    "attacker_is_superuser": false
+  }
+]

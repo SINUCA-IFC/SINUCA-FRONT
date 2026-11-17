@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import TaskService from '@/services/taskService'
+import { getAllPages } from '@/services/pagination'
 
 const taskService = new TaskService()
 
@@ -28,8 +29,7 @@ export const useTaskStore = defineStore('task', () => {
     async function getTasks() {
         carregando.value = true;
         try {
-            const data = await taskService.getTasks()
-            tasks.value = data.results
+            tasks.value = await getAllPages(page => taskService.getTasks(page))
         } finally {
             carregando.value = false;
         }
@@ -46,7 +46,7 @@ export const useTaskStore = defineStore('task', () => {
 
     async function updateTask(id, updatedTask) {
         const updated = await taskService.updateTask(id, updatedTask)
-        const index = tasks.value.findIndex(t => t.id === id)
+        const index = tasks.value.findIndex(t => String(t.id) === String(id))
         if (index !== -1) {
             tasks.value[index] = updated
         }
@@ -54,7 +54,7 @@ export const useTaskStore = defineStore('task', () => {
 
     async function deleteTask(id) {
         await taskService.deleteTask(id)
-        tasks.value = tasks.value.filter(t => t.id !== id)
+        tasks.value = tasks.value.filter(t => String(t.id) !== String(id))
     }
 
     return {

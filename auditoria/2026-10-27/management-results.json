@@ -1,0 +1,19 @@
+[
+  {
+    "name": "admin_existing_user_country_field_missing",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "country_editable": false
+  },
+  {
+    "name": "advanced_population_script_incompatible_models_and_false_success",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "messages": [
+      "❌ Erro ao criar tasks: 'Country' object has no attribute 'code'",
+      "❌ Erro ao criar posts: Invalid field name(s) for model Post: 'country', 'image_url'.",
+      "❌ Erro ao criar cronogramas: 'Country' object has no attribute 'code'",
+      "🎉 POPULAÇÃO AVANÇADA CONCLUÍDA COM SUCESSO!"
+    ]
+  }
+]

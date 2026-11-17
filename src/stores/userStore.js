@@ -3,21 +3,26 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import UserService from '../services/userService'
+import { getAllPages } from '@/services/pagination'
 
 const userService = new UserService()
 
+const getDefaultUser = () => ({
+  email: '',
+  name: '',
+  password: '',
+  foto: null,
+  gang: null,
+  matriculation: '',
+  country: { id: null },
+  approval_pending: false,
+})
+
 export const useUserStore = defineStore('auth', () => {
-  const user = ref({
-    email: '',
-    name: '',
-    password: '',
-    foto: null,
-    gang: null,
-    matriculation: '',
-    country: { id: null },
-  })
+  const user = ref(getDefaultUser())
   const loggedIn = ref(false)
   const users = ref([])
+  const pendingUsers = ref([])
   const loading = ref(false)
   const userType = ref()
 
@@ -35,7 +40,9 @@ export const useUserStore = defineStore('auth', () => {
   }
 
   function logout() {
-    user.value = {}
+    user.value = getDefaultUser()
+    users.value = []
+    pendingUsers.value = []
     loggedIn.value = false
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
@@ -56,11 +63,22 @@ export const useUserStore = defineStore('auth', () => {
   async function getAllUsers() {
     loading.value = true
     try {
-      const data = await userService.getUsers()
-      users.value = data.results
+      users.value = await getAllPages(page => userService.getUsers(page))
     } finally {
       loading.value = false
     }
+  }
+
+  async function getPendingUsers(page = 1) {
+    const data = await userService.getPendingUsers(page)
+    pendingUsers.value = data.results
+    return data
+  }
+
+  async function approveUser(id, countryId) {
+    const approved = await userService.approveUser(id, countryId)
+    pendingUsers.value = pendingUsers.value.filter(user => String(user.id) !== String(id))
+    return approved
   }
 
   function uploadImage(file, description) {
@@ -77,12 +95,15 @@ export const useUserStore = defineStore('auth', () => {
     user,
     loggedIn,
     users,
+    pendingUsers,
     loading,
     login,
     register,
     logout,
     checkAuth,
     getAllUsers,
+    getPendingUsers,
+    approveUser,
     userType,
     uploadImage,
   }

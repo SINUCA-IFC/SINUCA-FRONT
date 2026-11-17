@@ -1,13 +1,14 @@
 <script setup>
 import { computed } from 'vue'
 import { formatShortDate } from '@/utils/date'
+import { getCategoryStyle } from '@/utils/categoryStyle'
 const props = defineProps({
   task: { type: Object, required: true },
   categories: { type: Array, default: () => [] },
   categoryStyles: { type: Object, default: () => ({}) },
 })
 const emit = defineEmits(['open'])
-const catInfo = (id) => props.categoryStyles[id] || {}
+const catInfo = (id) => getCategoryStyle(id, props.categoryStyles)
 const catName = (c) => c.name ?? props.categories.find((x) => x.id === c.id)?.name ?? ''
 const taskDate = computed(() => formatShortDate(props.task.endDate || props.task.startDate))
 </script>

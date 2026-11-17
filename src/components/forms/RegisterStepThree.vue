@@ -25,13 +25,14 @@ const previewUrl = ref(null);
 const selectedFile = ref(null);
 
 const requirements = computed(() => {
+  const matriculation = userStore.user.matriculation ?? ''
   return [
     {
       requirement: 'Digite uma matrícula válida',
       valid:
-        userStore.user.matriculation.length < 10 ||
-        userStore.user.matriculation.length > 10 ||
-        !/^[0-9]+$/.test(userStore.user.matriculation),
+        matriculation.length < 10 ||
+        matriculation.length > 10 ||
+        !/^[0-9]+$/.test(matriculation),
     },
   ]
 })
@@ -49,22 +50,19 @@ async function register() {
   errorMessage.value = ''
 
   try {
-    if(selectedFile.value) {
-      const response = await userStore.uploadImage(selectedFile.value);
-      console.log('UPLOAD RESPONSE:', response.data)
-      userStore.user.foto = response.data.id
-    }
     await userStore.register(
       userStore.user.email,
       userStore.user.name,
       userStore.user.password,
       userStore.user.gang,
       userStore.user.matriculation,
-      userStore.user.foto,
+      selectedFile.value,
     )
     router.push('/')
   } catch (err) {
-    errorMessage.value = 'Erro ao cadastrar. Verifique suas credenciais'
+    errorMessage.value = err.response?.status === 429
+      ? 'Muitas tentativas. Aguarde um minuto e tente novamente.'
+      : err.response?.data?.foto?.[0] || 'Erro ao cadastrar. Verifique os dados e envie uma foto JPEG ou PNG de até 5 MiB.'
   } finally {
     loading.value = false
   }
@@ -134,7 +132,8 @@ onMounted(() => {
           </select>
         </div>
 
-        <AppButton type="submit">CADASTRAR</AppButton>
+        <p v-if="errorMessage" role="alert">{{ errorMessage }}</p>
+        <AppButton type="submit" :disabled="loading">{{ loading ? 'CADASTRANDO...' : 'CADASTRAR' }}</AppButton>
       </form>
     </div>
 

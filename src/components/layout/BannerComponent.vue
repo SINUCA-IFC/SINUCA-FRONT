@@ -18,7 +18,7 @@ const props = defineProps({
                 <span v-if="icon" :class="icon" class="title-icon"></span>
                 <img class="country-flag" v-if="CountryFlagUrl" :src="CountryFlagUrl" :alt="title">
             </div>
-            <p class="subtitle">{{ subtitle }}</p>
+            <p class="subtitle"><slot name="subtitle">{{ subtitle }}</slot></p>
         </div>
         <img class="ods-shape" src="/static/ods-shape.svg" alt="ods-shape">
     </section>

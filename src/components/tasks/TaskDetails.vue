@@ -30,8 +30,12 @@ const isFormUnchanged = computed(() => {
 
 async function handleSubmit() {
   if (saving.value || loading.value) return
-  saving.value = true
   error.value = ''
+  if (!taskStore.task.category.length || !taskStore.task.user.length) {
+    error.value = 'Selecione pelo menos uma categoria e um responsável.'
+    return
+  }
+  saving.value = true
   try {
     if (isEditMode.value) {
       await taskStore.updateTask(taskStore.task.id ?? props.taskId, taskStore.task)
@@ -39,8 +43,14 @@ async function handleSubmit() {
       await taskStore.createTask(taskStore.task)
     }
     emits('close')
-  } catch {
-    error.value = 'Não foi possível salvar a tarefa. Tente novamente.'
+  } catch (err) {
+    const data = err.response?.data
+    const [field, messages] = data && typeof data === 'object' ? Object.entries(data)[0] || [] : []
+    const labels = { title: 'Título', category: 'Categoria', user: 'Responsáveis', startDate: 'Início', endDate: 'Fim' }
+    const description = Array.isArray(messages) ? messages.join(' ') : messages
+    error.value = description
+      ? `${labels[field] || 'Erro'}: ${description}`
+      : 'Não foi possível salvar a tarefa. Tente novamente.'
   } finally {
     saving.value = false
   }

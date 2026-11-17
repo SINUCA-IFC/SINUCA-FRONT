@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 import CategoryService from "@/services/categoryService";
+import { getAllPages } from '@/services/pagination';
+import { getCategoryStyle } from '@/utils/categoryStyle';
 
 const categoryService = new CategoryService();
 
@@ -20,15 +22,14 @@ export const UseCategoryStore = defineStore('categoria', () => {
     }
 
     function getCategoryActive(id){
-        return categoriesStyle[id]
+        return getCategoryStyle(id, categoriesStyle)
     }
 
 
     async function getCategories() {
         loading.value = true
         try {
-            const data = await categoryService.getAllCategorys()
-            categories.value = data.results;
+            categories.value = await getAllPages(page => categoryService.getAllCategorys(page));
         }
         finally {
             loading.value = false
