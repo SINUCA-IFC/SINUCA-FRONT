@@ -6,6 +6,8 @@ A aplicação centraliza notícias, materiais de apoio, tarefas e informações 
 
 A API utilizada pela interface está no [SINUCA-BACK](https://github.com/SINUCA-IFC/SINUCA-BACK).
 
+FIGMA: https://www.figma.com/design/SxdVw9n8771wtU9HICf8Jg/SINUCA---LAYOUT?node-id=422-435&t=YW5CfsnfCA3GOPeE-1
+
 ## Funcionalidades
 
 - Mural de notícias e comunicados.
