@@ -35,7 +35,7 @@ async function getPost(id) {
 
 async function createPost(newPost) {
     const createdPost = await postService.createPost(newPost)
-    posts.value.push(createdPost)
+    posts.value.unshift(createdPost)
 }
 
 async function updatePost(id, updatedPost) {
