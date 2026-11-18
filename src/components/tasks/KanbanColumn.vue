@@ -1,75 +1,141 @@
 <script setup>
+import draggable from 'vuedraggable'
+import AppButton from '@/components/forms/AppButton.vue'
 import TaskCard from './TaskCard.vue'
+
 defineProps({
   title: String,
   color: String,
   empty: String,
   tasks: { type: Array, default: () => [] },
+  disabled: Boolean,
   categories: { type: Array, default: () => [] },
   categoryStyles: { type: Object, default: () => ({}) },
 })
-const emit = defineEmits(['open'])
+const emit = defineEmits(['open', 'move-task', 'add-task'])
+
+function handleChange({ added, moved }) {
+  const destination = added ?? moved
+  if (destination) emit('move-task', destination)
+}
 </script>
 <template>
-  <section class="column">
-    <h5 :style="{ color: color }">
+  <section class="column" :style="{ '--column-color': color }">
+    <h5 class="column-title">
       {{ title }}
-      <span class="count-task"> {{ tasks.length }} </span>
+      <span class="count-task">{{ tasks.length }}</span>
     </h5>
 
-    <ul v-if="tasks.length > 0">
-      <TaskCard
-        v-for="task in tasks"
-        :key="task.id"
-        :task="task"
-        :categories="categories"
-        :category-styles="categoryStyles"
-        @open="emit('open', $event)"
-      />
-    </ul>
-    <p v-else class="default">{{ empty }}</p>
+    <div class="column-body">
+      <draggable
+        class="task-drop-zone"
+        tag="ul"
+        :aria-label="title"
+        :model-value="tasks"
+        :disabled="disabled"
+        item-key="id"
+        group="kanban-tasks"
+        handle=".drag-handle"
+        direction="vertical"
+        ghost-class="task-ghost"
+        :animation="150"
+        :force-fallback="true"
+        :fallback-on-body="true"
+        :fallback-tolerance="5"
+        @change="handleChange"
+      >
+        <template #item="{ element }">
+          <TaskCard
+            :task="element"
+            :categories="categories"
+            :category-styles="categoryStyles"
+            @open="emit('open', $event)"
+          />
+        </template>
+      </draggable>
+      <p v-if="tasks.length === 0" class="default">{{ empty }}</p>
+    </div>
+
+    <AppButton class="add-task" :aria-label="`Adicionar tarefa · ${title}`" @click="emit('add-task')">
+      Adicionar tarefa
+      <span class="mdi mdi-plus" aria-hidden="true"></span>
+    </AppButton>
   </section>
 </template>
 <style scoped>
 .column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
   min-width: 0;
+  padding: 1rem;
+  border: 1.5px solid var(--column-color);
+  border-radius: 0.75rem;
+  background: #fff;
 }
 
-h5 {
-  font-weight: 500;
-  margin: 1.2rem 0;
+.column-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  color: #142238;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .count-task {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  color: color-mix(in srgb, var(--column-color) 70%, #142238);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
 
-  width: 24px;
-  height: 24px;
+.column-body {
+  position: relative;
+}
 
-  background-color: #fff;
-  border-radius: 50%;
-  margin-left: 1rem;
+.task-drop-zone {
+  block-size: clamp(17rem, 41vh, 22rem);
+  overflow-y: auto;
+  padding: 0.2rem;
+}
+
+.task-drop-zone :deep(.task-ghost) {
+  opacity: 0.35;
 }
 
 .default {
-  color: #969696;
-  font-weight: 500;
+  position: absolute;
+  inset: 0.9rem 0.75rem auto;
+  pointer-events: none;
+  color: #596578;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
-@media (min-width: 1024px) {
-  h5 {
-    font-size: 1.2rem;
-    margin: 0 0 1.2rem;
+.column-body:has(.task-ghost) .default {
+  visibility: hidden;
+}
+
+.add-task {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  margin-top: 0;
+  padding-inline: 0.75rem;
+  font-size: 0.925rem;
+}
+
+@media (max-width: 1023px) {
+  .column {
+    padding: 0.75rem;
   }
 
-  .count-task {
-    width: 22px;
-    height: 22px;
-    margin-left: 0.6rem;
-    font-size: 0.85rem;
-    color: #1a1a1a;
+  .task-drop-zone {
+    block-size: clamp(13rem, 37vh, 19rem);
   }
 }
 </style>
