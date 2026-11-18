@@ -6,7 +6,6 @@ import { useStatusStore } from '../../stores/statusStore'
 import { UseCategoryStore } from '../../stores/categoryStore.js'
 import KanbanColumn from '@/components/tasks/KanbanColumn.vue'
 import TaskCategoryFilter from '@/components/tasks/TaskCategoryFilter.vue'
-import AppButton from '../forms/AppButton.vue'
 
 const taskStore = useTaskStore()
 const statusStore = useStatusStore()
@@ -17,6 +16,8 @@ const emit = defineEmits(['openForm'])
 
 /* ---------- filtro por categoria (visível só no desktop) ---------- */
 const selectedCategory = ref(null)
+const savingMove = ref(false)
+const moveError = ref('')
 
 const applyFilter = (list) => {
   if (selectedCategory.value === null) return list
@@ -26,27 +27,45 @@ const applyFilter = (list) => {
 /* ---------- colunas do kanban ---------- */
 const columns = computed(() => [
   {
-    key: 'toDo',
-    title: 'A FAZER',
-    color: '#fd151b',
+    status: 1,
+    title: 'A fazer',
+    color: '#e94d2b',
     empty: 'Nenhuma tarefa a fazer',
     tasks: applyFilter(statusStore.toDo),
   },
   {
-    key: 'doing',
-    title: 'EM ANDAMENTO',
-    color: '#FFB30F',
+    status: 2,
+    title: 'Em andamento',
+    color: '#e99a13',
     empty: 'Nenhuma tarefa em andamento',
     tasks: applyFilter(statusStore.doing),
   },
   {
-    key: 'done',
-    title: 'CONCLUÍDO',
-    color: '#849324',
+    status: 3,
+    title: 'Concluída',
+    color: '#2a9655',
     empty: 'Nenhuma tarefa concluída',
     tasks: applyFilter(statusStore.done),
   },
 ])
+
+async function moveTask(column, { element, newIndex }) {
+  if (savingMove.value) return
+
+  const otherTasks = column.tasks.filter((task) => task.id !== element.id)
+  const nextTask = otherTasks[newIndex]
+  const previousTask = otherTasks[newIndex - 1]
+
+  moveError.value = ''
+  savingMove.value = true
+  try {
+    await taskStore.moveTask(element.id, column.status, nextTask?.id, previousTask?.id)
+  } catch {
+    moveError.value = 'Não foi possível mover a tarefa. Tente novamente.'
+  } finally {
+    savingMove.value = false
+  }
+}
 
 function openTask(taskId) {
   router.push(`/delegacao/tarefas/${taskId}/editar`)
@@ -63,26 +82,28 @@ onMounted(() => {
     <div class="header-title">
       <h4 class="section-title">Quadro de Tarefas</h4>
 
-      <div class="header-actions">
-        <!-- Filtro (desktop) -->
-        <TaskCategoryFilter
-          v-model="selectedCategory"
-          :categories="categoryStore.categories"
-          :category-styles="categoryStore.categoriesStyle"
-        />
-
-        <AppButton @click="emit('openForm')">Nova +</AppButton>
-      </div>
+      <TaskCategoryFilter
+        v-model="selectedCategory"
+        :categories="categoryStore.categories"
+        :category-styles="categoryStore.categoriesStyle"
+      />
     </div>
 
-    <div class="tasks-list">
+    <p v-if="moveError" class="move-error" role="alert">{{ moveError }}</p>
+    <div class="tasks-list" :aria-busy="savingMove">
       <KanbanColumn
         v-for="col in columns"
-        :key="col.key"
-        v-bind="col"
+        :key="col.status"
+        :title="col.title"
+        :color="col.color"
+        :empty="col.empty"
+        :tasks="col.tasks"
+        :disabled="savingMove"
         :categories="categoryStore.categories"
         :category-styles="categoryStore.categoriesStyle"
         @open="openTask"
+        @add-task="emit('openForm', col.status)"
+        @move-task="moveTask(col, $event)"
       />
     </div>
   </section>
@@ -93,6 +114,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .section-title {
@@ -100,28 +122,24 @@ onMounted(() => {
   font-size: 1.5rem;
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
+.tasks-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
 }
 
-.tasks-list {
-  margin-top: 2rem;
+.move-error {
+  margin-top: 1rem;
+  color: #b42318;
 }
-@media (min-width: 1024px) {
-  .tasks-list {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
-    align-items: start;
-    margin-top: 1.5rem;
-  }
-}
+
 @media (max-width: 1023px) {
-  .header-title {
-    flex-wrap: wrap;
+  .tasks-list {
+    grid-template-columns: repeat(3, minmax(16rem, 1fr));
     gap: 0.75rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.25rem 1rem;
   }
 }
 </style>
