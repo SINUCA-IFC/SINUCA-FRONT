@@ -52,6 +52,24 @@ export const useTaskStore = defineStore('task', () => {
         }
     }
 
+    async function moveTask(id, status, nextTaskId, previousTaskId) {
+        const current = tasks.value.find(task => task.id === id)
+        if (!current) return
+
+        if (current.status !== status) {
+            await updateTask(id, { status })
+        }
+
+        const index = tasks.value.findIndex(task => task.id === id)
+        if (index === -1) return
+
+        const [moved] = tasks.value.splice(index, 1)
+        const nextIndex = tasks.value.findIndex(task => task.id === nextTaskId)
+        const previousIndex = tasks.value.findIndex(task => task.id === previousTaskId)
+        const destination = nextIndex !== -1 ? nextIndex : previousIndex + 1
+        tasks.value.splice(destination, 0, moved)
+    }
+
     async function deleteTask(id) {
         await taskService.deleteTask(id)
         tasks.value = tasks.value.filter(t => String(t.id) !== String(id))
@@ -64,6 +82,7 @@ export const useTaskStore = defineStore('task', () => {
         getTask,
         createTask,
         updateTask,
+        moveTask,
         deleteTask,
         resetTask
     }

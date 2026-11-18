@@ -14,7 +14,7 @@ import AppButton from '@/components/forms/AppButton.vue'
 const taskStore = useTaskStore()
 const userStore = useUserStore()
 const categoryStore = UseCategoryStore()
-const props = defineProps({ taskId: [String, Number] })
+const props = defineProps({ taskId: [String, Number], initialStatus: Number })
 
 const emits = defineEmits(['close'])
 const isEditMode = computed(() => !!props.taskId)
@@ -74,6 +74,9 @@ async function loadTask() {
   loading.value = true
   error.value = ''
   taskStore.resetTask()
+  if (!isEditMode.value && props.initialStatus !== undefined) {
+    taskStore.task.status = props.initialStatus
+  }
   try {
     await Promise.all([
       userStore.getAllUsers(),

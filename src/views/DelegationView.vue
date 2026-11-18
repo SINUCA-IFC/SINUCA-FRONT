@@ -38,9 +38,8 @@ const route = useRoute();
 const activeModal = ref("");
 const selectedScheduleId = ref(null)
 
-const openTaskForm = () => {
-    activeModal.value = 'form-tarefa'
-    router.push('/delegacao/nova-tarefa')
+const openTaskForm = (status) => {
+    router.push({ path: '/delegacao/nova-tarefa', query: { status } })
 };
 
 const openScheduleModal = (id) => {
