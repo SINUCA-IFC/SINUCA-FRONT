@@ -14,38 +14,50 @@ const router = useRouter()
 
 const emit = defineEmits(['openForm'])
 
-/* ---------- filtro por categoria (visível só no desktop) ---------- */
+const searchText = ref('')
 const selectedCategory = ref(null)
 const savingMove = ref(false)
 const moveError = ref('')
 
-const applyFilter = (list) => {
-  if (selectedCategory.value === null) return list
-  return list.filter((t) => t.category?.some((c) => c.id === selectedCategory.value))
+function normalizeSearch(value) {
+  return value.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase('pt-BR').trim()
 }
 
-/* ---------- colunas do kanban ---------- */
+const searchTerm = computed(() => normalizeSearch(searchText.value))
+
+function applyFilters(tasks) {
+  const term = searchTerm.value
+  const categoryId = selectedCategory.value
+  if (!term && categoryId === null) return tasks
+
+  return tasks.filter(
+    (task) =>
+      (categoryId === null || task.category?.some((category) => category.id === categoryId)) &&
+      (!term || normalizeSearch(task.title).includes(term)),
+  )
+}
+
 const columns = computed(() => [
   {
     status: 1,
     title: 'A fazer',
     color: '#e94d2b',
     empty: 'Nenhuma tarefa a fazer',
-    tasks: applyFilter(statusStore.toDo),
+    tasks: applyFilters(statusStore.toDo),
   },
   {
     status: 2,
     title: 'Em andamento',
     color: '#e99a13',
     empty: 'Nenhuma tarefa em andamento',
-    tasks: applyFilter(statusStore.doing),
+    tasks: applyFilters(statusStore.doing),
   },
   {
     status: 3,
     title: 'Concluída',
     color: '#2a9655',
     empty: 'Nenhuma tarefa concluída',
-    tasks: applyFilter(statusStore.done),
+    tasks: applyFilters(statusStore.done),
   },
 ])
 
@@ -89,6 +101,16 @@ onMounted(() => {
       />
     </div>
 
+    <label class="task-search">
+      <span class="mdi mdi-magnify" aria-hidden="true"></span>
+      <input
+        v-model="searchText"
+        type="search"
+        aria-label="Pesquisar tarefas por título"
+        placeholder="Pesquisar tarefas"
+      />
+    </label>
+
     <p v-if="moveError" class="move-error" role="alert">{{ moveError }}</p>
     <div class="tasks-list" :aria-busy="savingMove">
       <KanbanColumn
@@ -96,7 +118,7 @@ onMounted(() => {
         :key="col.status"
         :title="col.title"
         :color="col.color"
-        :empty="col.empty"
+        :empty="searchTerm ? 'Sem resultados nesta coluna' : col.empty"
         :tasks="col.tasks"
         :disabled="savingMove"
         :categories="categoryStore.categories"
@@ -122,6 +144,40 @@ onMounted(() => {
   font-size: 1.5rem;
 }
 
+.task-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  margin-top: 0.875rem;
+  padding-inline: 0.75rem;
+  border: 1px solid #bdc6d1;
+  border-radius: 0.5rem;
+  color: #596578;
+  background: #fff;
+  cursor: text;
+}
+
+.task-search:focus-within {
+  outline: 2px solid #01295f;
+  outline-offset: 1px;
+}
+
+.task-search .mdi {
+  font-size: 1.25rem;
+}
+
+.task-search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  color: #142238;
+  background: transparent;
+  font: inherit;
+}
+
 .tasks-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -135,6 +191,10 @@ onMounted(() => {
 }
 
 @media (max-width: 1023px) {
+  .header-title {
+    flex-wrap: wrap;
+  }
+
   .tasks-list {
     grid-template-columns: repeat(3, minmax(16rem, 1fr));
     gap: 0.75rem;
