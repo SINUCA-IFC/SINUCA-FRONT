@@ -228,7 +228,7 @@ onUnmounted(() => {
 
 <template>
   <AppLayout
-    :title="showingDelegations ? 'Delegações' : 'Chat'"
+    :title="showingDelegations ? 'Delegações' : isOrganizer && country?.name ? `Chat · ${country.name}` : 'Chat'"
     class="chat-layout"
     :class="{
       'chat-layout--delegations': showingDelegations,
@@ -663,6 +663,30 @@ select:focus-visible {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+@media (max-width: 1023px) {
+  .chat-layout:not(.chat-layout--delegations) :deep(.header-class),
+  .chat-layout:not(.chat-layout--delegations) :deep(footer) {
+    flex-shrink: 0;
+  }
+  .chat-layout:not(.chat-layout--delegations) :deep(footer) {
+    position: static;
+  }
+  .chat-layout:not(.chat-layout--delegations) :deep(.app-content) {
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+  .chat-page:not(.chat-page--delegations) {
+    gap: 0;
+    padding: 0;
+  }
+  .chat-page:not(.chat-page--delegations) .chat-banner {
+    display: none;
+  }
+  .chat-page:not(.chat-page--delegations) .chat-panel {
+    border-radius: 0;
+    box-shadow: none;
+  }
 }
 @media (max-width: 359px) {
   .chat-layout--organizer .chat-banner :deep(.title-area) {
