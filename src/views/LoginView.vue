@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/userStore';
 import { useRoute, useRouter } from 'vue-router';
+import { getPushTarget } from '@/services/pushNotificationPayload';
 import AppInput from '@/components/forms/AppInput.vue';
 import AppButton from '@/components/forms/AppButton.vue';
 import odsShape from  '/static/ods-shape.svg'
@@ -37,7 +38,7 @@ async function login() {
     errorMessage.value = '';
     try {
         await userStore.login(email.value, password.value);
-        router.push('/');
+        router.push(route.query.redirect ? getPushTarget({ data: { url: route.query.redirect } }) : '/');
     } catch (err){
         errorMessage.value = 'Erro ao entrar. Verifique suas credenciais.';
     } finally {

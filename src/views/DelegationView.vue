@@ -35,6 +35,10 @@ const { activeTab } = useDelegationTabs();
 
 const router = useRouter();
 const route = useRoute();
+const notificationTaskId = computed(() => /^[1-9]\d*$/.test(String(route.query.task)) ? Number(route.query.task) : null);
+watch(() => route.query.task, (taskId) => {
+    if (taskId) activeTab.value = 0;
+}, { immediate: true });
 const activeModal = ref("");
 const selectedScheduleId = ref(null)
 
@@ -98,8 +102,8 @@ const refreshApproval = async () => {
     }
 };
 
-const logout = () => {
-    userStore.logout()
+const logout = async () => {
+    await userStore.logout()
     router.push('/bem-vindo')
 };
 
@@ -136,6 +140,7 @@ onMounted(loadDelegation);
                 </button>
             </div>
         </section>
+        <CreatTaskModal v-if="notificationTaskId" :task-id="notificationTaskId" read-only @close="closeModal" />
     </AppLayout>
     <AppLayout v-else title="Delegação">
         <main class="delegation-content">

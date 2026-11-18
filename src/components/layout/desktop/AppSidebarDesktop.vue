@@ -5,10 +5,13 @@ import LogoSinuca from '/logo-sinuca.svg'
 import { useUserStore } from '../../../stores/userStore'
 import { useDelegationTabs } from '../../../composables/useDelegationTabs'
 import UserAvatar from '../UserAvatar.vue'
+import { useChatStore } from '@/stores/chatStore'
+import UnreadBadge from '@/components/chat/UnreadBadge.vue'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const chatStore = useChatStore()
 const { tabs, activeTab, setTab } = useDelegationTabs()
 
 
@@ -40,8 +43,8 @@ function openTab(tab) {
 
 const isActivePath = (path) => route.path === path || route.path.startsWith(`${path}/`)
 
-function logout() {
-  userStore.logout()
+async function logout() {
+  await userStore.logout()
   router.push('/login')
 }
 </script>
@@ -107,7 +110,11 @@ function logout() {
             class="main-item"
             :class="{ active: isActivePath(link.path) }"
           >
-            <span :class="link.icon"></span>
+            <span class="main-icon">
+              <span :class="link.icon" aria-hidden="true"></span>
+              <UnreadBadge v-if="link.path === '/chat'" class="chat-badge" :count="chatStore.unreadCount"
+                :label="userStore.user.role === 'organizer' ? 'países com mensagens não lidas' : 'mensagens não lidas'" />
+            </span>
             {{ link.name }}
           </RouterLink>
         </li>
@@ -241,6 +248,33 @@ function logout() {
 
 .main-item .mdi {
   font-size: 1.3rem;
+}
+
+.main-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.main-icon .chat-badge {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #01295f;
+  border-radius: 50%;
+  background: #fd151b;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+  font-size: 0.625rem;
+  pointer-events: none;
+}
+
+.chat-badge :deep(img) {
+  display: none;
 }
 
 .main-item:hover {

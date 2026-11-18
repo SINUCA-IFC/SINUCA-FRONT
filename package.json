@@ -23,7 +23,9 @@
     "prettier": "3.8.1",
     "vite": "^7.0.0",
     "vite-plugin-pwa": "^1.2.0",
-    "vite-plugin-vue-devtools": "^8.1.1"
+    "vite-plugin-vue-devtools": "^8.1.1",
+    "workbox-precaching": "^7.4.0",
+    "workbox-routing": "^7.4.0"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

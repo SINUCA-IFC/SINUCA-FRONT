@@ -62,6 +62,29 @@ test('a rejected deletion preserves the existing task', async () => {
   assert.equal(store.tasks[0].title, 'Original')
 })
 
+test('moving a task saves its status and places it between the destination neighbors', async () => {
+  const store = useTaskStore()
+  store.tasks = [{ id: 1, status: 1 }, { id: 2, status: 2 }, { id: 3, status: 2 }]
+  axios.defaults.adapter = async config => {
+    assert.deepEqual(JSON.parse(config.data), { status: 2 })
+    return respond(config, { id: 1, status: 2 })
+  }
+  await store.moveTask(1, 2, 3, 2)
+  assert.deepEqual(store.tasks, [{ id: 2, status: 2 }, { id: 1, status: 2 }, { id: 3, status: 2 }])
+
+  axios.defaults.adapter = async () => { throw new Error('Reordering must stay local') }
+  await store.moveTask(3, 2, 2)
+  assert.deepEqual(store.tasks.map(task => task.id), [3, 2, 1])
+})
+
+test('a rejected task move preserves both its status and order', async () => {
+  const store = useTaskStore()
+  store.tasks = [{ id: 1, status: 1 }, { id: 2, status: 2 }]
+  axios.defaults.adapter = async () => { throw new Error('API unavailable') }
+  await assert.rejects(store.moveTask(1, 2, undefined, 2))
+  assert.deepEqual(store.tasks, [{ id: 1, status: 1 }, { id: 2, status: 2 }])
+})
+
 const lists = [
   ['tarefas', useTaskStore, 'getTasks', 'tasks'],
   ['categorias', UseCategoryStore, 'getCategories', 'categories'],

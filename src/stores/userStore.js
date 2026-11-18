@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 
 import UserService from '../services/userService'
 import { getAllPages } from '@/services/pagination'
+import { syncPushSubscription, unsubscribeFromPush } from '@/services/pushNotificationService'
 
 const userService = new UserService()
 
@@ -32,6 +33,7 @@ export const useUserStore = defineStore('auth', () => {
     localStorage.setItem('refresh_token', data.refresh)
     user.value = await userService.getUser()
     loggedIn.value = true
+    await syncPushSubscription()
   }
 
   async function register(email, name, password, gang, matriculation, foto) {
@@ -39,13 +41,17 @@ export const useUserStore = defineStore('auth', () => {
     await login(email, password)
   }
 
-  function logout() {
-    user.value = getDefaultUser()
-    users.value = []
-    pendingUsers.value = []
-    loggedIn.value = false
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+  async function logout() {
+    try {
+      await unsubscribeFromPush()
+    } finally {
+      user.value = getDefaultUser()
+      users.value = []
+      pendingUsers.value = []
+      loggedIn.value = false
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+    }
   }
 
   async function checkAuth() {
@@ -54,8 +60,9 @@ export const useUserStore = defineStore('auth', () => {
       try {
         user.value = await userService.getUser()
         loggedIn.value = true
+        await syncPushSubscription()
       } catch {
-        logout()
+        await logout()
       }
     }
   }

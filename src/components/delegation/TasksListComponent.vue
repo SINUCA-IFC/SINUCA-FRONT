@@ -1,6 +1,6 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useTaskStore } from '../../stores/taskStore'
 import { useStatusStore } from '../../stores/statusStore'
 import { UseCategoryStore } from '../../stores/categoryStore.js'
@@ -11,6 +11,7 @@ const taskStore = useTaskStore()
 const statusStore = useStatusStore()
 const categoryStore = UseCategoryStore()
 const router = useRouter()
+const route = useRoute()
 
 const emit = defineEmits(['openForm'])
 
@@ -36,6 +37,17 @@ function applyFilters(tasks) {
       (!term || normalizeSearch(task.title).includes(term)),
   )
 }
+
+watch(() => [route.query.task, taskStore.tasks], async () => {
+  const taskId = Number(route.query.task)
+  if (!Number.isSafeInteger(taskId) || taskId <= 0) return
+  selectedCategory.value = null
+  searchText.value = ''
+  await nextTick()
+  const card = document.getElementById(`task-${taskId}`)
+  card?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  card?.focus({ preventScroll: true })
+}, { immediate: true })
 
 const columns = computed(() => [
   {

@@ -1,9 +1,10 @@
 <script setup>
 import { useUserStore } from '@/stores/userStore';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import LogoAzul from '/logo-azul.svg'
 
 const router = useRouter();
+const route = useRoute();
 const userStore = useUserStore();
 
 const options = [
@@ -38,7 +39,7 @@ const selectUserType = ((id, title, icon, color) => {
 
     router.push({
         path: '/login',
-        query: { id, title, icon, color }
+        query: { id, title, icon, color, redirect: route.query.redirect }
     })
 })
 </script>

@@ -6,8 +6,12 @@ import BannerComponent from '@/components/layout/BannerComponent.vue'
 import DelegationChatList from '@/components/chat/DelegationChatList.vue'
 import MessageService from '@/services/messageService'
 import { useUserStore } from '@/stores/userStore'
+import { storeToRefs } from 'pinia'
+import { useChatStore } from '@/stores/chatStore'
 
 const userStore = useUserStore()
+const chatStore = useChatStore()
+const { conversations, loading: countriesLoading, error: countriesError } = storeToRefs(chatStore)
 const route = useRoute()
 const router = useRouter()
 const messageService = new MessageService()
@@ -19,9 +23,6 @@ const refreshing = ref(false)
 const sending = ref(false)
 const loadError = ref('')
 const sendError = ref('')
-const countriesLoading = ref(false)
-const countriesError = ref('')
-const conversations = ref([])
 const reading = ref(false)
 const markingUnread = ref(false)
 const readError = ref('')
@@ -52,7 +53,6 @@ const subtitle = computed(() => {
 // Cada número invalida as respostas antigas da operação correspondente.
 let requestNumber = 0
 let conversationNumber = 0
-let listRequestNumber = 0
 let refreshTimer
 let disposed = false
 
@@ -101,7 +101,10 @@ async function markVisibleMessagesRead() {
   readError.value = ''
   try {
     await messageService.markAsRead(countryId.value, lastId)
-    if (conversation === conversationNumber) lastReadMessageId.value = lastId
+    if (conversation === conversationNumber) {
+      lastReadMessageId.value = lastId
+      await chatStore.refresh({ force: true })
+    }
   } catch {
     if (conversation === conversationNumber)
       readError.value = 'Não foi possível confirmar a leitura. Tente atualizar a conversa.'
@@ -118,6 +121,7 @@ async function markAsUnread() {
   readError.value = ''
   try {
     await messageService.markAsUnread(countryId.value)
+    await chatStore.refresh({ force: true })
     if (conversation === conversationNumber)
       await router.push(isOrganizer.value ? '/chat' : '/mural')
   } catch {
@@ -169,18 +173,7 @@ function handleEnter(event) {
 
 async function loadConversations() {
   if (disposed || !isOrganizer.value || !canChat.value) return
-  const request = ++listRequestNumber
-  countriesLoading.value = true
-  countriesError.value = ''
-  try {
-    const result = await messageService.getConversations()
-    if (request === listRequestNumber) conversations.value = result
-  } catch {
-    if (request === listRequestNumber)
-      countriesError.value = 'Não foi possível carregar as delegações.'
-  } finally {
-    if (request === listRequestNumber) countriesLoading.value = false
-  }
+  await chatStore.refresh()
 }
 
 function refreshVisibleChat() {
@@ -192,11 +185,7 @@ function refreshVisibleChat() {
     markingUnread.value
   )
     return
-  if (showingDelegations.value) {
-    if (!countriesLoading.value) loadConversations()
-  } else {
-    loadMessages()
-  }
+  if (!showingDelegations.value) loadMessages()
 }
 
 watch(
@@ -204,7 +193,6 @@ watch(
   () => {
     requestNumber += 1
     conversationNumber += 1
-    listRequestNumber += 1
     messages.value = []
     draft.value = ''
     loadError.value = ''
@@ -216,7 +204,6 @@ watch(
     lastReadMessageId.value = 0
     lastLoadedMessageId.value = 0
     readError.value = ''
-    conversations.value = []
     if (isOrganizer.value) loadConversations()
     loadMessages(true)
   },
@@ -226,21 +213,22 @@ watch(
 onMounted(() => {
   refreshTimer = setInterval(refreshVisibleChat, 10000)
   document.addEventListener('visibilitychange', refreshVisibleChat)
+  window.addEventListener('sinuca:chat-message', refreshVisibleChat)
 })
 
 onUnmounted(() => {
   disposed = true
   requestNumber += 1
   conversationNumber += 1
-  listRequestNumber += 1
   clearInterval(refreshTimer)
   document.removeEventListener('visibilitychange', refreshVisibleChat)
+  window.removeEventListener('sinuca:chat-message', refreshVisibleChat)
 })
 </script>
 
 <template>
   <AppLayout
-    :title="showingDelegations ? 'Delegações' : 'Chat'"
+    :title="showingDelegations ? 'Delegações' : isOrganizer && country?.name ? `Chat · ${country.name}` : 'Chat'"
     class="chat-layout"
     :class="{
       'chat-layout--delegations': showingDelegations,
@@ -675,6 +663,30 @@ select:focus-visible {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+@media (max-width: 1023px) {
+  .chat-layout:not(.chat-layout--delegations) :deep(.header-class),
+  .chat-layout:not(.chat-layout--delegations) :deep(footer) {
+    flex-shrink: 0;
+  }
+  .chat-layout:not(.chat-layout--delegations) :deep(footer) {
+    position: static;
+  }
+  .chat-layout:not(.chat-layout--delegations) :deep(.app-content) {
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+  .chat-page:not(.chat-page--delegations) {
+    gap: 0;
+    padding: 0;
+  }
+  .chat-page:not(.chat-page--delegations) .chat-banner {
+    display: none;
+  }
+  .chat-page:not(.chat-page--delegations) .chat-panel {
+    border-radius: 0;
+    box-shadow: none;
+  }
 }
 @media (max-width: 359px) {
   .chat-layout--organizer .chat-banner :deep(.title-area) {

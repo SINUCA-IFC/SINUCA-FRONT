@@ -1,5 +1,9 @@
 import axios from 'axios';
-import router from '@/router';
+
+const redirectToLogin = async () => {
+  const { default: router } = await import('@/router/index.js');
+  return router.push({ name: 'login' });
+};
 
 // Configura a baseURL usando a variável de ambiente
 
@@ -14,6 +18,10 @@ axios.interceptors.request.use(
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    const pushEndpoint = localStorage.getItem('push_endpoint');
+    if (pushEndpoint) {
+      config.headers['X-Push-Endpoint'] = pushEndpoint;
     }
     return config;
   },
@@ -64,7 +72,7 @@ axios.interceptors.response.use(
         isRefreshing = false;
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        router.push({ name: 'login' });
+        await redirectToLogin();
         return Promise.reject(error);
       }
 
@@ -78,7 +86,7 @@ axios.interceptors.response.use(
         processQueue(refreshError, null);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        router.push({ name: 'login' });
+        await redirectToLogin();
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
