@@ -19,6 +19,18 @@ const searchText = ref('')
 const selectedCategory = ref(null)
 const savingMove = ref(false)
 const moveError = ref('')
+let dragging = false
+let ignoreTaskClick = false
+
+function setDragging(active) {
+  dragging = active
+  if (active) ignoreTaskClick = true
+}
+
+function resetTaskClick() {
+  // A soltura não libera o clique; somente uma nova interação intencional.
+  if (!dragging) ignoreTaskClick = false
+}
 
 function normalizeSearch(value) {
   return value.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase('pt-BR').trim()
@@ -92,6 +104,7 @@ async function moveTask(column, { element, newIndex }) {
 }
 
 function openTask(taskId) {
+  if (dragging || ignoreTaskClick) return
   router.push(`/delegacao/tarefas/${taskId}/editar`)
 }
 
@@ -124,7 +137,12 @@ onMounted(() => {
     </label>
 
     <p v-if="moveError" class="move-error" role="alert">{{ moveError }}</p>
-    <div class="tasks-list" :aria-busy="savingMove">
+    <div
+      class="tasks-list"
+      :aria-busy="savingMove"
+      @pointerdown.capture="resetTaskClick"
+      @keydown.capture="resetTaskClick"
+    >
       <KanbanColumn
         v-for="col in columns"
         :key="col.status"
@@ -138,6 +156,8 @@ onMounted(() => {
         @open="openTask"
         @add-task="emit('openForm', col.status)"
         @move-task="moveTask(col, $event)"
+        @drag-start="setDragging(true)"
+        @drag-end="setDragging(false)"
       />
     </div>
   </section>
@@ -211,6 +231,7 @@ onMounted(() => {
     grid-template-columns: repeat(3, minmax(16rem, 1fr));
     gap: 0.75rem;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
     padding: 0.25rem 0.25rem 1rem;
   }
 }

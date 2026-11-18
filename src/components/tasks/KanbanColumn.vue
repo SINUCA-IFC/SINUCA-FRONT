@@ -12,7 +12,7 @@ defineProps({
   categories: { type: Array, default: () => [] },
   categoryStyles: { type: Object, default: () => ({}) },
 })
-const emit = defineEmits(['open', 'move-task', 'add-task'])
+const emit = defineEmits(['open', 'move-task', 'add-task', 'drag-start', 'drag-end'])
 
 function handleChange({ added, moved }) {
   const destination = added ?? moved
@@ -42,6 +42,8 @@ function handleChange({ added, moved }) {
         :force-fallback="true"
         :fallback-on-body="true"
         :fallback-tolerance="5"
+        @start="emit('drag-start')"
+        @end="emit('drag-end')"
         @change="handleChange"
       >
         <template #item="{ element }">
@@ -69,7 +71,7 @@ function handleChange({ added, moved }) {
   gap: 0.875rem;
   min-width: 0;
   padding: 1rem;
-  border: 1.5px solid var(--column-color);
+  border: 2px solid var(--column-color);
   border-radius: 0.75rem;
   background: #fff;
 }
@@ -96,7 +98,7 @@ function handleChange({ added, moved }) {
 }
 
 .task-drop-zone {
-  block-size: clamp(17rem, 41vh, 22rem);
+  block-size: clamp(24rem, 55dvh, 36rem);
   overflow-y: auto;
   padding: 0.2rem;
 }
@@ -135,7 +137,7 @@ function handleChange({ added, moved }) {
   }
 
   .task-drop-zone {
-    block-size: clamp(13rem, 37vh, 19rem);
+    block-size: clamp(22rem, 60dvh, 36rem);
   }
 }
 </style>
