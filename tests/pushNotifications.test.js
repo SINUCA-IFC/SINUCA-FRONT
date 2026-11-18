@@ -163,6 +163,10 @@ function installPushBrowser({
   let subscribeOptions = null
   let unsubscribeCalls = 0
   const subscription = {
+    options: {
+      applicationServerKey: new Uint8Array([1, 2, 3, 4]).buffer,
+      userVisibleOnly: true,
+    },
     endpoint,
     toJSON: () => ({
       endpoint,
@@ -179,6 +183,7 @@ function installPushBrowser({
     getSubscription: async () => currentSubscription,
     subscribe: async (options) => {
       subscribeOptions = options
+      subscription.options = options
       currentSubscription = subscription
       return subscription
     },
@@ -270,6 +275,46 @@ test('granted browser subscription is registered in the authenticated API', asyn
   assert.deepEqual(JSON.parse(requests[1].data), browser.subscription.toJSON())
 })
 
+test('a subscription created with an old VAPID key is replaced before API registration', async () => {
+  const browser = installPushBrowser()
+  browser.setCurrentSubscription(browser.subscription)
+  const requests = []
+  axios.defaults.adapter = async (config) => {
+    requests.push(config)
+    if (config.url === '/vapid-public-key/') return respond(config, { publicKey: 'BQYHCA' })
+    return respond(config, { endpoint: browser.subscription.endpoint })
+  }
+
+  const subscription = await pushService.subscribeToPush()
+
+  assert.equal(subscription, browser.subscription)
+  assert.equal(browser.getUnsubscribeCalls(), 1)
+  assert.deepEqual([...browser.getSubscribeOptions().applicationServerKey], [5, 6, 7, 8])
+  assert.deepEqual(
+    requests.map(({ url }) => url),
+    ['/vapid-public-key/', '/push-subscriptions/'],
+  )
+})
+
+test('a subscription using the current VAPID key is preserved', async () => {
+  const browser = installPushBrowser()
+  browser.setCurrentSubscription(browser.subscription)
+  const requests = []
+  axios.defaults.adapter = async (config) => {
+    requests.push(config)
+    return respond(config, { publicKey: 'AQIDBA' })
+  }
+
+  await pushService.subscribeToPush()
+
+  assert.equal(browser.getUnsubscribeCalls(), 0)
+  assert.equal(browser.getSubscribeOptions(), null)
+  assert.deepEqual(
+    requests.map(({ url }) => url),
+    ['/vapid-public-key/', '/push-subscriptions/'],
+  )
+})
+
 test('unsubscribe clears browser and local state when API removal fails', async () => {
   const browser = installPushBrowser()
   browser.setCurrentSubscription(browser.subscription)
@@ -299,6 +344,7 @@ test('logout waits for an in-flight registration before deleting the subscriptio
   const actions = []
   let finishRegistration
   axios.defaults.adapter = (config) => {
+    if (config.method === 'get') return Promise.resolve(respond(config, { publicKey: 'AQIDBA' }))
     if (config.method === 'post')
       return new Promise((resolve) => {
         finishRegistration = () => {

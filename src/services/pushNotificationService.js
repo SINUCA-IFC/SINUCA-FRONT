@@ -40,15 +40,30 @@ export async function subscribeToPush() {
 
   const currentGeneration = generation
   const registration = await withTimeout(navigator.serviceWorker.ready)
+  const { data } = await axios.get('/vapid-public-key/', { timeout: 5000 })
+  if (!data.publicKey || currentGeneration !== generation) return null
+  const applicationServerKey = urlBase64ToUint8Array(data.publicKey)
   let subscription = await registration.pushManager.getSubscription()
   if (currentGeneration !== generation) return null
+
+  // Uma inscrição antiga pode existir e ainda assim ser rejeitada pelo Push Service.
+  if (subscription) {
+    const previousKey = new Uint8Array(subscription.options?.applicationServerKey || [])
+    const sameKey =
+      previousKey.length === applicationServerKey.length &&
+      previousKey.every((value, index) => value === applicationServerKey[index])
+    if (!sameKey) {
+      await withTimeout(subscription.unsubscribe())
+      if (currentGeneration !== generation) return null
+      localStorage.removeItem(PUSH_ENDPOINT_STORAGE_KEY)
+      subscription = null
+    }
+  }
   if (!subscription) {
-    const { data } = await axios.get('/vapid-public-key/', { timeout: 5000 })
-    if (!data.publicKey || currentGeneration !== generation) return null
     subscription = await withTimeout(
       registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(data.publicKey),
+        applicationServerKey,
       }),
     )
   }

@@ -9,6 +9,7 @@ O PWA segue o fluxo de [Web Push da Unidade 8](https://eduardo-da-silva.github.i
 - O menu desktop e a navegação mobile compartilham o indicador: mensagens para delegados, países com não lidas para organizadores. Na lista de países permanece a quantidade de mensagens de cada país. Acima de 99, exibe `99+`, com quantidade exata no texto acessível.
 - Os contadores atualizam após leitura/marcação manual, push e retorno à aba, além de consulta a cada 10 segundos com aba visível. Não dependem de conceder permissão push. Consultar a conversa não confirma leitura; o histórico precisa estar visível e no final.
 - Logout remove inscrição no servidor/navegador e estado local. Respostas antigas de conversas são ignoradas ao trocar de conta. Espera pelo Service Worker e requisições de inscrição têm limite de tempo.
+- A sincronização confere a chave pública VAPID atual mesmo quando já existe inscrição. Se a chave mudou, a inscrição do navegador é renovada antes do cadastro na API; permissão concedida e inscrição existente não garantem compatibilidade com a chave do servidor.
 - Consultas e mutações de tarefas iniciadas por uma conta não modificam o estado de outra conta após a troca de sessão. O toggle legado de notificação foi retirado do formulário, pois não representava uma preferência efetiva de push.
 
 ```bash
@@ -22,3 +23,5 @@ Publique o build com HTTPS, a API atualizada e as migrações aplicadas. O backe
 O CHORE front `df274f7` iniciou o serviço de inscrições e os helpers; o CHORE back `3b06c02` iniciou inscrições, VAPID e envio para postagens. Esta implementação completa a exibição e os cliques, adiciona tarefas/atrasos/chat e os indicadores compartilhados. O resumo cumulativo detalhado está no documento do backend.
 
 Testes automatizados simulam o navegador/Push Service. Entrega real exige dois navegadores inscritos com VAPID válido. Os navegadores precisam suportar Web Push; no iOS, o PWA deve estar instalado na tela inicial quando exigido pelo sistema. Permissão negada é alterada nas configurações do navegador.
+
+O backend inclui verificações da configuração VAPID pelo Django. Após publicar a versão atual, `python manage.py showmigrations`, permitido no painel do Fabroku, mostra avisos sobre chave ausente, privada inválida, par incompatível ou contato inválido, sem revelar os valores. Veja o diagnóstico e o resultado da varredura em `SINUCA-BACK/docs/NOTIFICACOES.md`.
