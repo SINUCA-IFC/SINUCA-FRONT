@@ -229,6 +229,7 @@ onUnmounted(() => {
 <template>
   <AppLayout
     :title="showingDelegations ? 'Delegações' : isOrganizer && country?.name ? `Chat · ${country.name}` : 'Chat'"
+    :show-corner-ods="!canChat || !countryId"
     class="chat-layout"
     :class="{
       'chat-layout--delegations': showingDelegations,
@@ -247,12 +248,31 @@ onUnmounted(() => {
         </template>
       </BannerComponent>
 
-      <section v-if="!canChat" class="chat-panel chat-notice">
-        <template v-if="userStore.user.approval_pending">
-          <p>O chat ficará disponível quando a organização atribuir sua delegação.</p>
-          <RouterLink to="/delegacao">Acompanhar aprovação</RouterLink>
-        </template>
-        <p v-else>O chat está disponível para alunos com delegação e organizadores.</p>
+      <section
+        v-if="!canChat && !countryId"
+        class="delegation-notice"
+        aria-labelledby="chat-delegation-title"
+      >
+        <span class="notice-icon mdi mdi-forum-outline" aria-hidden="true"></span>
+        <div>
+          <h2 id="chat-delegation-title">Você ainda está sem delegação</h2>
+          <p v-if="userStore.user.approval_pending">
+            Seu cadastro aguarda aprovação. Quando a organização vincular você a uma delegação,
+            o chat da sua equipe ficará disponível aqui.
+          </p>
+          <p v-else-if="userStore.user.role === 'student'">
+            É por aqui que sua delegação conversa com a organização. Você poderá participar
+            assim que seu perfil estiver vinculado a uma equipe.
+          </p>
+          <p v-else>O chat reúne a organização e os alunos de cada delegação.</p>
+          <RouterLink to="/delegacao" class="notice-link">
+            {{ userStore.user.approval_pending ? 'Acompanhar aprovação' : 'Consultar situação da delegação' }}
+            <span class="mdi mdi-arrow-right" aria-hidden="true"></span>
+          </RouterLink>
+        </div>
+      </section>
+      <section v-else-if="!canChat" class="chat-panel chat-notice">
+        <p>O chat está disponível para alunos com delegação e organizadores.</p>
       </section>
 
       <DelegationChatList
@@ -642,6 +662,55 @@ select:focus-visible {
   color: #707070;
   line-height: 1.6;
 }
+.delegation-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  min-height: min(100dvh, 30rem);
+  text-align: center;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid #d6e2ef;
+  border-radius: 1rem;
+  background: linear-gradient(115deg, #edf4fb, #fff 75%);
+  color: #01295f;
+  line-height: 1.5;
+  overflow-y: auto;
+}
+.notice-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: #01295f;
+  color: white;
+  font-size: 1.5rem;
+}
+.delegation-notice h2 {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 600;
+}
+.delegation-notice p {
+  max-width: 56ch;
+  margin: 0.5rem 0 1rem;
+  color: #43566c;
+}
+.notice-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #154b78;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+@media (max-width: 1023px) {
+  .delegation-notice { margin: 1rem; }
+}
+
 .chat-notice {
   align-items: center;
   justify-content: center;

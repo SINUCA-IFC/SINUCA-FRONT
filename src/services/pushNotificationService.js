@@ -81,6 +81,7 @@ export async function subscribeToPush() {
 }
 
 export async function unsubscribeFromPush() {
+  const token = localStorage.getItem('access_token')
   generation += 1
   const storedEndpoint = localStorage.getItem(PUSH_ENDPOINT_STORAGE_KEY)
   localStorage.removeItem(PUSH_ENDPOINT_STORAGE_KEY)
@@ -102,7 +103,13 @@ export async function unsubscribeFromPush() {
   }
   try {
     const endpoint = subscription?.endpoint || storedEndpoint
-    if (endpoint) await axios.delete('/push-subscriptions/', { data: { endpoint }, timeout: 5000 })
+    if (endpoint) {
+      await axios.delete('/push-subscriptions/', {
+        data: { endpoint },
+        timeout: 5000,
+        ...(token ? { headers: { Authorization: 'Bearer ' + token }, _retry: true } : {}),
+      })
+    }
   } catch {
     // A remoção local precisa funcionar também com a API indisponível.
   } finally {

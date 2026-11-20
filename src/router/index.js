@@ -9,7 +9,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('../views/BoardView.vue'),
-    }, 
+    },
     {
       path: '/delegacao',
       name: 'Delegacao',
@@ -35,17 +35,35 @@ const router = createRouter({
     {
       path: '/bem-vindo',
       name: 'bem-vindo',
-      component: () => import('../views/WelcomeView.vue')
+      component: () => import('../views/WelcomeView.vue'),
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/LoginView.vue')
+      component: () => import('../views/LoginView.vue'),
     },
     {
       path: '/cadastro',
       name: 'cadastro',
-      component: () => import('../views/RegisterView.vue')
+      component: () => import('../views/RegisterView.vue'),
+    },
+    {
+      path: '/verificar-email',
+      redirect: { name: 'cadastro', query: { etapa: 'email' } },
+    },
+    {
+      path: '/auth/vincular-google',
+      redirect: { name: 'login' },
+    },
+    {
+      path: '/auth/callback',
+      redirect: (to) => ({
+        name: 'login',
+        query: {
+          google: 'return',
+          ...(Object.hasOwn(to.query, 'error') ? { error: to.query.error } : {}),
+        },
+      }),
     },
     {
       path: '/chat/:countryId(\\d+)?',
@@ -56,12 +74,12 @@ const router = createRouter({
     {
       path: '/historia',
       name: 'histora',
-      component: () => import('../views/HistoryView.vue')
+      component: () => import('../views/HistoryView.vue'),
     },
     {
       path: '/mural',
       name: 'mural',
-      component: () => import('../views/BoardView.vue')
+      component: () => import('../views/BoardView.vue'),
     },
     {
       path: '/perfil',
@@ -69,45 +87,35 @@ const router = createRouter({
       component: () => import('../views/ProfileView.vue'),
       meta: { requiresAuth: true },
     },
-    {
-      path: '/p',
-      name: 'playground',
-      component: () => import('../views/playground.vue'),
-    },
   ],
-});
+})
 
 router.beforeEach(async (to) => {
-  const authStore = useUserStore();
-  
-  if(!authStore.loggedIn) {
-    await authStore.checkAuth();
-  };
+  const authStore = useUserStore()
+
+  if (!authStore.loggedIn && !['login', 'cadastro'].includes(to.name)) {
+    await authStore.checkAuth()
+  }
 
   if (to.name === 'home') {
     if (authStore.loggedIn) {
-      return { name: 'Delegacao' };
+      return { name: 'Delegacao' }
     } else {
-      return { name: 'mural' };
+      return { name: 'mural' }
     }
   }
 
-  if(authStore.loggedIn && (to.name === "login" || to.name === "bem-vindo")) {
-    if (to.query.redirect) return getPushTarget({ data: { url: to.query.redirect } });
-    return { name: "home" };
-  };
-
-  if(to.name === "login") {
-    const { title, icon, color } = to.query;
-    if(!title || !icon || !color) {
-      return { name: 'bem-vindo', query: { redirect: to.query.redirect } };
-    }
+  if (
+    authStore.loggedIn &&
+    ((to.name === 'login' && to.query.google !== 'return') || to.name === 'bem-vindo')
+  ) {
+    if (to.query.redirect) return getPushTarget({ data: { url: to.query.redirect } })
+    return { name: 'home' }
   }
 
   if (to.meta.requiresAuth && !authStore.loggedIn) {
-    return { name: 'bem-vindo', query: { redirect: to.fullPath } }
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
-
-});
+})
 
 export default router

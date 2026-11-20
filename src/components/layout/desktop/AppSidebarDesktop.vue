@@ -14,34 +14,20 @@ const userStore = useUserStore()
 const chatStore = useChatStore()
 const { tabs, activeTab, setTab } = useDelegationTabs()
 
-
-const historyLinks = [
-  { name: 'Sobre nós', path: '/historia' },
-  //{ name: 'Origem', path: '/historia/origem' },
-  //{ name: 'Edições Anteriores', path: '/historia/edicoes-anteriores' },
-]
-
 const mainLinks = [
-  //{ name: 'Como Funciona', icon: 'mdi mdi-help-circle', path: '/como-funciona' },
-  { name: 'Chat', icon: 'mdi mdi-chat', path: '/chat' },
+  { name: 'História', icon: 'mdi mdi-book-open-page-variant-outline', path: '/historia' },
+  { name: 'Chat', icon: 'mdi mdi-chat-outline', path: '/chat' },
   { name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/mural' },
 ]
 
-/* ------------------------------------------------------------------ */
-
-const isDelegation = computed(() => route.path.startsWith('/delegacao'))
-
-// Perfil > Kanban / Cronograma / Documentos / Notas
-const isTabActive = (tab) => isDelegation.value && activeTab.value === tab.id
+const isActivePath = (path) => route.path === path || route.path.startsWith(`${path}/`)
+const isDelegation = computed(() => isActivePath('/delegacao'))
+const profileName = computed(() => userStore.user.name || 'Meu perfil')
 
 function openTab(tab) {
   setTab(tab.id)
-  // Se estiver com um modal aberto (/delegacao/nova-tarefa etc.) ou em outra
-  // página, volta para a delegação.
   if (route.path !== '/delegacao') router.push('/delegacao')
 }
-
-const isActivePath = (path) => route.path === path || route.path.startsWith(`${path}/`)
 
 async function logout() {
   await userStore.logout()
@@ -52,223 +38,249 @@ async function logout() {
 <template>
   <aside class="sidebar">
     <RouterLink to="/delegacao" class="logo-link" aria-label="Início">
-      <img :src="LogoSinuca" alt="SINUCA" class="logo" />
+      <img :src="LogoSinuca" alt="" class="logo" />
+      <span class="sidebar-label brand-name">SINUCA</span>
     </RouterLink>
 
     <hr class="divider" />
 
-    <!-- PERFIL -->
-    <nav aria-label="Perfil">
-      <p class="group-title">
-        <span class="mdi mdi-account-circle"></span>
-        Perfil
-      </p>
-      <ul class="sub-list">
-        <li v-for="tab in tabs" :key="tab.id">
-          <button
-            type="button"
-            class="sub-item"
-            :class="{ active: isTabActive(tab) }"
-            @click="openTab(tab)"
-          >
-            <span :class="tab.icon"></span>
-            {{ tab.name }}
-          </button>
-        </li>
-      </ul>
-    </nav>
-
-    <hr class="divider" />
-
-    <!-- HISTÓRIA -->
-    <nav aria-label="História">
-      <p class="group-title">
-        <span class="mdi mdi-book-open-page-variant"></span>
-        História
-      </p>
-      <ul class="sub-list sub-list--plain">
-        <li v-for="link in historyLinks" :key="link.path">
-          <RouterLink
-            :to="link.path"
-            class="sub-item"
-            :class="{ active: isActivePath(link.path) }"
-          >
-            {{ link.name }}
-          </RouterLink>
-        </li>
-      </ul>
-    </nav>
-
-    <hr class="divider" />
-
-    <!-- LINKS PRINCIPAIS -->
-    <nav aria-label="Principal">
+    <nav aria-label="Navegação principal">
       <ul class="main-list">
+        <li>
+          <RouterLink
+            to="/delegacao"
+            class="sidebar-item delegation-link"
+            aria-label="Delegação"
+          >
+            <span class="item-icon mdi mdi-earth" aria-hidden="true"></span>
+            <span class="sidebar-label">Delegação</span>
+          </RouterLink>
+          <div class="submenu">
+            <ul class="sub-list">
+              <li v-for="tab in tabs" :key="tab.id">
+                <button
+                  type="button"
+                  class="sidebar-item sub-item"
+                  :class="{ active: isDelegation && activeTab === tab.id }"
+                  :aria-current="isDelegation && activeTab === tab.id ? 'true' : undefined"
+                  @click="openTab(tab)"
+                >
+                  <span :class="tab.icon" aria-hidden="true"></span>
+                  {{ tab.name }}
+                </button>
+              </li>
+            </ul>
+          </div>
+        </li>
         <li v-for="link in mainLinks" :key="link.path">
           <RouterLink
             :to="link.path"
-            class="main-item"
+            class="sidebar-item"
             :class="{ active: isActivePath(link.path) }"
+            :aria-label="link.name"
           >
-            <span class="main-icon">
+            <span class="item-icon">
               <span :class="link.icon" aria-hidden="true"></span>
-              <UnreadBadge v-if="link.path === '/chat'" class="chat-badge" :count="chatStore.unreadCount"
-                :label="userStore.user.role === 'organizer' ? 'países com mensagens não lidas' : 'mensagens não lidas'" />
+              <UnreadBadge
+                v-if="link.path === '/chat'"
+                class="chat-badge"
+                :count="chatStore.unreadCount"
+                :label="userStore.user.role === 'organizer' ? 'países com mensagens não lidas' : 'mensagens não lidas'"
+              />
             </span>
-            {{ link.name }}
+            <span class="sidebar-label">{{ link.name }}</span>
           </RouterLink>
         </li>
       </ul>
     </nav>
+
     <ul class="user-area">
-      <li>
-        <RouterLink to="/perfil" class="profile-link" :class="{ active: isActivePath('/perfil') }">
-          <UserAvatar :src="userStore.user.foto?.url" :alt="userStore.user.name || 'Foto de perfil'" />
-          <span class="user-name">{{ userStore.user.name || 'Meu perfil' }}</span>
+      <li v-if="userStore.loggedIn">
+        <RouterLink
+          to="/perfil"
+          class="sidebar-item"
+          :class="{ active: isActivePath('/perfil') }"
+          :aria-label="profileName"
+        >
+          <span class="item-icon">
+            <UserAvatar :src="userStore.user.foto?.url" alt="" class="sidebar-avatar" />
+          </span>
+          <span class="sidebar-label user-name">{{ profileName }}</span>
         </RouterLink>
       </li>
       <li>
-        <button type="button" class="logout" @click="logout">
-          <span class="mdi mdi-logout" aria-hidden="true"></span>
-          Sair
+        <button v-if="userStore.loggedIn" type="button" class="sidebar-item logout" aria-label="Sair" @click="logout">
+          <span class="item-icon mdi mdi-logout" aria-hidden="true"></span>
+          <span class="sidebar-label">Sair</span>
         </button>
+        <RouterLink v-else to="/login" class="sidebar-item" aria-label="Entrar">
+          <span class="item-icon mdi mdi-login" aria-hidden="true"></span>
+          <span class="sidebar-label">Entrar</span>
+        </RouterLink>
       </li>
-
     </ul>
   </aside>
 </template>
 
 <style scoped>
 .sidebar {
-  box-sizing: border-box;
+  --sidebar-bg: #01295f;
+  --sidebar-accent: #80ade6;
+  --sidebar-highlight: rgb(40 99 180 / 24%);
+  --sidebar-inset: 0.625rem;
   position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
+  inset: var(--sidebar-inset) auto var(--sidebar-inset) var(--sidebar-inset);
   z-index: 30;
-  width: var(--sidebar-width, 277px);
+  width: var(--sidebar-compact-width);
   display: flex;
   flex-direction: column;
-  padding: 2rem 2.2rem 2rem;
-  background-color: #01295f;
+  padding: 2rem 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  background: var(--sidebar-bg);
   color: #fff;
-  overflow-y: auto;
+  box-shadow: 0 4px 16px rgb(1 41 95 / 18%);
+  overflow: hidden auto;
+  scrollbar-width: thin;
+  transition: width 200ms ease, inset 200ms ease, border-radius 200ms ease, padding 200ms ease;
+}
+
+.sidebar:is(:hover, :has(:focus-visible)) {
+  inset: 0 auto 0 0;
+  width: var(--sidebar-expanded-width);
+  padding-inline: 1.25rem;
+  border-radius: 0;
+}
+
+.logo-link,
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
 }
 
 .logo-link {
-  display: block;
-  align-self: center;
+  justify-content: flex-start;
+  padding-left: 0.375rem;
 }
 
 .logo {
-  display: block;
-  height: 4.8rem;
-  width: auto;
+  width: 2.75rem;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-size: 1.45rem;
+  font-weight: 700;
 }
 
 .divider {
+  width: 1.75rem;
   flex-shrink: 0;
+  margin: 0.75rem auto 1.5rem;
   border: 0;
-  border-top: 2px solid rgba(255, 255, 255, 0.35);
-  margin: 1.5rem 0;
+  border-top: 1px solid rgb(255 255 255 / 40%);
+  transition: width 200ms ease;
 }
 
-.group-title {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.9rem;
-  font-weight: 700;
+.sidebar:is(:hover, :has(:focus-visible)) .divider {
+  width: 6rem;
 }
 
-
-.group-title .mdi {
-  font-size: 1.3rem;
-}
-
-/* ---------- sub-itens (Kanban, Cronograma, Sobre nós...) ---------- */
-.sub-list {
+.main-list,
+.user-area {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
-  width: max-content;
-  min-width: 7rem;
-  margin: 1.2rem 0 0 1.2rem;
+  gap: 0.25rem;
 }
 
-.sub-list--plain {
-  margin-left: 1.2rem;
-}
-
-.sub-item {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  width: 100%;
-  padding: 0 0 0.25rem;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: none;
-  color: inherit;
-  font: inherit;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-align: left;
+.sidebar-item {
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.2s, opacity 0.2s;
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
-.sub-item:hover {
-  opacity: 0.8;
+.sidebar-item:not(.logout, .delegation-link):is(:hover, :focus-visible, .active) {
+  background-color: var(--sidebar-highlight);
+  color: var(--sidebar-accent);
 }
 
-.sub-item.active {
-  border-bottom-color: #fff;
-}
-
-/* ---------- Chat / Mural / Como Funciona ---------- */
-.main-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.main-item {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  width: max-content;
-  padding-bottom: 0.2rem;
-  border-bottom: 2px solid transparent;
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 700;
-  transition: opacity 0.2s;
-}
-
-.main-item .mdi {
-  font-size: 1.3rem;
-}
-
-.main-icon {
+.item-icon {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  display: inline-grid;
+  flex: 0 0 3.5rem;
+  place-items: center;
+  font-size: 1.25rem;
   line-height: 1;
 }
 
-.main-icon .chat-badge {
+.sidebar-label {
+  line-height: 1.5;
+  min-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: opacity 140ms ease;
+}
+
+.sidebar:is(:hover, :has(:focus-visible)) .sidebar-label {
+  opacity: 1;
+}
+
+.submenu {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 200ms ease, visibility 200ms;
+}
+
+.sidebar:is(:hover, :has(:focus-visible)) .submenu {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+.sub-list {
+  min-height: 0;
+  overflow: hidden;
+  padding-inline: 1.625rem 0;
+}
+
+.sub-item {
+  min-height: 2rem;
+  padding-inline: 0.625rem;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.main-list > li:first-child {
+  transition: margin-bottom 200ms ease;
+}
+
+.sidebar:is(:hover, :has(:focus-visible)) .main-list > li:first-child {
+  margin-bottom: 0.75rem;
+}
+
+.item-icon .chat-badge {
   position: absolute;
   top: -7px;
-  right: -9px;
+  right: 4px;
   width: 20px;
   height: 20px;
-  border: 2px solid #01295f;
+  border: 2px solid var(--sidebar-bg);
   border-radius: 50%;
   background: #fd151b;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
   font-size: 0.625rem;
   pointer-events: none;
 }
@@ -277,74 +289,42 @@ async function logout() {
   display: none;
 }
 
-.main-item:hover {
-  opacity: 0.8;
-}
-
-.main-item.active {
-  border-bottom-color: #fff;
-}
-
-/* ---------- USER ---------- */
-
 .user-area {
   margin-top: auto;
-  padding: 2rem 0 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
+  padding-top: 1.5rem;
 }
 
-.profile-link {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: inherit;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 0.5rem 0;
+.sidebar-avatar {
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .user-name {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.profile-link.active .user-name {
-  text-decoration: underline;
-  text-underline-offset: 0.3rem;
+  padding-right: 0.5rem;
 }
 
 .logout {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  width: 100%;
-  padding: 0.5rem 0;
-  border: 0;
-  background: none;
-  color: #fff;
-  font: inherit;
-  font-size: 1.05rem;
-  font-weight: 700;
-  cursor: pointer;
+  background: #d21e2d;
 }
 
-.logout .mdi {
-  font-size: 1.3rem;
+.logout:is(:hover, :focus-visible) {
+  background: #ac1725;
+  color: white;
 }
 
-.logout:hover {
-  opacity: 0.8;
+.sidebar .logout:focus-visible {
+  outline-color: white;
 }
 
-.sidebar a:focus-visible,
-.sidebar button:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-  border-radius: 4px;
+.sidebar :is(a, button):focus-visible {
+  outline: 2px solid var(--sidebar-accent);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar * {
+    transition: none;
+  }
 }
 </style>

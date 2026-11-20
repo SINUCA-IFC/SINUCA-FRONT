@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BannerComponent from '@/components/layout/BannerComponent.vue'
 import ProfileActivities from '@/components/profile/ProfileActivities.vue'
+import UserAvatar from '@/components/layout/UserAvatar.vue'
 import ProfileName from '@/components/profile/ProfileName.vue'
 import EditProfileModal from '@/components/profile/EditProfileModal.vue'
 import { useUserStore } from '@/stores/userStore'
@@ -27,7 +28,7 @@ function profileSaved() {
 }
 </script>
 <template>
-  <AppLayout title="Meu perfil">
+  <AppLayout title="Meu perfil" show-corner-ods>
     <main class="profile-page">
       <RouterLink
         to="/delegacao"
@@ -41,8 +42,10 @@ function profileSaved() {
         class="profile-banner"
         :title="userStore.user.name || 'Usuário SINUCA'"
         :subtitle="userStore.user.email"
-        :UserImageUrl="userStore.user.foto?.url"
       >
+        <template #avatar>
+          <UserAvatar class="profile-avatar" :src="userStore.user.foto?.url" alt="Foto de perfil" />
+        </template>
         <template #title>
           <ProfileName :name="userStore.user.name || 'Usuário SINUCA'" />
         </template>
@@ -62,7 +65,18 @@ function profileSaved() {
         </div>
       </div>
       <p v-if="success" class="success" role="status">{{ success }}</p>
-      <ProfileActivities />
+      <ProfileActivities v-if="userStore.user.country?.id" />
+      <section v-else class="delegation-notice" aria-labelledby="delegation-notice-title">
+        <span class="notice-icon mdi mdi-earth" aria-hidden="true"></span>
+        <div>
+          <h2 id="delegation-notice-title">Você ainda está sem delegação</h2>
+          <p>Assim que a organização vincular seu perfil a uma delegação, você poderá acompanhar por aqui as tarefas atribuídas a você.</p>
+          <RouterLink to="/delegacao" class="notice-link">
+            Consultar situação da delegação
+            <span class="mdi mdi-arrow-right" aria-hidden="true"></span>
+          </RouterLink>
+        </div>
+      </section>
       <EditProfileModal v-if="editing" @close="editing = false" @saved="profileSaved" />
     </main>
   </AppLayout>
@@ -72,7 +86,7 @@ function profileSaved() {
   --profile-photo-size: clamp(64px, 10vw, 100px);
 }
 
-.profile-banner :deep(.user-image-container) {
+.profile-banner .profile-avatar {
   width: var(--profile-photo-size);
   height: var(--profile-photo-size);
 }
@@ -154,6 +168,56 @@ input:focus-visible {
 .back-link:hover {
   background: #e9eef6;
 }
+.delegation-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  min-height: min(40dvh, 22rem);
+  text-align: center;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid #d6e2ef;
+  border-radius: 1rem;
+  background: linear-gradient(115deg, #edf4fb, #fff 75%);
+  color: #01295f;
+}
+
+.notice-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: #01295f;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.delegation-notice h2 {
+  margin: 0;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 600;
+}
+
+.delegation-notice p {
+  max-width: 58ch;
+  margin: 0.5rem 0 1rem;
+  color: #43566c;
+}
+
+.notice-link {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: #154b78;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+
 .success {
   margin-right: auto;
   color: #37672c;

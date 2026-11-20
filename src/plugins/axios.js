@@ -1,100 +1,56 @@
-import axios from 'axios';
+import axios from 'axios'
+import { apiOrigin } from '@/services/authService'
 
-const redirectToLogin = async () => {
-  const { default: router } = await import('@/router/index.js');
-  return router.push({ name: 'login' });
-};
-
-// Configura a baseURL usando a variável de ambiente
-
-axios.defaults.baseURL = 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api'
-
-// axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-
-
-// Adiciona um interceptor para incluir o token de autenticação
-axios.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    const pushEndpoint = localStorage.getItem('push_endpoint');
-    if (pushEndpoint) {
-      config.headers['X-Push-Endpoint'] = pushEndpoint;
-    }
-    return config;
-  },
-  (error) => {
-    console.error('Request error:', error);
-    return Promise.reject(error);
+axios.defaults.baseURL = apiOrigin + '/api'
+axios.defaults.timeout = 15000
+let refreshPromise
+let onExpired = () => {}
+export function onAuthExpired(handler) {
+  onExpired = handler
+}
+const isPublic = (config) =>
+  config.skipAuth || /(?:^|\/)(token|registro|auth)(?:\/|$)/.test(config.url || '')
+axios.interceptors.request.use((config) => {
+  if (isPublic(config)) {
+    delete config.headers.Authorization
+  } else {
+    const token = localStorage.getItem('access_token')
+    if (token && !config.headers.Authorization) config.headers.Authorization = 'Bearer ' + token
+    const pushEndpoint = localStorage.getItem('push_endpoint')
+    if (pushEndpoint) config.headers['X-Push-Endpoint'] = pushEndpoint
   }
-);
-
-// Interceptor de resposta para renovar o token automaticamente
-let isRefreshing = false;
-let failedQueue = [];
-
-const processQueue = (error, token = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
-
+  return config
+})
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-
-    // Não tenta refresh para rotas de autenticação (login/refresh)
-    const isAuthRoute = originalRequest.url?.includes('/token');
-
-    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return axios(originalRequest);
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      const refreshToken = localStorage.getItem('refresh_token');
-      if (!refreshToken) {
-        isRefreshing = false;
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        await redirectToLogin();
-        return Promise.reject(error);
-      }
-
-      try {
-        const { data } = await axios.post('/token/refresh/', { refresh: refreshToken });
-        localStorage.setItem('access_token', data.access);
-        processQueue(null, data.access);
-        originalRequest.headers.Authorization = `Bearer ${data.access}`;
-        return axios(originalRequest);
-      } catch (refreshError) {
-        processQueue(refreshError, null);
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        await redirectToLogin();
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
+    const config = error.config
+    if (!config || error.response?.status !== 401 || isPublic(config) || config._retry) throw error
+    config._retry = true
+    const refresh = localStorage.getItem('refresh_token')
+    if (!refresh) {
+      onExpired()
+      throw error
     }
-
-    return Promise.reject(error);
-  }
-);
-
-export default axios;
+    if (!refreshPromise) {
+      refreshPromise = axios
+        .post('/token/refresh/', { refresh })
+        .then(({ data }) => {
+          if (localStorage.getItem('refresh_token') !== refresh) throw new Error('Sessão alterada')
+          localStorage.setItem('access_token', data.access)
+          return data.access
+        })
+        .catch((failure) => {
+          if (localStorage.getItem('refresh_token') === refresh) onExpired()
+          throw failure
+        })
+        .finally(() => {
+          refreshPromise = undefined
+        })
+    }
+    const token = await refreshPromise
+    config.headers.Authorization = 'Bearer ' + token
+    return axios(config)
+  },
+)
+export default axios

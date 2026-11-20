@@ -11,13 +11,19 @@ export default class UserService {
     return response.data
   }
 
+  async verifyToken(token) {
+    const { data } = await axios.post('/token/verify/', { token }, { skipAuth: true })
+    return data
+  }
+
   async register(email, name, password, gang, matriculation, foto) {
-    const formData = new FormData();
-    for (const [field, value] of Object.entries({ email, name, password, gang, matriculation, foto })) {
-      if (value !== null && value !== undefined) formData.append(field, value);
+    const payload = { email, name, password }
+    for (const [field, value] of Object.entries({ gang, foto })) {
+      if (Number.isInteger(Number(value)) && Number(value) > 0) payload[field] = Number(value)
     }
-    const response = await axios.post('/registro/', formData);
-    return response.data;
+    if (matriculation) payload.matriculation = matriculation
+    const response = await axios.post('/registro/', payload, { skipAuth: true })
+    return response.data
   }
 
   async getUser() {

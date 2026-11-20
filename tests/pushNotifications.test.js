@@ -137,6 +137,7 @@ const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator
 const originalNotification = Object.getOwnPropertyDescriptor(globalThis, 'Notification')
 const originalPushManager = Object.getOwnPropertyDescriptor(globalThis, 'PushManager')
 const originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage')
+const originalSessionStorage = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage')
 
 function defineGlobal(name, value) {
   Object.defineProperty(globalThis, name, { configurable: true, writable: true, value })
@@ -206,6 +207,7 @@ function installPushBrowser({
 
 beforeEach(() => {
   defineGlobal('localStorage', createLocalStorage())
+  defineGlobal('sessionStorage', createLocalStorage())
   setActivePinia(createPinia())
   axios.defaults.adapter = originalAdapter
 })
@@ -217,6 +219,7 @@ afterEach(() => {
     ['Notification', originalNotification],
     ['PushManager', originalPushManager],
     ['localStorage', originalLocalStorage],
+    ['sessionStorage', originalSessionStorage],
   ]) {
     if (descriptor) Object.defineProperty(globalThis, name, descriptor)
     else delete globalThis[name]
