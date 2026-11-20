@@ -2,8 +2,11 @@
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 import { useUserStore } from '@/stores/userStore';
+import { useChatStore } from '@/stores/chatStore';
+import UnreadBadge from '@/components/chat/UnreadBadge.vue';
 const route = useRoute();
 const userStore = useUserStore();
+const chatStore = useChatStore();
 
 const tabsFooter = computed(() => userStore.user.role === 'organizer' ? [
     {id: 1, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/mural'},
@@ -31,7 +34,11 @@ const isTabActive = (path) => route.path === path || route.path.startsWith(`${pa
                     :class="{ active: isTabActive(tab.path) }"
                 >
                     <RouterLink :to="tab.path">
-                        <span class="icon" :class="tab.icon"></span>
+                        <span class="tab-icon">
+                            <span class="icon" :class="tab.icon"></span>
+                            <UnreadBadge v-if="tab.path === '/chat'" class="chat-badge" :count="chatStore.unreadCount"
+                              :label="userStore.user.role === 'organizer' ? 'países com mensagens não lidas' : 'mensagens não lidas'" />
+                        </span>
                         <span >{{ tab.name }}</span>
                     </RouterLink>
                 </li>
@@ -41,6 +48,8 @@ const isTabActive = (path) => route.path === path || route.path.startsWith(`${pa
 </template>
 
 <style scoped>
+.tab-icon { position: relative; }
+.chat-badge { position: absolute; top: -8px; left: calc(100% - 3px); }
 footer {
     position: fixed;
     bottom: 0;

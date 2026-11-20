@@ -1,5 +1,4 @@
 <script setup>
-import TaskNotificationToggle from '@/components/tasks/TaskNotificationToggle.vue'
 import TaskAssigneeSelect from '@/components/tasks/TaskAssigneeSelect.vue'
 import TaskStatusSelect from '@/components/tasks/TaskStatusSelect.vue'
 import TaskCategorySelect from '@/components/tasks/TaskCategorySelect.vue'
@@ -14,7 +13,7 @@ import AppButton from '@/components/forms/AppButton.vue'
 const taskStore = useTaskStore()
 const userStore = useUserStore()
 const categoryStore = UseCategoryStore()
-const props = defineProps({ taskId: [String, Number] })
+const props = defineProps({ taskId: [String, Number], initialStatus: Number, readOnly: Boolean })
 
 const emits = defineEmits(['close'])
 const isEditMode = computed(() => !!props.taskId)
@@ -23,13 +22,14 @@ const initialTaskState = ref('')
 const loading = ref(true)
 const saving = ref(false)
 const error = ref('')
+const assignedNames = ref('')
 
 const isFormUnchanged = computed(() => {
   return initialTaskState.value === JSON.stringify(taskStore.task)
 })
 
 async function handleSubmit() {
-  if (saving.value || loading.value) return
+  if (props.readOnly || saving.value || loading.value) return
   error.value = ''
   if (!taskStore.task.category.length || !taskStore.task.user.length) {
     error.value = 'Selecione pelo menos uma categoria e um responsável.'
@@ -46,7 +46,13 @@ async function handleSubmit() {
   } catch (err) {
     const data = err.response?.data
     const [field, messages] = data && typeof data === 'object' ? Object.entries(data)[0] || [] : []
-    const labels = { title: 'Título', category: 'Categoria', user: 'Responsáveis', startDate: 'Início', endDate: 'Fim' }
+    const labels = {
+      title: 'Título',
+      category: 'Categoria',
+      user: 'Responsáveis',
+      startDate: 'Início',
+      endDate: 'Fim',
+    }
     const description = Array.isArray(messages) ? messages.join(' ') : messages
     error.value = description
       ? `${labels[field] || 'Erro'}: ${description}`
@@ -57,7 +63,7 @@ async function handleSubmit() {
 }
 
 async function deleteTask() {
-  if (saving.value || !confirm('Deseja realmente excluir essa tarefa?')) return
+  if (props.readOnly || saving.value || !confirm('Deseja realmente excluir essa tarefa?')) return
   saving.value = true
   error.value = ''
   try {
@@ -74,12 +80,19 @@ async function loadTask() {
   loading.value = true
   error.value = ''
   taskStore.resetTask()
+  if (!isEditMode.value && props.initialStatus !== undefined) {
+    taskStore.task.status = props.initialStatus
+  }
   try {
     await Promise.all([
-      userStore.getAllUsers(),
+      props.readOnly ? Promise.resolve() : userStore.getAllUsers(),
       categoryStore.getCategories(),
       isEditMode.value ? taskStore.getTask(props.taskId) : Promise.resolve(),
     ])
+    assignedNames.value = (taskStore.task.user || [])
+      .map((user) => user.name)
+      .filter(Boolean)
+      .join(', ')
     taskStore.task.category = (taskStore.task.category || []).map((c) => c.id ?? c)
     taskStore.task.user = (taskStore.task.user || []).map((u) => u.id ?? u)
     taskStore.task.status = Number(taskStore.task.status)
@@ -97,7 +110,9 @@ onMounted(loadTask)
 <template>
   <section class="form-create">
     <div class="header-section">
-      <h1 style="font-size: 1.7rem">{{ isEditMode ? 'Editar tarefa' : 'Nova tarefa' }}</h1>
+      <h1 style="font-size: 1.7rem">
+        {{ readOnly ? 'Tarefa atribuída' : isEditMode ? 'Editar tarefa' : 'Nova tarefa' }}
+      </h1>
       <span
         class="mdi mdi-close"
         style="color: #969696; font-size: 2rem"
@@ -108,7 +123,7 @@ onMounted(loadTask)
     <p v-if="loading" role="status">Carregando tarefa...</p>
     <p v-if="error" role="alert">{{ error }}</p>
     <form v-if="!loading && initialTaskState" @submit.prevent="handleSubmit()" class="task-form">
-      <fieldset :disabled="saving" class="task-fields">
+      <fieldset :disabled="saving || readOnly" class="task-fields">
         <AppInput
           label="Título"
           placeholder="Ex: Estudar temas do debate."
@@ -132,16 +147,15 @@ onMounted(loadTask)
 
         <TaskStatusSelect v-model="taskStore.task.status" />
 
-        <TaskAssigneeSelect v-model="taskStore.task.user" :users="userStore.users" />
+        <p v-if="readOnly">Responsáveis: {{ assignedNames || 'Não informado' }}</p>
+        <TaskAssigneeSelect v-else v-model="taskStore.task.user" :users="userStore.users" />
 
         <div class="date-row">
           <AppInput v-model="taskStore.task.startDate" label="Início" type="date" />
           <AppInput v-model="taskStore.task.endDate" label="Fim" type="date" />
         </div>
-
-        <TaskNotificationToggle v-model="taskStore.task.notification" />
       </fieldset>
-      <div class="task-actions">
+      <div v-if="!readOnly" class="task-actions">
         <AppButton type="submit" :disabled="isFormUnchanged || saving">
           {{ isEditMode ? 'Salvar Alterações' : 'Adicionar' }}
         </AppButton>

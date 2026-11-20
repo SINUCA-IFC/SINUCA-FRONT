@@ -5,6 +5,7 @@ import { defineStore } from 'pinia'
 
 import UserService from '../services/userService'
 import { getAllPages } from '@/services/pagination'
+import { syncPushSubscription, unsubscribeFromPush } from '@/services/pushNotificationService'
 
 const userService = new UserService()
 
@@ -39,6 +40,7 @@ export const useUserStore = defineStore('auth', () => {
       if (version !== authVersion) throw new Error('Sessão alterada')
       user.value = profile
       loggedIn.value = true
+      await syncPushSubscription()
     } catch (error) {
       if (version === authVersion) clearLocal()
       throw error
@@ -83,9 +85,10 @@ export const useUserStore = defineStore('auth', () => {
     clearPending()
   }
   async function logout() {
+    const pushCleanup = unsubscribeFromPush()
     clearLocal()
     try {
-      await logoutSession()
+      await Promise.all([pushCleanup, logoutSession()])
     } catch {
       /* Local cleanup succeeds offline too. */
     }
@@ -100,6 +103,7 @@ export const useUserStore = defineStore('auth', () => {
         if (version === authVersion) {
           user.value = profile
           loggedIn.value = true
+          void syncPushSubscription()
         }
       } catch {
         if (version === authVersion) clearLocal()
@@ -138,6 +142,11 @@ export const useUserStore = defineStore('auth', () => {
     })
   }
 
+  async function updateProfile(changes) {
+    const updated = await userService.updateProfile(user.value.id, changes)
+    user.value = { ...user.value, ...updated }
+  }
+
   return {
     user,
     loggedIn,
@@ -155,5 +164,6 @@ export const useUserStore = defineStore('auth', () => {
     approveUser,
     userType,
     uploadImage,
+    updateProfile,
   }
 })

@@ -31,9 +31,14 @@ export default class UserService {
     return response.data
   }
 
-  async getUsers(page = 1) {
-    const { data } = await axios.get('/usuarios/', { params: { page } })
+  async updateProfile(id, changes) {
+    const { data } = await axios.patch(`/usuarios/${id}/`, changes)
     return data
+  }
+
+  async getUsers(page = 1) {
+    const {data} = await axios.get('/usuarios/', { params: { page } });
+    return data;
   }
 
   async getPendingUsers(page = 1) {

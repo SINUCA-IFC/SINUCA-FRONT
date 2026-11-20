@@ -35,6 +35,10 @@ export default defineConfig(({ command, mode }) => {
       vue(),
       VitePWA({
         registerType: 'autoUpdate',
+        strategies: 'injectManifest',
+        srcDir: 'src',
+        filename: 'sw.js',
+        devOptions: { enabled: true, type: 'module', navigateFallback: 'index.html' },
         manifest: {
           id: 'com.sinuca-pwa',
           name: 'SINUCA Site',

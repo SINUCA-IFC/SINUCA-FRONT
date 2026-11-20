@@ -15,7 +15,9 @@ axios.interceptors.request.use((config) => {
     delete config.headers.Authorization
   } else {
     const token = localStorage.getItem('access_token')
-    if (token) config.headers.Authorization = 'Bearer ' + token
+    if (token && !config.headers.Authorization) config.headers.Authorization = 'Bearer ' + token
+    const pushEndpoint = localStorage.getItem('push_endpoint')
+    if (pushEndpoint) config.headers['X-Push-Endpoint'] = pushEndpoint
   }
   return config
 })

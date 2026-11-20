@@ -38,14 +38,23 @@ A tela mobile e desktop usa os frames do Figma e a API existente. Alunos com del
 
 Contrato e verificações: [integração front/back](architecture/INTEGRACAO-FRONT-BACK.md#chat-por-delegação).
 
-## Notificações — trabalho futuro
+## Notificações push — implementação concluída, publicação pendente
 
-Solicitado em 11/11/2026. O contador do chat representa mensagens não lidas; a entrega de notificações ainda será desenvolvida.
+Implementação ampliada em 17/11/2026, baseada na Unidade 8: Web Push, VAPID, Service Worker customizado com `injectManifest`, inscrição por navegador e integração com login/logout.
 
-- [ ] Notificar novas postagens do mural: definir destinatários, preferências e o evento de publicação que gera o aviso.
-- [ ] Criar a central de notificações na aplicação, com listagem e estados lida/não lida. Definir quais eventos entram nela, incluindo mensagens, tarefas e cronogramas.
-- [ ] Definir e implementar os canais necessários, como avisos dentro do site, push do PWA ou e-mail, com permissão e preferência do usuário.
-- [ ] Evitar avisos duplicados e testar destinatários, leitura, falhas e novas tentativas. O campo de notificação já existente em tarefas não comprova entrega de avisos.
+- [x] Notificar novas postagens para usuários ativos inscritos, excluindo o navegador de origem.
+- [x] Notificar responsáveis recém-adicionados às tarefas, sem repetir avisos para quem já estava atribuído.
+- [x] Comando `notify_overdue_tasks`: notificar responsáveis de tarefas com prazo anterior ao dia atual e não concluídas. Registro único por tarefa, responsável e prazo; sem envio bem-sucedido, permite tentar na próxima execução.
+- [x] Notificar o outro lado do chat: alunos da delegação recebem mensagens da organização; organizadores recebem mensagens dos alunos. O corpo do push não contém o texto privado.
+- [x] Criar inscrições autenticadas, chave pública VAPID e serviço de envio com exclusão de origem, timeout e desativação de endpoints expirados.
+- [x] Completar Service Worker, banner “Ativar”/“Agora não”, recebimento, clique e retorno ao destino depois de autenticar.
+- [x] Compartilhar indicadores no desktop/celular: mensagens não lidas para delegados; países com não lidas para organizadores. Reutilizar o símbolo da lista de países e manter atualização sem depender de push.
+- [x] Limpar inscrições/notificações na saída e ignorar respostas antigas de conversas/tarefas ao trocar de conta. Não armazenar respostas autenticadas da API no Service Worker.
+- [x] Cobrir eventos, isolamento, falhas, prazos, contadores e cliques com testes automatizados; gerar build PWA.
+- [ ] Publicar back/front com HTTPS e par VAPID válido, aplicar migrações `0029`/`0030` e configurar execução diária de `notify_overdue_tasks`.
+- [ ] Validar entrega real em duas sessões/navegadores e testar cliques com sessão ativa e expirada.
+
+Operação, testes e mudanças acumuladas desde os CHORE: [notificações](NOTIFICACOES.md) e `SINUCA-BACK/docs/NOTIFICACOES.md`. Perfil, e-mail, central interna de notificações e push de cronograma continuam fora deste ciclo. O booleano legado `Task.notification` não representa inscrição, entrega ou leitura.
 
 ## Verificação real de e-mail — prioridade alta
 

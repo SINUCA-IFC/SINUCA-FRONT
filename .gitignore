@@ -55,6 +55,7 @@ __screenshots__/
 
 # PWA / Service Worker
 sw.js
+!src/sw.js
 workbox-*.js
 registerSW.js
 

@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { getPushTarget } from '@/services/pushNotificationPayload'
 import { useUserStore } from '@/stores/userStore'
 import { authError, exchangeGoogleSession, googleCallbackError } from '@/services/authService'
 import AuthShell from '@/components/forms/AuthShell.vue'
@@ -50,7 +51,7 @@ async function login() {
   registrationPending.value = false
   try {
     if (await userStore.login(email.value.trim(), password.value)) {
-      await router.push('/')
+      await router.push(getPushTarget({ data: { url: route.query.redirect } }))
     } else {
       registrationPending.value = true
       errorMessage.value = 'Confirme seu e-mail para concluir o cadastro e entrar.'

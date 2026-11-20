@@ -61,16 +61,16 @@ main {
 
 @media (min-width: 1024px) {
     main {
+        width: 100%;
+        max-width: 58rem;
+        margin-inline: auto;
         padding: 0;
         gap: 2.5rem;
-        margin-right: clamp(1rem, 2rem, 3rem);
-        margin-left: clamp(4rem, 6rem, 8rem);
     }
 
     .post-list {
-        max-width: 900px;
         width: 100%;
-        margin: 2rem auto 0;
+        margin: 2rem 0 0;
         gap: 1.5rem;
     }
 }

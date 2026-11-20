@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
-
-import { useUserStore } from '@/stores/userStore'
+import { createRouter, createWebHistory } from 'vue-router';
+import { useUserStore } from '@/stores/userStore';
+import { getPushTarget } from '@/services/pushNotificationPayload';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -81,6 +81,12 @@ const router = createRouter({
       name: 'mural',
       component: () => import('../views/BoardView.vue'),
     },
+    {
+      path: '/perfil',
+      name: 'perfil',
+      component: () => import('../views/ProfileView.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 
@@ -103,11 +109,12 @@ router.beforeEach(async (to) => {
     authStore.loggedIn &&
     ((to.name === 'login' && to.query.google !== 'return') || to.name === 'bem-vindo')
   ) {
+    if (to.query.redirect) return getPushTarget({ data: { url: to.query.redirect } })
     return { name: 'home' }
   }
 
   if (to.meta.requiresAuth && !authStore.loggedIn) {
-    return { name: 'login' }
+    return { name: 'login', query: { redirect: to.fullPath } }
   }
 })
 

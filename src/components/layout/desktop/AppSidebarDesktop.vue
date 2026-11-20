@@ -4,10 +4,14 @@ import { useRoute, useRouter } from 'vue-router'
 import LogoSinuca from '/logo-sinuca.svg'
 import { useUserStore } from '../../../stores/userStore'
 import { useDelegationTabs } from '../../../composables/useDelegationTabs'
+import UserAvatar from '../UserAvatar.vue'
+import { useChatStore } from '@/stores/chatStore'
+import UnreadBadge from '@/components/chat/UnreadBadge.vue'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const chatStore = useChatStore()
 const { tabs, activeTab, setTab } = useDelegationTabs()
 
 
@@ -39,9 +43,8 @@ function openTab(tab) {
 
 const isActivePath = (path) => route.path === path || route.path.startsWith(`${path}/`)
 
-function logout() {
-  // TODO: troque pela sua ação real de logout.
-  if (typeof userStore.logout === 'function') userStore.logout()
+async function logout() {
+  await userStore.logout()
   router.push('/login')
 }
 </script>
@@ -107,17 +110,31 @@ function logout() {
             class="main-item"
             :class="{ active: isActivePath(link.path) }"
           >
-            <span :class="link.icon"></span>
+            <span class="main-icon">
+              <span :class="link.icon" aria-hidden="true"></span>
+              <UnreadBadge v-if="link.path === '/chat'" class="chat-badge" :count="chatStore.unreadCount"
+                :label="userStore.user.role === 'organizer' ? 'países com mensagens não lidas' : 'mensagens não lidas'" />
+            </span>
             {{ link.name }}
           </RouterLink>
         </li>
       </ul>
     </nav>
+    <ul class="user-area">
+      <li>
+        <RouterLink to="/perfil" class="profile-link" :class="{ active: isActivePath('/perfil') }">
+          <UserAvatar :src="userStore.user.foto?.url" :alt="userStore.user.name || 'Foto de perfil'" />
+          <span class="user-name">{{ userStore.user.name || 'Meu perfil' }}</span>
+        </RouterLink>
+      </li>
+      <li>
+        <button type="button" class="logout" @click="logout">
+          <span class="mdi mdi-logout" aria-hidden="true"></span>
+          Sair
+        </button>
+      </li>
 
-    <button type="button" class="logout" @click="logout">
-      <span class="mdi mdi-logout"></span>
-      Sair
-    </button>
+    </ul>
   </aside>
 </template>
 
@@ -150,6 +167,7 @@ function logout() {
 }
 
 .divider {
+  flex-shrink: 0;
   border: 0;
   border-top: 2px solid rgba(255, 255, 255, 0.35);
   margin: 1.5rem 0;
@@ -232,6 +250,33 @@ function logout() {
   font-size: 1.3rem;
 }
 
+.main-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.main-icon .chat-badge {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #01295f;
+  border-radius: 50%;
+  background: #fd151b;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+  font-size: 0.625rem;
+  pointer-events: none;
+}
+
+.chat-badge :deep(img) {
+  display: none;
+}
+
 .main-item:hover {
   opacity: 0.8;
 }
@@ -240,13 +285,45 @@ function logout() {
   border-bottom-color: #fff;
 }
 
-/* ---------- Sair ---------- */
+/* ---------- USER ---------- */
+
+.user-area {
+  margin-top: auto;
+  padding: 2rem 0 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.profile-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 0;
+}
+
+.user-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.profile-link.active .user-name {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
 .logout {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-top: auto;
-  padding: 0;
+  width: 100%;
+  padding: 0.5rem 0;
   border: 0;
   background: none;
   color: #fff;
