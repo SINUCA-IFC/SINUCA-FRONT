@@ -1,0 +1,336 @@
+{
+  "editions": [
+    {
+      "year": "2018",
+      "title": "Primeira Edição do SINUCA",
+      "image": "ef616.png",
+      "groups": [
+        {
+          "title": "Delegações Participantes",
+          "items": [
+            {
+              "desktop": "África do Sul - Desafio Gast.",
+              "mobile": "África do Sul - Vencedor Desafio Gast."
+            },
+            "Argentina - Vencedor Geral e Apres. Cult",
+            "Brasil",
+            {
+              "desktop": "Coreia do Norte -  Debate",
+              "mobile": "Coreia do Norte - Vencedor Debate"
+            },
+            "Japão",
+            "Noruega",
+            "Síria"
+          ]
+        },
+        {
+          "title": "Tipos de Simulação",
+          "items": [
+            "Debates, Apresentações Culturais (Desafio Gastronômico e Dança)"
+          ]
+        }
+      ]
+    },
+    {
+      "year": "2019",
+      "title": "Segunda Edição do SINUCA",
+      "image": "d9e01.png",
+      "groups": [
+        {
+          "title": "Delegações Participantes",
+          "items": [
+            "Arábia Saudita",
+            "Brasil",
+            {
+              "desktop": "Canadá - Debate",
+              "mobile": "Canadá - Deabte"
+            },
+            "Catalunha",
+            "China",
+            "Colômbia",
+            "Curdistão",
+            "Espanha",
+            "Estados Unidos",
+            "Filipinas",
+            "França",
+            "Índia",
+            "Indonésia",
+            "Irã - Vencedor Geral, Apres. Cult. e Desafio Gast.",
+            "Kiribati - Discurso de Abertura",
+            "Marrocos",
+            "Paquistão",
+            "Saara Ocidental",
+            "Turquia",
+            "Uruguai"
+          ]
+        },
+        {
+          "title": "Tipos de Simulação",
+          "items": [
+            "Debates, Apresentação Cultural (Dança e Desafio Gastronômico)"
+          ]
+        },
+        {
+          "title": "Debates",
+          "items": [
+            "Arábia Saudita x Irã: Tema não registrado",
+            "Brasil x França: Tema não registrado",
+            "Índia x Paquistão: Território da Caxemira",
+            "Marrocos x Saara Ocidental: Independência do Saara Ocidental",
+            "Curdistão x Turquia: Independência do Curdistão",
+            "Espanha x Catalunha: Tema não registrado",
+            "Colômbia x Holanda: Guerra às drogas",
+            "Indonésia x Uruguai: Legalização das drogas",
+            "Filipinas x Canadá: Tema não registrado",
+            "EUA x China: Tema não registrado"
+          ]
+        }
+      ]
+    },
+    {
+      "year": "2021",
+      "title": "Terceira Edição do SINUCA",
+      "image": "3255e.png",
+      "intro": "A única edição feita de maneira remota, a qual todos os países participaram dos debates junto de órgãos filiados à ONU e movimentos sociais.",
+      "groups": [
+        {
+          "title": "Delegações Participantes",
+          "items": [
+            "Alemanha",
+            "Austrália",
+            "China - Vencedor Geral",
+            "Egito",
+            "Estados Unidos",
+            "Quênia - Vencedor Geral",
+            "Rússia"
+          ]
+        },
+        {
+          "title": "Órgãos e Movimentos Participantes",
+          "items": [
+            "ACNUDH(Alto Comissariado das Nações Unidas para os Direitos Humanos)",
+            "Blue Lives Matter",
+            "Movimentos Pró-Militares",
+            "Movimentos Anti-Racistas"
+          ]
+        },
+        {
+          "title": "Tipos de Simulação",
+          "items": [
+            "Debates, Atividades Pré-Conselho(apresentações culturais, pratos típicos, aspectos geográficos e visão dos movimentos acerca dos debates realizados)."
+          ]
+        },
+        {
+          "title": "Debates",
+          "items": [
+            "Brasil x ACNUDH: Cúpula do Clima",
+            "Israel x Palestina: Questão da Palestina",
+            "Movimentos Anti-Racistas x EUA e Blue Lives Matter: Movimento Black Lives Matter (George Floyd)",
+            "ACNUDH x Defensores da Operação Militar: Chacina no Jacarezinho"
+          ]
+        }
+      ]
+    },
+    {
+      "year": "2025",
+      "title": "Quarta Edição do SINUCA",
+      "image": "23e5c.png",
+      "groups": [
+        {
+          "title": "Delegações Participantes",
+          "items": [
+            "Afeganistão",
+            "Alemanha",
+            "Argentina",
+            "Brasil",
+            "Burkina Faso - Apres. Cult.",
+            "China",
+            "Colômbia - Debates",
+            "Egito",
+            "El Salvador",
+            "Estados Unidos",
+            "Etiópia",
+            "França",
+            "Índia",
+            "Irã",
+            "Irlanda",
+            "Israel - Vencedor Geral e Desafio Gastr.",
+            "Malásia",
+            "Paquistão",
+            "Paraguai",
+            "Reino Unido",
+            "Rússia",
+            "Ucrânia"
+          ]
+        },
+        {
+          "title": "Tipos de Simulação",
+          "items": [
+            "Mesa de Cooperação, Debates e Apresentação Cultural (Dança e Desafio Gastronômico)"
+          ]
+        },
+        {
+          "title": "Debates",
+          "items": [
+            "Brasil x EUA: Taxação e Liberdade de Expressão",
+            "Afeganistão x Inglaterra: Direito das Mulheres e Imperialismo",
+            "Etiópia x Egito: Águas do Rio Nilo",
+            "França x Burkina Faso: Colonialismo e reparações",
+            "Israel x Irã: Questão da Palestina e Grupos Terroristas",
+            "Argentina x Irlanda: Regulamentação das Redes",
+            "Colômbia x El Salvador: Direitos Humanos e Imigração",
+            "Malásia x Alemanha: Agricultura Verde e Agrotóxicos",
+            "China x Paraguai: Reconhecimento do Taiwan",
+            "Rússia x Ucrânia: Guerra e Disputa Territorial",
+            "Índia x Paquistão: Território da Caxemira"
+          ]
+        },
+        {
+          "title": "Mesas de Cooperação",
+          "items": [
+            "Questão da Palestina",
+            "Mudanças Climáticas"
+          ]
+        }
+      ]
+    },
+    {
+      "year": "2026",
+      "title": "Quinta Edição do SINUCA",
+      "image": "76b44.png",
+      "groups": [
+        {
+          "title": "Delegações Participantes",
+          "items": [
+            "Argélia",
+            "Argentina",
+            "Brasil - Discurso de abertura",
+            "China",
+            "Cuba",
+            "Equador",
+            "Estados Unidos",
+            "França - Desafio Gastr.",
+            "Guiana",
+            "Irã",
+            "Japão",
+            "Marrocos",
+            "Myanmar",
+            "Reino Unido",
+            {
+              "desktop": "Rússia - Vencedor Geral, Debate e Apres. Cult",
+              "mobile": "Rússia - Vencedor Geral, Deabate e Apress. Cult"
+            },
+            "Timor-Leste",
+            "Venezuela"
+          ]
+        },
+        {
+          "title": "Tipos de Simulação",
+          "items": [
+            "Mesa de Cooperação, Debates e Apresentação Cultural (Dança e Desafio Gastronômico)"
+          ]
+        },
+        {
+          "title": "Debates",
+          "items": [
+            "EUA x Irã: Ameaça de Trump e controle do Estreito de Ormuz",
+            "Equador x Cuba: Crise diplomática",
+            "Timor Leste x Myanmar: Investigação de crimes de guerra e genocídio",
+            "Marrocos x Argélia: Rivalidade pelo Saara Ocidental e controle de reservas",
+            "Reino Unido x Argentina: Soberania das Malvinas",
+            "China x Japão: Richas históricas e disputas territoriais",
+            "Venezuela e Guiana: ",
+            "França x Rússia: Expansão da OTAN e do arsenal nuclear francẽs"
+          ]
+        },
+        {
+          "title": "Mesas de Cooperação",
+          "items": [
+            "Questão da Palestina",
+            "Energia Atômica"
+          ]
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "accent": "#01295f",
+      "title": "O que é o SINUCA",
+      "blocks": [
+        {
+          "layout": "introduction",
+          "image": "sinuca-grupo.png",
+          "text": "O Simulado Interdisciplinar das Nações Unidas (SINUCA) é um projeto de ensino que integra diversas matérias com o objetivo de reproduzir, de maneira lúdica e dinâmica, a experiência do funcionamento da Organização das Nações Unidas; nele são utilizados debates de cunho político para incentivar a discussão acerca de temas atuais e relevantes, e, como consequência, a compreensão de diferentes pontos de vista e aspectos culturais.",
+          "after": "A análise da autoavaliação dos discentes revela que o SINUCA colabora para o desenvolvimento de habilidades como oratória, mediação e redação escrita; estimula a integração entre áreas do saber; desperta o interesse dos estudantes pelos temas geopolíticos e contextos históricos dos temas debatidos, estimula a criatividade e a inovação."
+        }
+      ]
+    },
+    {
+      "accent": "#849324",
+      "title": "Como o SINUCA foi criado",
+      "blocks": [
+        {
+          "layout": "origin",
+          "image": "sinuca-origem.png",
+          "text": "A iniciativa do SINUCA surgiu da adaptação de modelos de simulação de organizações internacionais já desenvolvidos em universidades brasileiras e estrangeiras, bem como em outros campi do Instituto Federal Catarinense. A experiência foi posteriormente adaptada à realidade do Campus Araquari, considerando a proposta institucional de promover uma formação integral e cidadã. Nesse processo, buscou-se relacionar a simulação às disciplinas do Ensino Médio Integrado, especialmente aos conteúdos de Geografia, aproximando os assuntos estudados em sala de aula das discussões sobre política internacional e geopolítica."
+        }
+      ]
+    },
+    {
+      "accent": "#fd151b",
+      "title": "Como o SINUCA funciona",
+      "blocks": [
+        {
+          "text": "O SINUCA acontece anualmente no IFC Campus Araquari, durante dois dias da última semana do mês de outubro. O evento reúne os discentes do segundo ano e os divide em grupos, os quais são atribuídos países de relevância no cenário global. Os alunos realizam pesquisas sobre o aspecto cultural, político e econômico do país selecionado. Durante o simulado, são realizados debates, mesas de cooperação e apresentações culturais, incluindo danças e o desafio gastronômico.",
+          "image": "83377.png"
+        },
+        {
+          "heading": "Debates:",
+          "text": "Os debates são intermediados pela organização e são estruturados em um discurso inicial de cada representante da delegação, nele é construída e esclarecida a posição dos países em relação ao tema discutido; para cada turno, as delegações têm direito a réplicas e tréplicas. Os argumentos defendidos nos debates têm de coincidir com o interesse pessoal de cada país envolvido, sendo assim, o debate é mediado de acordo com a qualidade argumentativa e a capacidade de defesa da posição da delegação.",
+          "image": "6ad8d.png"
+        },
+        {
+          "heading": "Mesas de Cooperação",
+          "text": "Os discentes participantes das mesas de cooperação, que atuam como diplomatas, são direcionados a uma sala onde, em uma roda de conversa, ocorre uma discussão acerca de um tema de grande relevância e interesse global. Nesse diálogo, diferentemente dos debates, os países têm como objetivo chegar a um consenso geral, ainda que defendam seus próprios interesses. Caso o acordo proposto entre em grave divergência com os interesses ou posicionamentos de algum país participante, a delegação pode optar por não aderir a ele, embora seja priorizada a busca por uma conciliação entre todas as delegações. As mesas de cooperação ocorrem no fim da primeira rodada de debates e antes da segunda, a qual todos os países participam.",
+          "image": "da136.png"
+        },
+        {
+          "text": "Durante o processo de discussão, as delegações podem ser divididas em pequenos grupos, visando proporcionar diálogos mais fluidos. Cada delegação tem direito a uma breve fala no início da discussão, e o processo de tomada de decisões é feito por meio de votações.",
+          "image": "2f9d3.png"
+        },
+        {
+          "heading": "Apresentação Cultural (Dança)",
+          "text": "As danças culturais são realizadas durante os intervalos dos debates, proporcionando ao público um maior contato com a cultura dos países participantes. Dessa forma, o SINUCA amplia sua abordagem para além da geopolítica, incorporando também aspectos artísticos e culturais das diferentes nações representadas no evento. Geralmente as apresentações são curtas, possuindo 10 minutos, e utilizam de vestimentas culturais e músicas.",
+          "image": "1a97c.png"
+        },
+        {
+          "image": "73149.png"
+        },
+        {
+          "heading": "Apresentação Cultural (Desafio Gastronômico)",
+          "text": "O desafio gastronômico consiste na criação e na apresentação de pratos típicos dos países os quais cada delegação recebe, tem o objetivo de imergir ainda mais os participantes do evento na cultura dos países de uma forma diferenciada. A apresentação dos pratos permite explorar a gastronomia como uma manifestação cultural, mostrando costumes e tradições de cada povo. ",
+          "image": "4060d.png"
+        }
+      ]
+    },
+    {
+      "accent": "#ffb30f",
+      "title": "Como fazer uma simulação da ONU",
+      "blocks": [
+        {
+          "text": "A realização de uma Simulação das Nações Unidas exige planejamento e organização prévios, começando pela definição dos temas que serão debatidos e dos comitês que farão parte do evento. Em seguida, os participantes são divididos em delegações, cada uma responsável por representar determinado país, assumindo suas perspectivas e posicionamentos diante das questões propostas.",
+          "image": "94413.png"
+        },
+        {
+          "text": "Durante a preparação, é necessário pesquisar os aspectos políticos, econômicos, históricos e culturais das nações representadas, a fim de compreender seus interesses e fundamentar os argumentos apresentados. No decorrer da simulação, os debates são conduzidos por uma equipe responsável pela mediação, garantindo a organização das falas, a apresentação de propostas e a interação entre as delegações. As mesas, juntamente, são realizadas e guiadas pela organização do evento. Dessa forma, o evento se desenvolve por meio da representação diplomática, da argumentação e da busca por acordos entre os participantes.",
+          "image": "36078.png"
+        },
+        {
+          "text": "\tAlém dos debates, também são organizadas as atividades culturais. Para as apresentações, são definidos os trajes, as músicas e as coreografias que representam as tradições dos países, além da realização de ensaios. Já para o desafio gastronômico, são planejados os pratos típicos e a decoração dos espaços de apresentação, de modo a proporcionar aos participantes diferentes formas de contato com as culturas representadas.",
+          "image": "d97b9.png"
+        }
+      ]
+    }
+  ]
+}
