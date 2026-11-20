@@ -41,13 +41,14 @@ const isDesktop = useIsDesktop()
 }
 
 .app-layout.is-desktop {
-  --sidebar-width: 277px;
+  --sidebar-compact-width: 4.75rem;
+  --sidebar-expanded-width: 14.5rem;
   min-height: 100vh;
   background-color: #f6f6f2;
 }
 
 .is-desktop .app-content {
-  margin-left: var(--sidebar-width);
+  margin-left: calc(var(--sidebar-compact-width) + 0.625rem);
   padding: 5rem 4.75rem 4rem;
 }
 
