@@ -23,7 +23,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <AppLayout title="Mural">
+    <AppLayout title="Mural" show-corner-ods>
         <main>
             <BannerComponent
                 title="Mural"

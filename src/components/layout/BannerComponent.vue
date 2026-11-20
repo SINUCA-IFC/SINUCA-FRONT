@@ -7,7 +7,6 @@ const props = defineProps({
     icon: String,
     subtitle: String,
     CountryFlagUrl: String, 
-    UserImageUrl: String,
 });
 </script>
 
@@ -15,9 +14,7 @@ const props = defineProps({
     <section class="banner">
         <div class="title-area">
             <div class="title-row">
-                <div v-if="UserImageUrl" class="user-image-container">
-                    <img class="user-image" v-if="UserImageUrl" :src="UserImageUrl" :alt="`Foto de perfil do usuário ${title}`">
-                </div>
+                <slot name="avatar" />
                 <div class="info-banner">
                     <div class="title-heading">
                         <slot name="title"><h2 class="title">{{ title }}</h2></slot>
@@ -93,21 +90,6 @@ const props = defineProps({
     min-width: 0;
 }
 
-.user-image-container {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-
-.user-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-}
 .ods-shape {
     flex: 0 1 28%;
     width: 28%;
