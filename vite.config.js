@@ -35,7 +35,7 @@ export default defineConfig(({ command, mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: (VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/api\/?$/, ''),
+          target: (VITE_API_BASE_URL || 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br').replace(/\/api\/?$/, ''),
           changeOrigin: true,
         },
       },

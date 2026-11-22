@@ -70,6 +70,7 @@ defineEmits(['retry'])
 }
 .delegation-info {
   grid-column: 2;
+  grid-row: 1;
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -89,10 +90,12 @@ defineEmits(['retry'])
 }
 .delegation-flag {
   grid-column: 3;
+  grid-row: 1;
+  display: block;
   width: 40px;
   height: 27px;
   border-radius: 5px;
-  object-fit: cover;
+  object-fit: contain;
 }
 .list-status {
   padding: 1.5rem;
@@ -111,7 +114,7 @@ defineEmits(['retry'])
   font: inherit;
   cursor: pointer;
 }
-@media (max-width: 359px) {
+@media (max-width: 479px) {
   .delegation-card {
     gap: 0.5rem;
     padding-right: 1rem;

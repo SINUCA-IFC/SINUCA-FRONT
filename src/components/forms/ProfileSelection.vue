@@ -1,15 +1,17 @@
 <script setup>
+import BackButton from '@/components/layout/BackButton.vue'
 import { authProfiles } from '@/services/authProfiles'
 defineEmits(['select'])
 </script>
 
 <template>
   <section class="profile-selection" aria-labelledby="welcome-title">
+    <BackButton to="/mural" label="Voltar ao mural" class="selection-back" />
     <header class="welcome-brand">
       <img src="/logo-azul.svg" alt="SINUCA" width="80" height="6" />
       <span>SINUCA</span>
     </header>
-    <h1 class="welcome-title">BEM-VINDO</h1>
+    <h1 id="welcome-title" class="welcome-title">BEM-VINDO</h1>
     <p class="welcome-subtitle">Selecione como deseja acessar o sistema</p>
     <div class="profile-options">
       <button
@@ -34,6 +36,9 @@ defineEmits(['select'])
 </template>
 
 <style scoped>
+.selection-back {
+  margin-bottom: 1rem;
+}
 .profile-selection {
   position: relative;
   isolation: isolate;
@@ -89,6 +94,8 @@ h1 {
   display: flex;
   justify-content: center;
   gap: 28px;
+  flex-wrap: wrap;
+  max-width: 100%;
   margin: clamp(24px, 5dvh, 48px) auto 0;
 }
 .profile-option {
@@ -98,6 +105,7 @@ h1 {
   justify-content: center;
   box-sizing: border-box;
   width: 220px;
+  max-width: 100%;
   min-height: 210px;
   padding: 20px 16px;
   border: 2px solid;

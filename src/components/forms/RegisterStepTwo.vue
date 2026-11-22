@@ -1,4 +1,5 @@
 <script setup>
+import BackButton from '@/components/layout/BackButton.vue'
 import { computed, ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
@@ -92,5 +93,5 @@ async function resend() {
   <p v-else>Não há uma confirmação disponível. Volte ao login para continuar.</p>
   <p v-if="error" role="alert">{{ error }}</p>
   <p v-if="message" role="status">{{ message }}</p>
-  <RouterLink class="auth-link" to="/login">Voltar ao login</RouterLink>
+  <BackButton to="/login" label="Voltar ao login" />
 </template>

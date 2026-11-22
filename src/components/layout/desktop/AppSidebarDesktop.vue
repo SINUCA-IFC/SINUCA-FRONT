@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import LogoSinuca from '/logo-sinuca.svg'
 import { useUserStore } from '../../../stores/userStore'
 import { useDelegationTabs } from '../../../composables/useDelegationTabs'
+import { organizerTabs } from '@/composables/useOrganizerTabs'
 import UserAvatar from '../UserAvatar.vue'
 import { useChatStore } from '@/stores/chatStore'
 import UnreadBadge from '@/components/chat/UnreadBadge.vue'
@@ -12,7 +13,11 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const chatStore = useChatStore()
-const { tabs, activeTab, setTab } = useDelegationTabs()
+const { tabs: delegationTabs, activeTab, setTab } = useDelegationTabs()
+const isOrganizer = computed(() => userStore.user.role === 'organizer')
+const tabs = computed(() => (isOrganizer.value ? organizerTabs : delegationTabs))
+const panelPath = computed(() => (isOrganizer.value ? '/organizador' : '/delegacao'))
+const panelName = computed(() => (isOrganizer.value ? 'Organizador' : 'Delegação'))
 
 const mainLinks = [
   { name: 'História', icon: 'mdi mdi-book-open-page-variant-outline', path: '/historia' },
@@ -21,10 +26,14 @@ const mainLinks = [
 ]
 
 const isActivePath = (path) => route.path === path || route.path.startsWith(`${path}/`)
-const isDelegation = computed(() => isActivePath('/delegacao'))
+const isDelegation = computed(() => isActivePath(panelPath.value))
 const profileName = computed(() => userStore.user.name || 'Meu perfil')
 
 function openTab(tab) {
+  if (isOrganizer.value) {
+    router.push('/organizador')
+    return
+  }
   setTab(tab.id)
   if (route.path !== '/delegacao') router.push('/delegacao')
 }
@@ -37,7 +46,7 @@ async function logout() {
 
 <template>
   <aside class="sidebar">
-    <RouterLink to="/delegacao" class="logo-link" aria-label="Início">
+    <RouterLink :to="panelPath" class="logo-link" aria-label="Início">
       <img :src="LogoSinuca" alt="" class="logo" />
       <span class="sidebar-label brand-name">SINUCA</span>
     </RouterLink>
@@ -47,13 +56,9 @@ async function logout() {
     <nav aria-label="Navegação principal">
       <ul class="main-list">
         <li>
-          <RouterLink
-            to="/delegacao"
-            class="sidebar-item delegation-link"
-            aria-label="Delegação"
-          >
+          <RouterLink :to="panelPath" class="sidebar-item delegation-link" :aria-label="panelName">
             <span class="item-icon mdi mdi-earth" aria-hidden="true"></span>
-            <span class="sidebar-label">Delegação</span>
+            <span class="sidebar-label">{{ panelName }}</span>
           </RouterLink>
           <div class="submenu">
             <ul class="sub-list">
@@ -61,8 +66,10 @@ async function logout() {
                 <button
                   type="button"
                   class="sidebar-item sub-item"
-                  :class="{ active: isDelegation && activeTab === tab.id }"
-                  :aria-current="isDelegation && activeTab === tab.id ? 'true' : undefined"
+                  :class="{ active: isDelegation && (isOrganizer || activeTab === tab.id) }"
+                  :aria-current="
+                    isDelegation && (isOrganizer || activeTab === tab.id) ? 'true' : undefined
+                  "
                   @click="openTab(tab)"
                 >
                   <span :class="tab.icon" aria-hidden="true"></span>
@@ -85,7 +92,11 @@ async function logout() {
                 v-if="link.path === '/chat'"
                 class="chat-badge"
                 :count="chatStore.unreadCount"
-                :label="userStore.user.role === 'organizer' ? 'países com mensagens não lidas' : 'mensagens não lidas'"
+                :label="
+                  userStore.user.role === 'organizer'
+                    ? 'países com mensagens não lidas'
+                    : 'mensagens não lidas'
+                "
               />
             </span>
             <span class="sidebar-label">{{ link.name }}</span>
@@ -109,7 +120,13 @@ async function logout() {
         </RouterLink>
       </li>
       <li>
-        <button v-if="userStore.loggedIn" type="button" class="sidebar-item logout" aria-label="Sair" @click="logout">
+        <button
+          v-if="userStore.loggedIn"
+          type="button"
+          class="sidebar-item logout"
+          aria-label="Sair"
+          @click="logout"
+        >
           <span class="item-icon mdi mdi-logout" aria-hidden="true"></span>
           <span class="sidebar-label">Sair</span>
         </button>
@@ -141,7 +158,11 @@ async function logout() {
   box-shadow: 0 4px 16px rgb(1 41 95 / 18%);
   overflow: hidden auto;
   scrollbar-width: thin;
-  transition: width 200ms ease, inset 200ms ease, border-radius 200ms ease, padding 200ms ease;
+  transition:
+    width 200ms ease,
+    inset 200ms ease,
+    border-radius 200ms ease,
+    padding 200ms ease;
 }
 
 .sidebar:is(:hover, :has(:focus-visible)) {
@@ -208,7 +229,9 @@ async function logout() {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 }
 
 .sidebar-item:not(.logout, .delegation-link):is(:hover, :focus-visible, .active) {
@@ -243,7 +266,9 @@ async function logout() {
   display: grid;
   grid-template-rows: 0fr;
   visibility: hidden;
-  transition: grid-template-rows 200ms ease, visibility 200ms;
+  transition:
+    grid-template-rows 200ms ease,
+    visibility 200ms;
 }
 
 .sidebar:is(:hover, :has(:focus-visible)) .submenu {

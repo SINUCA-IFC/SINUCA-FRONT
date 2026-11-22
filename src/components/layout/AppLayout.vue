@@ -54,7 +54,7 @@ const isDesktop = useIsDesktop()
 
 .is-desktop .app-content {
   margin-left: calc(var(--sidebar-compact-width) + 0.625rem);
-  padding: 5rem 4.75rem 4rem;
+  padding: 5rem clamp(1.5rem, 4vw, 4.75rem) 4rem;
 }
 
 .is-desktop .sidebar:is(:hover, :has(:focus-visible)) + .app-content {

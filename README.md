@@ -129,13 +129,9 @@ diretamente `VITE_API_BASE_URL`, para manter os cookies no domínio do callback
 Google. O backend deve autorizar as duas origens em `FRONTEND_ALLOWED_ORIGINS`,
 com CORS de credenciais e CSRF habilitados. Isso exige publicar o backend atualizado.
 
-Para usar a API local, configure `.env.local`:
-
-```dotenv
-VITE_API_BASE_URL=http://localhost:8000
-```
-
-Para usar a API publicada em desenvolvimento:
+O desenvolvimento e o build usam a API HTTPS publicada por padrão.
+Não é necessário iniciar um banco de dados ou backend local neste repositório.
+Para definir explicitamente a API em desenvolvimento, configure `.env.local`:
 
 ```dotenv
 VITE_API_BASE_URL=https://sinuca-backend.class.fabricadesoftware.ifc.edu.br

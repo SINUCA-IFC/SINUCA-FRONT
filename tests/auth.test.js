@@ -218,7 +218,7 @@ test('Google submits a full navigation POST, exchanges once with fresh CSRF and 
   let exchangeCount = 0
   axios.defaults.adapter = async (config) => {
     assert.equal(config.withCredentials, true)
-    assert.equal(config.baseURL, 'http://localhost:8000/api')
+    assert.equal(config.baseURL, 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api')
     assert.equal(config.headers.Authorization, undefined)
     if (config.url === '/auth/csrf/') return respond(config, { csrfToken: `csrf-${++csrfCount}` })
     assert.equal(config.url, '/token/session/')
@@ -229,7 +229,7 @@ test('Google submits a full navigation POST, exchanges once with fresh CSRF and 
   await startGoogle()
   assert.equal(submitted, true)
   assert.equal(elements[0].method, 'POST')
-  assert.equal(elements[0].action, 'http://localhost:8000/api/auth/google/')
+  assert.equal(elements[0].action, 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api/auth/google/')
   assert.equal(elements[1].name, 'csrfmiddlewaretoken')
   assert.equal(elements[1].value, 'csrf-1')
   const [first, second] = await Promise.all([exchangeGoogleSession(), exchangeGoogleSession()])

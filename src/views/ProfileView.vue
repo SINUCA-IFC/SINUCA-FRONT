@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref } from 'vue'
+import BackButton from '@/components/layout/BackButton.vue'
+import { computed, onMounted, ref } from 'vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BannerComponent from '@/components/layout/BannerComponent.vue'
 import ProfileActivities from '@/components/profile/ProfileActivities.vue'
@@ -9,7 +10,13 @@ import EditProfileModal from '@/components/profile/EditProfileModal.vue'
 import { useUserStore } from '@/stores/userStore'
 import { useDelegationTabs } from '@/composables/useDelegationTabs'
 import { useToastStore } from '@/stores/toastStore'
+import { useChatStore } from '@/stores/chatStore'
 const userStore = useUserStore()
+const chatStore = useChatStore()
+const isOrganizer = computed(() => userStore.user.role === 'organizer')
+onMounted(() => {
+  if (isOrganizer.value) chatStore.refresh()
+})
 const { setTab } = useDelegationTabs()
 const editing = ref(false)
 const success = ref('')
@@ -32,14 +39,11 @@ function profileSaved() {
 <template>
   <AppLayout title="Meu perfil" show-corner-ods>
     <main class="profile-page">
-      <RouterLink
-        to="/delegacao"
-        class="back-link"
-        aria-label="Voltar ao Kanban"
-        @click="setTab(0)"
-      >
-        <span class="mdi mdi-arrow-left" aria-hidden="true"></span>
-      </RouterLink>
+      <BackButton
+        :to="isOrganizer ? '/organizador' : '/delegacao'"
+        :label="isOrganizer ? 'Voltar ao painel' : 'Voltar ao Kanban'"
+        @click="!isOrganizer && setTab(0)"
+      />
       <BannerComponent
         class="profile-banner"
         :title="userStore.user.name || 'Usuário SINUCA'"
@@ -66,14 +70,34 @@ function profileSaved() {
       <div class="profile-toolbar">
         <div class="profile-meta">
           <span class="role-badge">{{ role }}</span>
-          <span
+          <span v-if="!isOrganizer"
             ><span class="mdi mdi-earth" aria-hidden="true"></span>
             {{ userStore.user.country?.name || 'Delegação ainda não vinculada' }}</span
           >
         </div>
       </div>
       <p v-if="success" class="success" role="status">{{ success }}</p>
-      <ProfileActivities v-if="userStore.user.country?.id" />
+      <section v-if="isOrganizer" class="delegation-notice" aria-labelledby="profile-chat-title">
+        <span class="notice-icon mdi mdi-forum-outline" aria-hidden="true"></span>
+        <div>
+          <h2 id="profile-chat-title">Suas conversas</h2>
+          <p v-if="chatStore.error" role="alert">{{ chatStore.error }}</p>
+          <p v-else-if="chatStore.loading" role="status">
+            Atualizando notificações de conversas...
+          </p>
+          <p v-else-if="chatStore.unreadCount" role="status">
+            Você tem {{ chatStore.unreadCount }}
+            {{
+              chatStore.unreadCount === 1
+                ? 'conversa com mensagens não lidas.'
+                : 'conversas com mensagens não lidas.'
+            }}
+          </p>
+          <p v-else role="status">Sem notificações de conversas. Suas mensagens estão em dia.</p>
+          <RouterLink to="/chat" class="notice-link">Abrir chat</RouterLink>
+        </div>
+      </section>
+      <ProfileActivities v-else-if="userStore.user.country?.id" />
       <section v-else class="delegation-notice" aria-labelledby="delegation-notice-title">
         <span class="notice-icon mdi mdi-earth" aria-hidden="true"></span>
         <div>
@@ -164,20 +188,6 @@ input:focus-visible {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-}
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-  width: 44px;
-  height: 44px;
-  color: #01295f;
-  font-size: 1.6rem;
-  border-radius: 8px;
-}
-.back-link:hover {
-  background: #e9eef6;
 }
 .delegation-notice {
   display: flex;
