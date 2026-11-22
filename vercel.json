@@ -22,8 +22,8 @@
   ],
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api/:path*"
+      "source": "/api/(.*)",
+      "destination": "https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api/$1"
     },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

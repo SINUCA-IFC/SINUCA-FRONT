@@ -120,7 +120,7 @@ npm ci
 O frontend suporta `http://localhost:5173` e `https://sinuca-ifc-mocha.vercel.app`.
 As chamadas comuns usam `/api`: o Vite encaminha para `VITE_API_BASE_URL` em
 desenvolvimento, e `vercel.json` encaminha para a API do IFC em produção.
-O rewrite `/api/:path*` deve ficar antes do fallback para `index.html`.
+O rewrite `/api/(.*)` deve ficar antes do fallback para `index.html` e preservar a barra final exigida pelo Django.
 Ao mudar a API de produção, atualize tanto `.env.production` quanto o destino
 em `vercel.json`.
 
@@ -241,3 +241,17 @@ Configure a URL da API antes do build e utilize HTTPS para os recursos de PWA qu
 - [Back-end](https://github.com/SINUCA-IFC/SINUCA-BACK)
 - [Organização SINUCA-IFC](https://github.com/SINUCA-IFC)
 - [Documento do projeto](https://docs.google.com/document/d/17GRwIq2vJa5Fo7NMv2ppM04NwbgOPGmEZtuLE4Cn_as/edit)
+
+### Verificar o deploy real
+
+Depois de publicar, execute:
+
+```bash
+node scripts/check-deployment.js https://sinuca-ifc-mocha.vercel.app
+node scripts/check-deployment.js http://localhost:5173
+```
+
+A verificação exige JSON nas postagens e no POST de login vazio (400 por campos
+obrigatórios). HTML, redirecionamento ou 405 indicam falha de roteamento.
+Se `/api/token` chega à API mas `/api/token/` entrega `index.html`, confira se o
+rewrite publicado usa `/api/(.*)` com destino terminado em `/api/$1`.
