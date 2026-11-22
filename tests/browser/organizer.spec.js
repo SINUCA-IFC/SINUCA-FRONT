@@ -18,7 +18,7 @@ for (const width of [390, 1440]) {
         ),
       }),
     )
-    await page.route('http://localhost:8000/api/**', async (route) => {
+    await page.route('**/api/**', async (route) => {
       const req = route.request()
       const path = new URL(req.url()).pathname
       let data = { results: [], total_pages: 1 }

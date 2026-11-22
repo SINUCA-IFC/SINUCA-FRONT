@@ -37,7 +37,9 @@ defineEmits(['select'])
 
 <style scoped>
 .selection-back {
-  margin-bottom: 1rem;
+  position: absolute;
+  top: clamp(20px, 4vw, 40px);
+  left: clamp(20px, 4vw, 40px);
 }
 .profile-selection {
   position: relative;
@@ -47,7 +49,7 @@ defineEmits(['select'])
   justify-content: center;
   min-height: 100dvh;
   box-sizing: border-box;
-  padding: clamp(24px, 5dvh, 48px) 24px;
+  padding: 88px 24px 32px;
   background: #f6f6f2;
   color: #1e1e1e;
   text-align: center;
@@ -146,7 +148,7 @@ h1 {
 }
 @media (max-width: 767px) {
   .profile-selection {
-    padding: clamp(12px, 2.5dvh, 24px) 20px;
+    padding: 80px 20px 24px;
   }
   .profile-selection::before {
     background-image: url('/static/fundo-continente.svg');

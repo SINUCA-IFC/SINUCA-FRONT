@@ -362,7 +362,7 @@ h1 {
 }
 @media (min-width: 768px) {
   .login-layout {
-    padding: clamp(80px, 16dvh, 164px) 32px 24px;
+    padding: clamp(24px, 5dvh, 48px) 32px 24px;
   }
   .login-layout::before {
     content: '';
@@ -373,11 +373,9 @@ h1 {
     clip-path: polygon(58.4% 0, 100% 0, 100% 100%, 11.5% 100%);
   }
   .login-header {
-    position: absolute;
-    top: clamp(24px, 7.8dvh, 80px);
-    left: clamp(32px, 5.8vw, 84px);
-    width: auto;
-    margin: 0;
+    position: static;
+    width: min(100%, 636px);
+    margin: 0 0 1.5rem;
     gap: 20px;
   }
   .login-header img {
@@ -390,7 +388,7 @@ h1 {
     text-align: left;
   }
   .login-intro h1 {
-    padding-left: 10px;
+    padding-left: 0;
     text-align: left;
     font-size: 40px;
     line-height: 1.3;

@@ -39,34 +39,40 @@ function profileSaved() {
 <template>
   <AppLayout title="Meu perfil" show-corner-ods>
     <main class="profile-page">
-      <BackButton
-        :to="isOrganizer ? '/organizador' : '/delegacao'"
-        :label="isOrganizer ? 'Voltar ao painel' : 'Voltar ao Kanban'"
-        @click="!isOrganizer && setTab(0)"
-      />
-      <BannerComponent
-        class="profile-banner"
-        :title="userStore.user.name || 'Usuário SINUCA'"
-        :subtitle="userStore.user.email"
-      >
-        <template #avatar>
-          <UserAvatar class="profile-avatar" :src="userStore.user.foto?.url" alt="Foto de perfil" />
-        </template>
-        <template #title>
-          <ProfileName :name="userStore.user.name || 'Usuário SINUCA'" />
-        </template>
-        <template #title-action>
-          <button
-            type="button"
-            class="edit-profile"
-            aria-label="Editar perfil"
-            title="Editar perfil"
-            @click="startEditing"
-          >
-            <span class="mdi mdi-pencil-outline" aria-hidden="true"></span>
-          </button>
-        </template>
-      </BannerComponent>
+      <header class="page-heading">
+        <BackButton
+          :to="isOrganizer ? '/organizador' : '/delegacao'"
+          :label="isOrganizer ? 'Voltar ao painel' : 'Voltar ao Kanban'"
+          @click="!isOrganizer && setTab(0)"
+        />
+        <BannerComponent
+          class="profile-banner"
+          :title="userStore.user.name || 'Usuário SINUCA'"
+          :subtitle="userStore.user.email"
+        >
+          <template #avatar>
+            <UserAvatar
+              class="profile-avatar"
+              :src="userStore.user.foto?.url"
+              alt="Foto de perfil"
+            />
+          </template>
+          <template #title>
+            <ProfileName :name="userStore.user.name || 'Usuário SINUCA'" />
+          </template>
+          <template #title-action>
+            <button
+              type="button"
+              class="edit-profile"
+              aria-label="Editar perfil"
+              title="Editar perfil"
+              @click="startEditing"
+            >
+              <span class="mdi mdi-pencil-outline" aria-hidden="true"></span>
+            </button>
+          </template>
+        </BannerComponent>
+      </header>
       <div class="profile-toolbar">
         <div class="profile-meta">
           <span class="role-badge">{{ role }}</span>
@@ -117,6 +123,29 @@ function profileSaved() {
   </AppLayout>
 </template>
 <style scoped>
+.page-heading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+.page-heading .profile-banner {
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 479px) {
+  .page-heading {
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .page-heading > .app-back {
+    align-self: flex-start;
+    margin-top: 1rem;
+  }
+  .profile-banner :deep(.title-row) {
+    flex-wrap: wrap;
+  }
+}
 .profile-banner {
   --profile-photo-size: clamp(64px, 10vw, 100px);
 }

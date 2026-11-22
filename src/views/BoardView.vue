@@ -126,7 +126,7 @@ onMounted(loadPosts)
           </p>
           <p v-if="deleteError" role="alert">{{ deleteError }}</p>
           <footer>
-            <AppButton variant="secondary" :disabled="deleting" @click="deletingPost = null"
+            <AppButton variant="danger" :disabled="deleting" @click="deletingPost = null"
               >Cancelar</AppButton
             >
             <AppButton variant="danger" :disabled="deleting" @click="deletePost">{{

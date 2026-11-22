@@ -1,5 +1,4 @@
 <script setup>
-import BackButton from '@/components/layout/BackButton.vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import AppModal from '@/components/layout/AppModal.vue'
 import AppInput from '@/components/forms/AppInput.vue'
@@ -237,7 +236,7 @@ async function save() {
           :category-styles="categoryStyles"
         />
         <footer class="form-actions">
-          <AppButton variant="secondary" @click="close">Cancelar</AppButton
+          <AppButton variant="danger" @click="close">Cancelar</AppButton
           ><AppButton type="submit" :disabled="saving || loading">Adicionar</AppButton>
         </footer>
       </form>
@@ -245,10 +244,14 @@ async function save() {
         <p>
           Confirmar o cadastro de <strong>{{ form.title }}</strong> nesta delegação?
         </p>
-        <BackButton :disabled="saving" @click="confirming = false" />
-        <AppButton :disabled="saving" @click="save">{{
-          saving ? 'Salvando...' : 'Confirmar cadastro'
-        }}</AppButton>
+        <footer class="form-actions">
+          <AppButton variant="danger" :disabled="saving" @click="confirming = false"
+            >Cancelar confirmação</AppButton
+          >
+          <AppButton :disabled="saving" @click="save">{{
+            saving ? 'Salvando...' : 'Confirmar cadastro'
+          }}</AppButton>
+        </footer>
       </div>
       <p v-if="error" role="alert" class="error">{{ error }}</p>
       <AppButton

@@ -5,7 +5,7 @@ for (const width of [320, 768, 1440]) {
     await page.setViewportSize({ width, height: 700 })
     await page.addInitScript(() => localStorage.setItem('access_token', 'test-access'))
     let unread = 2
-    await page.route('http://localhost:8000/api/**', async route => {
+    await page.route('**/api/**', async route => {
       const path = new URL(route.request().url()).pathname
       let data = { results: [], total_pages: 1 }
       if (path === '/api/usuarios/me/') data = {
@@ -38,7 +38,7 @@ for (const width of [320, 768, 1440]) {
 
 test('profile selection offers a way out on a short mobile screen', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 480 })
-  await page.route('http://localhost:8000/api/**', route => route.fulfill({ json: { results: [] } }))
+  await page.route('**/api/**', route => route.fulfill({ json: { results: [] } }))
   await page.goto('/login')
   await page.getByRole('link', { name: 'Voltar ao mural' }).click()
   await expect(page).toHaveURL(/\/mural$/)

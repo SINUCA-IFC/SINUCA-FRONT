@@ -114,17 +114,21 @@ watch(
 <template>
   <AppLayout title="Delegação">
     <main class="delegation-content">
-      <BackButton to="/organizador" label="Voltar ao painel" />
+      <header class="page-heading">
+        <BackButton to="/organizador" label="Voltar ao painel" />
+        <BannerComponent
+          v-if="country && !loading && !error"
+          :title="country.name"
+          :subtitle="country.political_name"
+          :CountryFlagUrl="country.flag?.url"
+        />
+        <h1 v-else>Delegação</h1>
+      </header>
       <p v-if="loading" role="status">Carregando delegação...</p>
       <div v-else-if="error" role="alert">
         {{ error }} <AppButton @click="load">Tentar novamente</AppButton>
       </div>
       <template v-else-if="country">
-        <BannerComponent
-          :title="country.name"
-          :subtitle="country.political_name"
-          :CountryFlagUrl="country.flag?.url"
-        />
         <NavigationComponent v-model="tab" :tabs="tabs" />
         <section v-if="tab === 0">
           <div class="section-heading">
@@ -170,8 +174,7 @@ watch(
           ><p>
             Adicionar <strong>{{ selected.name }}</strong> à delegação de {{ country.name }}?
           </p>
-          <AppButton :disabled="saving" @click="addParticipant">Confirmar</AppButton></template
-        >
+        </template>
         <template v-else
           ><AppInput v-model="query" label="Pesquisar discente" type="search" />
           <ul class="participant-options">
@@ -187,18 +190,50 @@ watch(
           <p v-if="!saving && !available.length">Nenhum discente disponível.</p></template
         >
         <p v-if="modalError" role="alert">{{ modalError }}</p>
-        <BackButton v-if="selected" :disabled="saving" @click="selected = null" />
-        <AppButton v-else variant="secondary" :disabled="saving" @click="close">Cancelar</AppButton>
+        <footer class="modal-actions">
+          <AppButton v-if="selected" variant="danger" :disabled="saving" @click="selected = null"
+            >Cancelar seleção</AppButton
+          >
+          <AppButton v-else variant="danger" :disabled="saving" @click="close">Cancelar</AppButton>
+          <AppButton v-if="selected" :disabled="saving" @click="addParticipant"
+            >Confirmar</AppButton
+          >
+        </footer>
       </section>
     </AppModal>
   </AppLayout>
 </template>
 <style scoped>
-.delegation-content > a {
-  color: #526d89;
-  font-size: 0.9rem;
-  text-decoration: none;
-  align-self: flex-start;
+.page-heading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+.page-heading > .banner {
+  flex: 1;
+  min-width: 0;
+}
+.page-heading h1 {
+  font-size: 1.5rem;
+}
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.modal-actions .app-button {
+  margin: 0;
+}
+@media (max-width: 479px) {
+  .page-heading {
+    gap: 0.5rem;
+  }
+  .page-heading :deep(.ods-shape) {
+    display: none;
+  }
 }
 .delegation-content > .app-button {
   align-self: flex-end;

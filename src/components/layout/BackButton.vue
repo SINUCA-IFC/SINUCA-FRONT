@@ -26,16 +26,16 @@ defineProps({
   align-items: center;
   justify-content: center;
   flex: none;
-  align-self: flex-start;
-  width: clamp(44px, 6dvh, 57px);
-  height: clamp(44px, 6dvh, 57px);
+  align-self: center;
+  width: 44px;
+  height: 44px;
   padding: 0.5rem;
   border: 0;
   border-radius: 0.5rem;
   background: #ebebeb;
   color: #1e1e1e;
   font: inherit;
-  font-size: 30px;
+  font-size: 26px;
   text-decoration: none;
   cursor: pointer;
 }

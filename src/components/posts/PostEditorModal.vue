@@ -101,7 +101,7 @@ onBeforeUnmount(clearPreview)
         </fieldset>
         <p v-if="error" role="alert">{{ error }}</p>
         <footer>
-          <AppButton variant="secondary" :disabled="saving" @click="close">Cancelar</AppButton>
+          <AppButton variant="danger" :disabled="saving" @click="close">Cancelar</AppButton>
           <AppButton type="submit" :disabled="saving">{{
             saving ? 'Salvando...' : post ? 'Salvar alterações' : 'Publicar'
           }}</AppButton>

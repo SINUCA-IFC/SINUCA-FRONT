@@ -25,7 +25,12 @@ const tabsFooter = computed(() =>
         },
         { id: 2, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/mural' },
         { id: 3, name: 'Chat', icon: 'mdi mdi-chat-outline', path: '/chat' },
-        { id: 4, name: 'Delegação', icon: 'mdi mdi-earth', path: '/delegacao' },
+        {
+          id: 4,
+          name: 'Delegação',
+          icon: userStore.user.role === 'evaluator' ? 'mdi mdi-crown-outline' : 'mdi mdi-earth',
+          path: '/delegacao',
+        },
       ],
 )
 

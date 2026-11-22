@@ -17,10 +17,13 @@ const saving = ref(false)
 const error = ref('')
 const removePhoto = ref(false)
 const validName = computed(() => Boolean(name.value.trim()) && name.value.trim().length <= 255)
-const photo = computed(() => preview.value || (removePhoto.value ? undefined : userStore.user.foto?.url))
+const photo = computed(
+  () => preview.value || (removePhoto.value ? undefined : userStore.user.foto?.url),
+)
 
 const changed = computed(
-  () => name.value.trim() !== (userStore.user.name || '') || Boolean(file.value) || removePhoto.value,
+  () =>
+    name.value.trim() !== (userStore.user.name || '') || Boolean(file.value) || removePhoto.value,
 )
 
 function removeCurrentPhoto() {
@@ -158,7 +161,13 @@ onBeforeRouteLeave(canClose)
       </div>
       <form @submit.prevent="saveProfile">
         <fieldset :disabled="saving">
-          <button type="button" class="avatar" aria-label="Alterar foto do perfil" aria-describedby="photo-help" @click="photoInput?.click()">
+          <button
+            type="button"
+            class="avatar"
+            aria-label="Alterar foto do perfil"
+            aria-describedby="photo-help"
+            @click="photoInput?.click()"
+          >
             <UserAvatar :src="photo" alt="Prévia da foto de perfil" />
             <span class="photo-edit mdi mdi-pencil-outline" aria-hidden="true"></span>
           </button>
@@ -177,14 +186,18 @@ onBeforeRouteLeave(canClose)
           />
           <p id="photo-help">JPG ou PNG. Até 5 MB.</p>
           <AppInput v-model="name" label="Nome completo" type="text" required />
-          <p v-if="!name.trim()" class="error" role="status">Informe seu nome. O campo não pode ficar vazio.</p>
-          <p v-else-if="!validName" class="error" role="status">O nome deve ter no máximo 255 caracteres.</p>
+          <p v-if="!name.trim()" class="error" role="status">
+            Informe seu nome. O campo não pode ficar vazio.
+          </p>
+          <p v-else-if="!validName" class="error" role="status">
+            O nome deve ter no máximo 255 caracteres.
+          </p>
           <p v-if="error" class="error" role="alert">{{ error }}</p>
           <div class="form-actions">
             <AppButton type="submit" :disabled="!changed || !validName || saving">{{
               saving ? 'Salvando...' : 'Salvar alterações'
             }}</AppButton>
-            <AppButton variant="secondary" :disabled="saving" @click="requestClose"
+            <AppButton variant="danger" :disabled="saving" @click="requestClose"
               >Cancelar</AppButton
             >
           </div>

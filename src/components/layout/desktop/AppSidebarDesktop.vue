@@ -57,7 +57,11 @@ async function logout() {
       <ul class="main-list">
         <li>
           <RouterLink :to="panelPath" class="sidebar-item delegation-link" :aria-label="panelName">
-            <span class="item-icon mdi mdi-earth" aria-hidden="true"></span>
+            <span
+              class="item-icon mdi"
+              :class="userStore.user.role === 'evaluator' ? 'mdi-crown-outline' : 'mdi-earth'"
+              aria-hidden="true"
+            ></span>
             <span class="sidebar-label">{{ panelName }}</span>
           </RouterLink>
           <div class="submenu">

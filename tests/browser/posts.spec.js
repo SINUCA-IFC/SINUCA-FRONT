@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 async function setup(page, role = 'organizer') {
   await page.addInitScript(() => localStorage.setItem('access_token', 'test-access'))
   const state = { posts: [], uploads: 0, deletes: 0, fail: false, payload: null }
-  await page.route('http://localhost:8000/api/**', async (route) => {
+  await page.route('**/api/**', async (route) => {
     const request = route.request()
     const path = new URL(request.url()).pathname
     let data = { results: [], total_pages: 1 }

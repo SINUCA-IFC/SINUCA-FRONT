@@ -11,7 +11,7 @@ for (const width of [390, 1440]) {
     const student = { id: 8, name: 'Ana', email: 'ana@example.com', role: 'student', country: null }
     const docs = [],
       schedules = []
-    await page.route('http://localhost:8000/api/**', async (route) => {
+    await page.route('**/api/**', async (route) => {
       const request = route.request(),
         path = new URL(request.url()).pathname
       let data = { results: [], total_pages: 1 }

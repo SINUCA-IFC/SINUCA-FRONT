@@ -1,5 +1,4 @@
 <script setup>
-import BackButton from '@/components/layout/BackButton.vue'
 import { computed, onMounted, ref } from 'vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BannerComponent from '@/components/layout/BannerComponent.vue'
@@ -225,12 +224,14 @@ onMounted(load)
         </template>
         <p v-if="actionError" class="error" role="alert">{{ actionError }}</p>
         <footer class="modal-actions">
-          <BackButton
+          <AppButton
             v-if="modal === 'add' && selected"
+            variant="danger"
             :disabled="saving"
             @click="((selected = null), (actionError = ''))"
-          />
-          <AppButton v-else variant="secondary" :disabled="saving" @click="closeModal"
+            >Cancelar seleção</AppButton
+          >
+          <AppButton v-else variant="danger" :disabled="saving" @click="closeModal"
             >Cancelar</AppButton
           >
           <AppButton
