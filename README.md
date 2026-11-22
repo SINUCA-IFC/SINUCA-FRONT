@@ -115,35 +115,11 @@ npm ci
 
 ## Configuração da API
 
-A URL está definida em `src/plugins/axios.js`. Atualmente, o cliente utiliza:
+O frontend já lê `VITE_API_BASE_URL`; não é necessário editar o Axios.
 
-```js
-axios.defaults.baseURL =
-  'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api'
-```
-
-Para utilizar o back-end local, substitua essa atribuição por:
-
-```js
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api'
-```
-
-Para configurar a URL por variável de ambiente, substitua a atribuição ativa por:
-
-```js
-axios.defaults.baseURL =
-  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api'
-```
-
-Depois, crie `.env.local` na raiz:
-
-```dotenv
-VITE_API_BASE_URL=http://127.0.0.1:8000/api
-```
-
-Reinicie o Vite após alterar o ambiente.
-
-**Apenas criar `.env.local` não altera a API utilizada:** a leitura da variável precisa estar ativa em `axios.js`. Variáveis `VITE_` são públicas e não devem conter segredos.
+O desenvolvimento e o build usam a API HTTPS publicada por padrão.
+Para apontar para outro ambiente, configure `VITE_API_BASE_URL` e reinicie o Vite.
+Não é necessário iniciar um banco de dados ou backend local neste repositório.
 
 ## Execução
 

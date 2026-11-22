@@ -31,7 +31,7 @@ function toggleCategory(category) {
       :style="modelValue.includes(c.id) ? catInfo(c.id).activeStyle : ''"
     >
       <p style="font-size: 0.9rem">
-        <span :class="catInfo(c.id).icon"></span>
+        <span :class="catInfo(c.id).icon" aria-hidden="true"></span>
         {{ c.name }}
       </p>
     </button>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { onMounted } from 'vue'
 import { useScheduleStore } from '@/stores/scheduleStore'
 import AppButton from '@/components/forms/AppButton.vue'
@@ -8,6 +8,14 @@ import { useToastStore } from '@/stores/toastStore'
 const error = ref('')
 
 const scheduleStore = useScheduleStore()
+const props = defineProps({ countryId: [String, Number] })
+const schedules = computed(() =>
+  scheduleStore.schedules.filter(
+    (item) =>
+      !props.countryId ||
+      item.country?.some((id) => String(id.id ?? id) === String(props.countryId)),
+  ),
+)
 
 const emit = defineEmits(['openDetails'])
 
@@ -37,10 +45,10 @@ function openSchedule(scheduleId) {
       <p role="alert">{{ error }}</p>
       <AppButton @click="loadSchedules">Tentar novamente</AppButton>
     </div>
-    <p v-else-if="!scheduleStore.schedules.length">Nenhuma atividade no cronograma por enquanto.</p>
+    <p v-else-if="!schedules.length">Nenhuma atividade no cronograma por enquanto.</p>
     <ul v-else>
       <li
-        v-for="s in scheduleStore.schedules"
+        v-for="s in schedules"
         :key="s.id"
         class="schedule-item"
         role="button"

@@ -30,6 +30,7 @@ Thumbs.db
 !.env.example
 !.env.production
 *.local
+.local/
 
 # Editor / IDE
 .vscode/*

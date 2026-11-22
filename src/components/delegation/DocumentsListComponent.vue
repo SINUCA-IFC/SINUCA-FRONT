@@ -7,6 +7,14 @@ import { useToastStore } from '@/stores/toastStore'
 
 const linkStore = useLinkStore()
 const error = ref('')
+const props = defineProps({ countryId: [String, Number] })
+const documents = computed(() =>
+  linkStore.links.filter(
+    (item) =>
+      !props.countryId ||
+      item.country?.some((id) => String(id.id ?? id) === String(props.countryId)),
+  ),
+)
 
 const groups = computed(() =>
   [
@@ -19,7 +27,7 @@ const groups = computed(() =>
     },
   ].map((group) => ({
     ...group,
-    documents: linkStore.links.filter((document) => document.categories?.includes(group.id)),
+    documents: documents.value.filter((document) => document.categories?.includes(group.id)),
   })),
 )
 
@@ -44,6 +52,14 @@ onMounted(loadDocuments)
       <AppButton @click="loadDocuments">Tentar novamente</AppButton>
     </div>
     <div v-else class="documents-groups">
+      <DocumentItem
+        v-for="document in documents.filter(
+          (item) => !item.categories?.some((id) => [2, 3].includes(id)),
+        )"
+        :key="document.id"
+        :title="document.name"
+        :link="document.url"
+      />
       <section v-for="group in groups" :key="group.id" :class="['documents-group', group.category]">
         <h5 class="group-title"><span :class="group.icon" /> {{ group.title }}</h5>
         <ul v-if="group.documents.length" class="documents-list">

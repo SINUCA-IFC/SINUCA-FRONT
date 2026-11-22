@@ -1,4 +1,5 @@
 <script setup>
+import BackButton from '@/components/layout/BackButton.vue'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getAuthProfile } from '@/services/authProfiles'
@@ -33,9 +34,7 @@ defineProps({
   <ProfileSelection v-if="!profile && !bypassSelection" @select="selectProfile" />
   <main v-else class="auth-shell" :class="{ 'login-layout': loginLayout }">
     <header v-if="loginLayout" class="login-header">
-      <button type="button" class="auth-back" aria-label="Voltar" @click="back">
-        <span class="mdi mdi-arrow-left" aria-hidden="true"></span>
-      </button>
+      <BackButton @click="back" />
       <img src="/logo-azul.svg" alt="SINUCA" width="64" height="50" />
     </header>
     <div v-if="loginLayout" class="login-intro">
@@ -47,9 +46,7 @@ defineProps({
     </div>
     <img v-else class="auth-ods-shape" src="/static/ods-shape.svg" alt="" aria-hidden="true" />
     <section class="auth-card" aria-labelledby="auth-title">
-      <button v-if="!loginLayout" type="button" class="auth-back" aria-label="Voltar" @click="back">
-        <span class="mdi mdi-arrow-left" aria-hidden="true"></span>
-      </button>
+      <BackButton v-if="!loginLayout" class="card-back" @click="back" />
       <div v-if="profile" class="auth-brand" :style="loginLayout ? { color: profile.color } : {}">
         <span
           class="mdi profile-icon"
@@ -83,8 +80,8 @@ defineProps({
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
-  height: 100dvh;
-  overflow: hidden;
+  min-height: 100dvh;
+  overflow-x: clip;
   display: grid;
   place-items: center;
   padding: clamp(1rem, 4vw, 3rem);
@@ -105,8 +102,8 @@ defineProps({
 }
 .auth-card {
   min-height: 0;
-  max-height: 100%;
-  overflow-y: auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
   box-sizing: border-box;
   width: min(100%, 29rem);
   padding: clamp(1.25rem, 5vw, 2.5rem);
@@ -115,28 +112,8 @@ defineProps({
   background: white;
   box-shadow: 0 12px 40px #01295f26;
 }
-.auth-back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  min-width: 44px;
+.card-back {
   margin-bottom: 0.75rem;
-  padding: 0.5rem;
-  border: 0;
-  border-radius: 0.5rem;
-  background: transparent;
-  color: #01295f;
-  font: inherit;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-.auth-back:hover {
-  background: #01295f0d;
-}
-.auth-back:focus-visible {
-  outline: 2px solid #01295f;
-  outline-offset: 2px;
 }
 .auth-brand {
   display: grid;
@@ -212,14 +189,7 @@ h1 {
   max-width: 1200px;
   margin-bottom: 60px;
 }
-.login-header .auth-back {
-  width: 57px;
-  height: 57px;
-  margin: 0;
-  background: #ebebeb;
-  color: #1e1e1e;
-  font-size: 30px;
-}
+
 .login-header img {
   object-fit: contain;
 }
@@ -335,10 +305,7 @@ h1 {
   flex: none;
   margin-bottom: clamp(12px, calc(14dvh - 86px), 60px);
 }
-.login-header .auth-back {
-  width: clamp(44px, 6dvh, 57px);
-  height: clamp(44px, 6dvh, 57px);
-}
+
 .login-header img {
   height: clamp(38px, 5.3dvh, 50px);
   width: auto;
