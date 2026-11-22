@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { apiOrigin } from '@/services/authService'
 
-axios.defaults.baseURL = import.meta.env?.DEV ? '/api' : apiOrigin + '/api'
+axios.defaults.baseURL = '/api'
 axios.defaults.timeout = 15000
 let refreshPromise
 let onExpired = () => {}
@@ -11,6 +11,8 @@ export function onAuthExpired(handler) {
 const isPublic = (config) =>
   config.skipAuth || /(?:^|\/)(token|registro|auth)(?:\/|$)/.test(config.url || '')
 axios.interceptors.request.use((config) => {
+  // OAuth cookies must stay on the backend domain used by Google's callback.
+  if (config.withCredentials) config.baseURL = apiOrigin + '/api'
   if (isPublic(config)) {
     delete config.headers.Authorization
   } else {

@@ -19,7 +19,9 @@ No painel de ambiente **do backend**, configure:
 ```dotenv
 MODE=DEPLOY
 DEBUG=False
-FRONTEND_URL=https://sinuca-front-pedro-gabriel-goncalves-projects.vercel.app
+FRONTEND_URL=https://sinuca-ifc-mocha.vercel.app
+FRONTEND_ALLOWED_ORIGINS=https://sinuca-ifc-mocha.vercel.app,http://localhost:5173
+AUTH_COOKIE_SECURE=True
 AUTH_CROSS_SITE_COOKIES=True
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.gmail.com
@@ -49,7 +51,7 @@ o serviço. Valide recebimento real do código, reenvio e login Google em produ�
 
 `AUTH_CROSS_SITE_COOKIES=True` requer a versão do backend que lê essa variável.
 Ela habilita cookies `SameSite=None; Secure` para o fluxo atual entre Vercel e IFC,
-mantendo CORS restrito a `FRONTEND_URL` e a verificação CSRF. Navegadores que
+mantendo CORS restrito a `FRONTEND_ALLOWED_ORIGINS` e a verificação CSRF. Navegadores que
 bloqueiam cookies de terceiros ainda podem impedir o login Google; nesse caso,
 publique o frontend em um domínio do mesmo site da API. Ao trocar o domínio,
 atualize `FRONTEND_URL` e reavalie a necessidade desse modo de cookies.
@@ -113,37 +115,35 @@ cd SINUCA-FRONT
 npm ci
 ```
 
-## Configuração da API
+## Configuração da API nos dois ambientes
 
-A URL está definida em `src/plugins/axios.js`. Atualmente, o cliente utiliza:
+O frontend suporta `http://localhost:5173` e `https://sinuca-ifc-mocha.vercel.app`.
+As chamadas comuns usam `/api`: o Vite encaminha para `VITE_API_BASE_URL` em
+desenvolvimento, e `vercel.json` encaminha para a API do IFC em produção.
+O rewrite `/api/:path*` deve ficar antes do fallback para `index.html`.
+Ao mudar a API de produção, atualize tanto `.env.production` quanto o destino
+em `vercel.json`.
 
-```js
-axios.defaults.baseURL =
-  'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api'
-```
+As chamadas que usam cookies (CSRF, troca da sessão Google e logout) acessam
+diretamente `VITE_API_BASE_URL`, para manter os cookies no domínio do callback
+Google. O backend deve autorizar as duas origens em `FRONTEND_ALLOWED_ORIGINS`,
+com CORS de credenciais e CSRF habilitados. Isso exige publicar o backend atualizado.
 
-Para utilizar o back-end local, substitua essa atribuição por:
-
-```js
-axios.defaults.baseURL = 'http://127.0.0.1:8000/api'
-```
-
-Para configurar a URL por variável de ambiente, substitua a atribuição ativa por:
-
-```js
-axios.defaults.baseURL =
-  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api'
-```
-
-Depois, crie `.env.local` na raiz:
+Para usar a API local, configure `.env.local`:
 
 ```dotenv
-VITE_API_BASE_URL=http://127.0.0.1:8000/api
+VITE_API_BASE_URL=http://localhost:8000
 ```
 
-Reinicie o Vite após alterar o ambiente.
+Para usar a API publicada em desenvolvimento:
 
-**Apenas criar `.env.local` não altera a API utilizada:** a leitura da variável precisa estar ativa em `axios.js`. Variáveis `VITE_` são públicas e não devem conter segredos.
+```dotenv
+VITE_API_BASE_URL=https://sinuca-backend.class.fabricadesoftware.ifc.edu.br
+```
+
+Reinicie o Vite após alterar o ambiente. No deploy da Vercel, mantenha a URL
+HTTPS pública. Nunca coloque segredos Google em variáveis `VITE_*`.
+O service worker fica habilitado somente no build de produção.
 
 ## Execução
 

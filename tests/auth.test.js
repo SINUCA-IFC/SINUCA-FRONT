@@ -218,6 +218,7 @@ test('Google submits a full navigation POST, exchanges once with fresh CSRF and 
   let exchangeCount = 0
   axios.defaults.adapter = async (config) => {
     assert.equal(config.withCredentials, true)
+    assert.equal(config.baseURL, 'http://localhost:8000/api')
     assert.equal(config.headers.Authorization, undefined)
     if (config.url === '/auth/csrf/') return respond(config, { csrfToken: `csrf-${++csrfCount}` })
     assert.equal(config.url, '/token/session/')
