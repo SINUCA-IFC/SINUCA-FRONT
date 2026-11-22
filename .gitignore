@@ -27,6 +27,8 @@ Thumbs.db
 # Ambiente
 .env
 .env.*
+!.env.example
+!.env.production
 *.local
 
 # Editor / IDE
@@ -41,6 +43,8 @@ Thumbs.db
 
 # Testes
 coverage/
+test-results/
+playwright-report/
 __screenshots__/
 
 # Cypress
@@ -52,6 +56,7 @@ __screenshots__/
 
 # PWA / Service Worker
 sw.js
+!src/sw.js
 workbox-*.js
 registerSW.js
 

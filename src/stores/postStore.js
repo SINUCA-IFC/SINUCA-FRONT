@@ -1,4 +1,5 @@
 import PostService from "@/services/postService";
+import { getAllPages } from '@/services/pagination';
 import {ref} from "vue";
 import {defineStore} from "pinia";
 
@@ -22,8 +23,7 @@ const carregando = ref(false)
 async function getPosts() {
     carregando.value = true;
     try {
-    const data = await postService.getPosts()
-    posts.value = data.results
+    posts.value = await getAllPages(page => postService.getPosts(page))
 } finally {
     carregando.value = false;
 }
@@ -35,7 +35,7 @@ async function getPost(id) {
 
 async function createPost(newPost) {
     const createdPost = await postService.createPost(newPost)
-    posts.value.push(createdPost)
+    posts.value.unshift(createdPost)
 }
 
 async function updatePost(id, updatedPost) {

@@ -1,169 +1,167 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { computed } from 'vue'
-import { useIsDesktop } from '../../composables/useIsDesktop'
-import { useDelegationTabs } from '../../composables/useDelegationTabs'
-
-// O estado da aba ativa agora é compartilhado (sidebar + esta barra + view).
-const { tabs: tabsNav, activeTab, setTab } = useDelegationTabs();
-const isDesktop = useIsDesktop();
-
-// Mobile: carrossel mostrando 2 abas por vez.
-const medidor = ref(0);
-
-watch(medidor, () => {
-    if(medidor.value < 0) {
-        medidor.value = 2
-    } else if(medidor.value > tabsNav.length - 2) {
-        medidor.value = 0
-    }
-});
-
-// Desktop: todas as abas visíveis. Mobile: janela de 2.
-const visibleTabs = computed(() =>
-    isDesktop.value ? tabsNav : tabsNav.slice(medidor.value, medidor.value + 2)
-);
-
-// Mantido por compatibilidade: a view ainda pode escutar @change-tab.
-const emit = defineEmits(['changeTab']);
-
-const selectTab = (id) => {
-    setTab(id)
-    emit('changeTab', id)
-};
+import { computed, nextTick, ref, watch } from 'vue'
+import { useIsDesktop } from '@/composables/useIsDesktop'
+import { useDelegationTabs } from '@/composables/useDelegationTabs'
+const props = defineProps({
+  tabs: { type: Array, default: null },
+  modelValue: { type: [String, Number], default: undefined },
+  label: { type: String, default: 'Navegação da delegação' },
+})
+const emit = defineEmits(['changeTab', 'update:modelValue'])
+const { tabs: delegationTabs, activeTab: selected, setTab } = useDelegationTabs()
+const tabsNav = computed(() => props.tabs ?? delegationTabs)
+const activeTab = computed(() => (props.tabs ? props.modelValue : selected.value))
+const isDesktop = useIsDesktop()
+const strip = ref(null)
+function selectTab(id) {
+  if (!props.tabs) setTab(id)
+  emit('update:modelValue', id)
+  emit('changeTab', id)
+}
+function revealActive() {
+  const active = strip.value?.querySelector('[aria-pressed="true"]')
+  if (!active || isDesktop.value) return
+  const item = active.getBoundingClientRect()
+  const viewport = strip.value.getBoundingClientRect()
+  if (item.left < viewport.left || item.right > viewport.right) {
+    strip.value.scrollLeft += item.left - viewport.left - (viewport.width - item.width) / 2
+  }
+}
+watch(
+  [activeTab, isDesktop],
+  async () => {
+    await nextTick()
+    revealActive()
+  },
+  { immediate: true },
+)
+function scroll(direction) {
+  strip.value?.scrollBy({
+    left: direction * strip.value.clientWidth * 0.85,
+    behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+  })
+}
+function navigate(event, index) {
+  let next
+  if (event.key === 'ArrowRight') next = (index + 1) % tabsNav.value.length
+  else if (event.key === 'ArrowLeft')
+    next = (index - 1 + tabsNav.value.length) % tabsNav.value.length
+  else if (event.key === 'Home') next = 0
+  else if (event.key === 'End') next = tabsNav.value.length - 1
+  else return
+  event.preventDefault()
+  strip.value.querySelectorAll('button')[next]?.focus()
+  selectTab(tabsNav.value[next].id)
+}
 </script>
-
 <template>
-    <div class="container">
-        <span v-if="!isDesktop" class="mdi mdi-chevron-left" style="font-size: 1.7rem;" @click="medidor--"></span>
-        <ul class="tabs-navigation">
-            <li 
-                v-for="tab in visibleTabs" 
-                :key="tab.id" 
-                :class="activeTab === tab.id ? 'active' : 'tab-item'"
-                @click="selectTab(tab.id)"
-                >
-                <span :class="tab.icon"></span>
-                <h4>{{ tab.name }}</h4>
-            </li>
-        </ul>
-        <span v-if="!isDesktop" class="mdi mdi-chevron-right" style="font-size: 1.7rem;" @click="medidor++"></span>
-    </div>
+  <nav class="delegation-navigation" :aria-label="label">
+    <button
+      v-if="!isDesktop && tabsNav.length > 2"
+      type="button"
+      class="carousel-arrow"
+      aria-label="Opções anteriores"
+      @click="scroll(-1)"
+    >
+      <span class="mdi mdi-chevron-left" aria-hidden="true"></span>
+    </button>
+    <ul ref="strip" class="tabs-navigation">
+      <li v-for="(tab, index) in tabsNav" :key="tab.id">
+        <button
+          type="button"
+          :class="{ active: activeTab === tab.id }"
+          :aria-pressed="activeTab === tab.id"
+          @click="selectTab(tab.id)"
+          @keydown="navigate($event, index)"
+        >
+          <span :class="tab.icon" aria-hidden="true"></span><span>{{ tab.name }}</span>
+        </button>
+      </li>
+    </ul>
+    <button
+      v-if="!isDesktop && tabsNav.length > 2"
+      type="button"
+      class="carousel-arrow"
+      aria-label="Próximas opções"
+      @click="scroll(1)"
+    >
+      <span class="mdi mdi-chevron-right" aria-hidden="true"></span>
+    </button>
+  </nav>
 </template>
-
 <style scoped>
-.container {
-    background-color: white;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    padding: 2rem 0;
-    height: 3rem;
-    position: relative;
+.delegation-navigation {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+  padding: 8px 4px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background: #fff;
 }
-
 .tabs-navigation {
-    display: flex;
-    gap: 0.3rem;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  padding: 4px;
+  margin: 0;
+  -webkit-overflow-scrolling: touch;
 }
-
-.tabs-navigation li {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.3rem;
-    font-size: clamp(0.8rem, 2.5vw, 1rem);
-    padding: 0.4rem 0.5rem;
-    white-space: nowrap;
+li {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
 }
-
-.tabs-navigation li span {
-    font-size: clamp(1rem, 4vw, 1.4rem);
+button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
 }
-
-.tab-item {
-    color: #969696;
+li button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  white-space: nowrap;
+  color: #596578;
+  background: transparent;
 }
-
-.active {
-    background-color: #F8F8FF;
-    font-weight: bold;
-    color: #01295F;
-    border-radius: 10px;
-    transition: all .3s ease-in-out;
+li .mdi {
+  font-size: 22px;
 }
-
-.active:hover {
-    cursor: pointer;
+button.active {
+  background: #edf2f8;
+  color: #01295f;
+  font-weight: 600;
 }
-
-.active:active {
-    transform: scale(0.95);
+button:focus-visible {
+  outline: 2px solid #01295f;
+  outline-offset: 1px;
 }
-
-span.mdi-chevron-left {
-    position: absolute;
-    left: 1rem;
+.carousel-arrow {
+  flex: 0 0 44px;
+  padding: 0;
+  font-size: 28px;
+  color: #01295f;
+  background: transparent;
 }
-
-span.mdi-chevron-right {
-    position: absolute;
-    right: 1rem;
-}
-
-.tabs-navigation li h4 {
-font-size: clamp(0.8rem, 2.5vw, 1rem);
-    white-space: nowrap;
-}
-
-
-
 @media (min-width: 1024px) {
-    .container {
-        height: auto;
-        padding: 1.35rem 1rem;
-        border-radius: 16px;
-    }
-
-    .tabs-navigation {
-        gap: clamp(0.8rem, 2vw, 2.4rem);
-        width: 100%;
-    }
-
-    .tabs-navigation li {
-        flex: 0 1 auto;
-        min-width: 0;
-        padding: 0.8rem clamp(0.2rem, 0.5vw, 0.5rem);
-        font-size: clamp(1rem, 1.2vw, 1.4rem);
-    }
-
-    .tabs-navigation li span {
-        font-size: clamp(1.5rem, 2vw, 2.2rem);
-        line-height: 1;
-    }
-
-    .tabs-navigation li h4 {
-        font-size: clamp(0.85rem, 1.4vw, 1.1rem);
-        font-weight: inherit;
-        white-space: nowrap;
-    }
-
-    .tab-item:hover {
-        color: #01295F;
-        background-color: #F8F8FF;
-        cursor: pointer;
-    }
-}
-@media (max-width: 1023px) {
-  .container { height: auto; min-height: 4rem; padding: 0.75rem 2.25rem; }
-  .tabs-navigation { width: 100%; min-width: 0; }
-  .tabs-navigation li { flex: 1; min-width: 0; flex-wrap: wrap; white-space: normal; padding: 0.4rem 0.2rem; }
-  .tabs-navigation li h4 { white-space: normal; text-align: center; line-height: 1.4; }
-  span.mdi-chevron-left { left: 0.25rem; }
-  span.mdi-chevron-right { right: 0.25rem; }
+  .delegation-navigation {
+    padding: 12px;
+  }
+  .tabs-navigation {
+    justify-content: center;
+    gap: clamp(8px, 2vw, 32px);
+  }
 }
 </style>

@@ -6,7 +6,6 @@ const useStore = useUserStore();
 </script>
 
 <template>
-    <button @click="router.push('/p')">playground</button>
     <button @click="router.push('/delegacao')">delegacao</button>
     <button v-if="useStore.loggedIn" @click="useStore.logout()">logout</button>
 </template>

@@ -1,0 +1,401 @@
+[
+  {
+    "name": "migrations_apply",
+    "kind": "functional",
+    "confirmed": true
+  },
+  {
+    "name": "jwt_login_valid",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 200
+  },
+  {
+    "name": "jwt_login_invalid_rejected",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 401
+  },
+  {
+    "name": "jwt_refresh",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 200
+  },
+  {
+    "name": "jwt_verify",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 200
+  },
+  {
+    "name": "anonymous_create_postagens",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "anonymous_update_delete_postagens",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "patch_status": 200,
+    "delete_status": 204
+  },
+  {
+    "name": "anonymous_create_categorias",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "anonymous_update_delete_categorias",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "patch_status": 200,
+    "delete_status": 204
+  },
+  {
+    "name": "anonymous_create_turmas",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "anonymous_update_delete_turmas",
+    "kind": "vulnerability",
+    "confirmed": false,
+    "patch_status": 400,
+    "delete_status": 204
+  },
+  {
+    "name": "anonymous_create_paises",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "anonymous_update_delete_paises",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "patch_status": 200,
+    "delete_status": 204
+  },
+  {
+    "name": "anonymous_create_cronogramas",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "anonymous_create_docs",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "link_created_without_country_binding",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "input_country": [
+      1
+    ],
+    "stored_country_count": 0
+  },
+  {
+    "name": "anonymous_get_tarefas",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 500
+  },
+  {
+    "name": "anonymous_get_cronogramas",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 500
+  },
+  {
+    "name": "anonymous_get_docs",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 500
+  },
+  {
+    "name": "anonymous_image_upload",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "anonymous_image_enumeration",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 200,
+    "fields": [
+      "id",
+      "attachment_key",
+      "description",
+      "uploaded_on",
+      "url"
+    ]
+  },
+  {
+    "name": "anonymous_pdf_upload",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "invalid_image_rejected",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 400
+  },
+  {
+    "name": "invalid_pdf_rejected",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 400
+  },
+  {
+    "name": "registration_arbitrary_delegation_chat_access",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "register_status": 201,
+    "messages_status": 200
+  },
+  {
+    "name": "weak_password_and_missing_student_identity_accepted",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "registration_role_and_superuser_ignored",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "task_detail_password_hash_exposure",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 200,
+    "nested_exposure": {
+      "creator": true,
+      "user": true
+    },
+    "creator_fields": [
+      "id",
+      "password",
+      "last_login",
+      "is_superuser",
+      "role",
+      "matriculation",
+      "email",
+      "name",
+      "is_active",
+      "is_staff",
+      "foto",
+      "gang",
+      "country",
+      "groups",
+      "user_permissions"
+    ]
+  },
+  {
+    "name": "cross_country_direct_read_blocked_tarefas",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 404
+  },
+  {
+    "name": "cross_country_direct_read_blocked_docs",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 404
+  },
+  {
+    "name": "cross_country_direct_read_blocked_usuarios",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 404
+  },
+  {
+    "name": "cross_country_direct_read_blocked_mensagens",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 404
+  },
+  {
+    "name": "student_message_country_forced",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "evaluator_chat_forbidden",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 403
+  },
+  {
+    "name": "anonymous_chat_forbidden",
+    "kind": "security_control",
+    "confirmed": true,
+    "status": 401
+  },
+  {
+    "name": "organizer_message_create",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "invalid_country_filter_raises_500",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 500
+  },
+  {
+    "name": "student_alters_deactivates_peer",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 200
+  },
+  {
+    "name": "student_changes_shared_event",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "patch_status": 200,
+    "other_delegation_status": 200
+  },
+  {
+    "name": "student_changes_shared_link",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 200
+  },
+  {
+    "name": "task_accepts_assignee_other_delegation",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "status": 200
+  },
+  {
+    "name": "ui_empty_dates_rejected",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 400,
+    "errors": {
+      "endDate": [
+        "Formato inválido para data. Use um dos formatos a seguir: YYYY-MM-DD."
+      ],
+      "startDate": [
+        "Formato inválido para data. Use um dos formatos a seguir: YYYY-MM-DD."
+      ]
+    }
+  },
+  {
+    "name": "task_create_valid",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "task_update_delete_valid",
+    "kind": "functional",
+    "confirmed": true,
+    "patch_status": 200,
+    "delete_status": 204
+  },
+  {
+    "name": "task_inverted_dates_accepted",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 201
+  },
+  {
+    "name": "tasks_pagination_exists_ui_first_page_only",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "page_size": 10,
+    "total_pages": 2,
+    "page2_count": 2
+  },
+  {
+    "name": "profile_unassigned",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 200,
+    "country_is_null": true
+  },
+  {
+    "name": "unassigned_schedules_empty",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 200,
+    "result_count": 0
+  },
+  {
+    "name": "profile_organizer",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 200,
+    "country_is_null": true
+  },
+  {
+    "name": "organizer_schedules_empty",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 200,
+    "result_count": 0
+  },
+  {
+    "name": "profile_evaluator",
+    "kind": "functional",
+    "confirmed": true,
+    "status": 200,
+    "country_is_null": true
+  },
+  {
+    "name": "evaluator_schedules_empty",
+    "kind": "functional_bug",
+    "confirmed": true,
+    "status": 200,
+    "result_count": 0
+  },
+  {
+    "name": "task_list_query_count",
+    "kind": "observation",
+    "confirmed": true,
+    "queries": 14,
+    "objects": 10
+  },
+  {
+    "name": "user_list_query_count",
+    "kind": "observation",
+    "confirmed": true,
+    "queries": 8,
+    "objects": 2
+  },
+  {
+    "name": "cors_any_origin",
+    "kind": "observation",
+    "confirmed": true,
+    "status": 200,
+    "allow_origin": "*"
+  },
+  {
+    "name": "student_self_promotes_superuser",
+    "kind": "vulnerability",
+    "confirmed": true,
+    "patch_status": 200,
+    "cross_delegation_after_escalation": 200
+  },
+  {
+    "name": "refresh_reusable_no_revocation",
+    "kind": "observation",
+    "confirmed": true,
+    "status": 200
+  }
+]
