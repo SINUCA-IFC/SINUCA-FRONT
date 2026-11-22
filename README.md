@@ -19,6 +19,8 @@ No painel de ambiente **do backend**, configure:
 ```dotenv
 MODE=DEPLOY
 DEBUG=False
+FRONTEND_URL=https://sinuca-front-pedro-gabriel-goncalves-projects.vercel.app
+AUTH_CROSS_SITE_COOKIES=True
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
@@ -44,6 +46,18 @@ caminho nem barra final. O backend usa esse valor para CORS, CSRF e retorno do
 Google. Use `TRUST_PROXY_HTTPS=True` somente se o proxy da hospedagem remover e
 reescrever corretamente `X-Forwarded-Proto`. Após alterar as variáveis, reinicie
 o serviço. Valide recebimento real do código, reenvio e login Google em produção.
+
+`AUTH_CROSS_SITE_COOKIES=True` requer a versão do backend que lê essa variável.
+Ela habilita cookies `SameSite=None; Secure` para o fluxo atual entre Vercel e IFC,
+mantendo CORS restrito a `FRONTEND_URL` e a verificação CSRF. Navegadores que
+bloqueiam cookies de terceiros ainda podem impedir o login Google; nesse caso,
+publique o frontend em um domínio do mesmo site da API. Ao trocar o domínio,
+atualize `FRONTEND_URL` e reavalie a necessidade desse modo de cookies.
+
+O `vercel.json` configura o build, o fallback de rotas Vue e a revalidação do
+manifesto/service worker. Também redireciona o caminho antigo
+`/public/logo-sinuca.svg` para `/logo-sinuca.svg`. Essas correções só ficam
+disponíveis após publicar o commit que as contém na Vercel.
 
 Referências: [variáveis do Vite](https://vite.dev/guide/env-and-mode),
 [senhas de app Google](https://support.google.com/accounts/answer/185833) e
