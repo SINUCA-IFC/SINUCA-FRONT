@@ -7,6 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig(({ command, mode }) => {
+  const { VITE_API_BASE_URL } = loadEnv(mode, process.cwd(), 'VITE_')
   if (command === 'build' && mode !== 'development') {
     const { VITE_API_BASE_URL } = loadEnv(mode, process.cwd(), 'VITE_')
     let url
@@ -31,6 +32,14 @@ export default defineConfig(({ command, mode }) => {
   }
 
   return {
+    server: {
+      proxy: {
+        '/api': {
+          target: (VITE_API_BASE_URL || 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br').replace(/\/api\/?$/, ''),
+          changeOrigin: true,
+        },
+      },
+    },
     plugins: [
       vue(),
       VitePWA({
@@ -38,7 +47,7 @@ export default defineConfig(({ command, mode }) => {
         strategies: 'injectManifest',
         srcDir: 'src',
         filename: 'sw.js',
-        devOptions: { enabled: true, type: 'module', navigateFallback: 'index.html' },
+        devOptions: { enabled: false },
         manifest: {
           id: 'com.sinuca-pwa',
           name: 'SINUCA Site',

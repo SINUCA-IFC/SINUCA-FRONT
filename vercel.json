@@ -20,5 +20,11 @@
       "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
     }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api/$1"
+    },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

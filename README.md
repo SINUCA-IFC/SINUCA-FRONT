@@ -19,7 +19,9 @@ No painel de ambiente **do backend**, configure:
 ```dotenv
 MODE=DEPLOY
 DEBUG=False
-FRONTEND_URL=https://sinuca-front-pedro-gabriel-goncalves-projects.vercel.app
+FRONTEND_URL=https://sinuca-ifc-mocha.vercel.app
+FRONTEND_ALLOWED_ORIGINS=https://sinuca-ifc-mocha.vercel.app,http://localhost:5173
+AUTH_COOKIE_SECURE=True
 AUTH_CROSS_SITE_COOKIES=True
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.gmail.com
@@ -49,7 +51,7 @@ o serviço. Valide recebimento real do código, reenvio e login Google em produ�
 
 `AUTH_CROSS_SITE_COOKIES=True` requer a versão do backend que lê essa variável.
 Ela habilita cookies `SameSite=None; Secure` para o fluxo atual entre Vercel e IFC,
-mantendo CORS restrito a `FRONTEND_URL` e a verificação CSRF. Navegadores que
+mantendo CORS restrito a `FRONTEND_ALLOWED_ORIGINS` e a verificação CSRF. Navegadores que
 bloqueiam cookies de terceiros ainda podem impedir o login Google; nesse caso,
 publique o frontend em um domínio do mesmo site da API. Ao trocar o domínio,
 atualize `FRONTEND_URL` e reavalie a necessidade desse modo de cookies.
@@ -113,13 +115,31 @@ cd SINUCA-FRONT
 npm ci
 ```
 
-## Configuração da API
+## Configuração da API nos dois ambientes
 
-O frontend já lê `VITE_API_BASE_URL`; não é necessário editar o Axios.
+O frontend suporta `http://localhost:5173` e `https://sinuca-ifc-mocha.vercel.app`.
+As chamadas comuns usam `/api`: o Vite encaminha para `VITE_API_BASE_URL` em
+desenvolvimento, e `vercel.json` encaminha para a API do IFC em produção.
+O rewrite `/api/(.*)` deve ficar antes do fallback para `index.html` e preservar a barra final exigida pelo Django.
+Ao mudar a API de produção, atualize tanto `.env.production` quanto o destino
+em `vercel.json`.
+
+As chamadas que usam cookies (CSRF, troca da sessão Google e logout) acessam
+diretamente `VITE_API_BASE_URL`, para manter os cookies no domínio do callback
+Google. O backend deve autorizar as duas origens em `FRONTEND_ALLOWED_ORIGINS`,
+com CORS de credenciais e CSRF habilitados. Isso exige publicar o backend atualizado.
 
 O desenvolvimento e o build usam a API HTTPS publicada por padrão.
-Para apontar para outro ambiente, configure `VITE_API_BASE_URL` e reinicie o Vite.
 Não é necessário iniciar um banco de dados ou backend local neste repositório.
+Para definir explicitamente a API em desenvolvimento, configure `.env.local`:
+
+```dotenv
+VITE_API_BASE_URL=https://sinuca-backend.class.fabricadesoftware.ifc.edu.br
+```
+
+Reinicie o Vite após alterar o ambiente. No deploy da Vercel, mantenha a URL
+HTTPS pública. Nunca coloque segredos Google em variáveis `VITE_*`.
+O service worker fica habilitado somente no build de produção.
 
 ## Execução
 
@@ -217,3 +237,17 @@ Configure a URL da API antes do build e utilize HTTPS para os recursos de PWA qu
 - [Back-end](https://github.com/SINUCA-IFC/SINUCA-BACK)
 - [Organização SINUCA-IFC](https://github.com/SINUCA-IFC)
 - [Documento do projeto](https://docs.google.com/document/d/17GRwIq2vJa5Fo7NMv2ppM04NwbgOPGmEZtuLE4Cn_as/edit)
+
+### Verificar o deploy real
+
+Depois de publicar, execute:
+
+```bash
+node scripts/check-deployment.js https://sinuca-ifc-mocha.vercel.app
+node scripts/check-deployment.js http://localhost:5173
+```
+
+A verificação exige JSON nas postagens e no POST de login vazio (400 por campos
+obrigatórios). HTML, redirecionamento ou 405 indicam falha de roteamento.
+Se `/api/token` chega à API mas `/api/token/` entrega `index.html`, confira se o
+rewrite publicado usa `/api/(.*)` com destino terminado em `/api/$1`.
