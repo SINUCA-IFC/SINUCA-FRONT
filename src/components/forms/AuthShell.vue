@@ -22,7 +22,11 @@ function back() {
   if (profile.value) router.push({ name: route.name, query: { redirect: route.query.redirect } })
   else router.back()
 }
-defineProps({ title: { type: String, required: true }, loginLayout: Boolean })
+defineProps({
+  title: { type: String, required: true },
+  subtitle: { type: String, default: 'Entre com suas credenciais' },
+  loginLayout: Boolean,
+})
 </script>
 
 <template>
@@ -36,7 +40,7 @@ defineProps({ title: { type: String, required: true }, loginLayout: Boolean })
     </header>
     <div v-if="loginLayout" class="login-intro">
       <h1 id="auth-title">{{ title }}</h1>
-      <p v-if="profile?.role !== 'evaluator'">Entre com suas credenciais</p>
+      <p v-if="subtitle && profile?.role !== 'evaluator'">{{ subtitle }}</p>
     </div>
     <div v-if="loginLayout" class="login-decoration" aria-hidden="true">
       <img src="/static/ods-shape.svg" alt="" />
@@ -282,7 +286,7 @@ h1 {
   opacity: 1;
 }
 .login-layout :deep(.app-button) {
-  min-height: 38px;
+  min-height: 44px;
   border-radius: 8px;
   box-shadow: 0 3px 3px #0004;
 }
@@ -322,6 +326,7 @@ h1 {
 
 /* Distribute space according to the available viewport height, without scaling controls. */
 .login-layout {
+  --auth-input-height: clamp(44px, 5dvh, 48px);
   min-height: 100dvh;
   padding: clamp(12px, calc(12dvh - 65px), 59px) clamp(20px, 7.7vw, 34px)
     clamp(48px, calc(20dvh - 80px), 130px);
@@ -370,7 +375,9 @@ h1 {
   line-height: 22px;
 }
 .login-layout :deep(.input-class) {
-  height: clamp(40px, 5dvh, 48px);
+  height: var(--auth-input-height);
+  min-height: 44px;
+  font-size: 16px;
 }
 .login-layout :deep(.auth-link) {
   margin-top: clamp(16px, calc(4dvh - 10px), 28px);
@@ -404,9 +411,7 @@ h1 {
     left: clamp(32px, 5.8vw, 84px);
     width: auto;
     margin: 0;
-  }
-  .login-header .auth-back {
-    display: none;
+    gap: 20px;
   }
   .login-header img {
     width: clamp(72px, 7.5vw, 108px);
@@ -447,8 +452,8 @@ h1 {
     font-size: 16px;
   }
   .login-layout :deep(.app-button) {
-    width: min(100%, 282px);
-    justify-self: center;
+    width: 100%;
+    justify-self: stretch;
   }
 }
 </style>

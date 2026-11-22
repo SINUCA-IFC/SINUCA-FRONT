@@ -134,9 +134,14 @@ async function login() {
 .toggle-password {
   position: absolute;
   right: 0.45rem;
-  bottom: 0.5rem;
-  width: 2rem;
-  height: 2rem;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: var(--auth-input-height, 48px);
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
   border: 0;
   background: transparent;
   color: #01295f;

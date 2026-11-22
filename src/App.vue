@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, watch } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
-import NotificationPrompt from '@/components/NotificationPrompt.vue'
+import ToastRegion from '@/components/layout/ToastRegion.vue'
 import { useUserStore } from '@/stores/userStore'
 import { useChatStore } from '@/stores/chatStore'
 import { usePostStore } from '@/stores/postStore'
@@ -60,5 +60,5 @@ onUnmounted(() => {
 </script>
 <template>
   <RouterView />
-  <NotificationPrompt />
+  <ToastRegion />
 </template>

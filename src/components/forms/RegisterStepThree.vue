@@ -6,6 +6,8 @@ import AppButton from './AppButton.vue'
 import AppInput from './AppInput.vue'
 import { getAuthProfile } from '@/services/authProfiles'
 import { authError } from '@/services/authService'
+import { useToastStore } from '@/stores/toastStore'
+const toasts = useToastStore()
 
 const userStore = useUserStore()
 const gangStore = useGangStore()
@@ -37,6 +39,12 @@ const requirements = computed(() => {
 function handleImage(event) {
   const file = event.target.files[0]
   if (!file) return
+  if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+    errorMessage.value = 'Escolha uma foto JPG ou PNG de até 5 MB.'
+    event.target.value = ''
+    return
+  }
+  errorMessage.value = ''
 
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
   selectedFile.value = file
@@ -45,25 +53,25 @@ function handleImage(event) {
 
 async function register() {
   if (loading.value) return
+  if (props.userId === '2' && requirements.value[0].valid) {
+    errorMessage.value = 'A matrícula deve ter 10 dígitos.'
+    return
+  }
   loading.value = true
   errorMessage.value = ''
 
   try {
-    let photoId
-    if (selectedFile.value) {
-      const { data } = await userStore.uploadImage(selectedFile.value, 'Foto de perfil', true)
-      photoId = data.id
-    }
     await userStore.register(
       props.draft.email,
-      props.draft.name,
+      props.draft.name.trim(),
       props.draft.password,
       props.draft.gang,
       props.draft.matriculation,
-      photoId,
+      selectedFile.value,
       getAuthProfile(props.userId)?.role,
     )
     props.draft.password = ''
+    toasts.show('Cadastro enviado. Confira o código no seu e-mail.')
     emit('registered')
   } catch (err) {
     errorMessage.value = authError(err)
@@ -92,7 +100,12 @@ onUnmounted(() => {
           <i class="mdi mdi-camera"></i>
         </span>
 
-        <input type="file" accept="image/jpeg, image/png" @change="handleImage" />
+        <input
+          type="file"
+          aria-label="Escolher foto de perfil"
+          accept="image/jpeg, image/png"
+          @change="handleImage"
+        />
       </label>
     </div>
 
@@ -109,6 +122,9 @@ onUnmounted(() => {
       label="Matrícula"
       type="text"
       placeholder="Digite sua matrícula."
+      inputmode="numeric"
+      pattern="[0-9]{10}"
+      maxlength="10"
       @focus="focusMatriculation = true"
       @blur="focusMatriculation = false"
       required
@@ -178,7 +194,16 @@ onUnmounted(() => {
 }
 
 .avatar input {
-  display: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.avatar:focus-within {
+  outline: 3px solid #01295f;
+  outline-offset: 3px;
 }
 
 .avatar-placeholder {

@@ -42,6 +42,9 @@ function handleChange({ added, moved }) {
         :force-fallback="true"
         :fallback-on-body="true"
         :fallback-tolerance="5"
+        :delay="180"
+        :delay-on-touch-only="true"
+        :touch-start-threshold="5"
         @start="emit('drag-start')"
         @end="emit('drag-end')"
         @change="handleChange"
@@ -58,7 +61,11 @@ function handleChange({ added, moved }) {
       <p v-if="tasks.length === 0" class="default">{{ empty }}</p>
     </div>
 
-    <AppButton class="add-task" :aria-label="`Adicionar tarefa · ${title}`" @click="emit('add-task')">
+    <AppButton
+      class="add-task"
+      :aria-label="`Adicionar tarefa · ${title}`"
+      @click="emit('add-task')"
+    >
       Adicionar tarefa
       <span class="mdi mdi-plus" aria-hidden="true"></span>
     </AppButton>

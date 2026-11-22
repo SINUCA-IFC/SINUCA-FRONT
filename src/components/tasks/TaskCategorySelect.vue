@@ -47,6 +47,7 @@ function toggleCategory(category) {
 }
 
 .category-option {
+  min-height: 44px;
   border: 1px solid #969696;
   border-radius: 15px;
   color: #969696;

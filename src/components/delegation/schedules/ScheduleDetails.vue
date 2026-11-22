@@ -77,7 +77,13 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="modal" :style="{ borderTop: '1.8rem solid ' + (category?.color || '#01295f') }">
+  <section
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Detalhes do cronograma"
+    :style="{ borderTop: '1.8rem solid ' + (category?.color || '#01295f') }"
+  >
     <div class="header">
       <div class="title">
         <h2>{{ category?.name || 'Detalhes do cronograma' }}</h2>

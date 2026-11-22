@@ -100,6 +100,7 @@ function nextStep() {
     >
     <AppInput
       label="Confirme sua senha"
+      placeholder="Digite sua senha novamente"
       type="password"
       v-model="confirmPassword"
       autocomplete="new-password"
@@ -126,9 +127,14 @@ function nextStep() {
 .toggle-password {
   position: absolute;
   right: 0.45rem;
-  bottom: 0.18rem;
-  width: 2rem;
-  height: 2rem;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: var(--auth-input-height, 48px);
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
   border: 0;
   background: transparent;
   color: #01295f;

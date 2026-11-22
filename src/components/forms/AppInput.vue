@@ -51,6 +51,7 @@ const value = computed({
 }
 
 .input-class {
+  min-height: 44px;
   box-sizing: border-box;
   border: 2px solid #d9d9d9;
   background-color: inherit;
@@ -74,6 +75,11 @@ const value = computed({
 @media (min-width: 768px) {
   .app-input {
     margin-bottom: 2vw;
+  }
+}
+@media (pointer: coarse) {
+  .input-class {
+    font-size: 16px;
   }
 }
 </style>

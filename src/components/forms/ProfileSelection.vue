@@ -4,12 +4,12 @@ defineEmits(['select'])
 </script>
 
 <template>
-  <main class="profile-selection" aria-labelledby="welcome-title">
+  <section class="profile-selection" aria-labelledby="welcome-title">
     <header class="welcome-brand">
-      <img src="/logo-azul.svg" alt="SINUCA" width="72" height="56" />
-      <span aria-hidden="true">SINUCA</span>
+      <img src="/logo-azul.svg" alt="SINUCA" width="80" height="6" />
+      <span>SINUCA</span>
     </header>
-    <h1 id="welcome-title">Bem-vindo</h1>
+    <h1 class="welcome-title">BEM-VINDO</h1>
     <p class="welcome-subtitle">Selecione como deseja acessar o sistema</p>
     <div class="profile-options">
       <button
@@ -30,13 +30,16 @@ defineEmits(['select'])
         <span class="profile-description">{{ option.description }}</span>
       </button>
     </div>
-  </main>
+  </section>
 </template>
 
 <style scoped>
 .profile-selection {
   position: relative;
   isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-height: 100dvh;
   box-sizing: border-box;
   padding: clamp(24px, 5dvh, 48px) 24px;
@@ -75,7 +78,6 @@ h1 {
   font-size: clamp(28px, 3vw, 40px);
   font-weight: 800;
   line-height: 1.3;
-  text-transform: uppercase;
 }
 .welcome-subtitle {
   margin: 0;
@@ -105,6 +107,7 @@ h1 {
   color: inherit;
   font: inherit;
   cursor: pointer;
+  transition: all 0.2s;
 }
 .profile-option > .mdi {
   font-size: 44px;
@@ -116,6 +119,13 @@ h1 {
   line-height: 1.5;
   font-weight: 700;
 }
+
+.profile-option:hover {
+  transform: translateY(-4px);
+  background-color: #eeeeed;
+  box-shadow: 0 5px 6px #0005;
+}
+
 .profile-description {
   font-size: 16px;
   line-height: 1.5;

@@ -8,6 +8,7 @@ import ProfileName from '@/components/profile/ProfileName.vue'
 import EditProfileModal from '@/components/profile/EditProfileModal.vue'
 import { useUserStore } from '@/stores/userStore'
 import { useDelegationTabs } from '@/composables/useDelegationTabs'
+import { useToastStore } from '@/stores/toastStore'
 const userStore = useUserStore()
 const { setTab } = useDelegationTabs()
 const editing = ref(false)
@@ -25,6 +26,7 @@ function startEditing() {
 function profileSaved() {
   editing.value = false
   success.value = 'Perfil atualizado com sucesso!'
+  useToastStore().show(success.value)
 }
 </script>
 <template>
@@ -50,7 +52,13 @@ function profileSaved() {
           <ProfileName :name="userStore.user.name || 'Usuário SINUCA'" />
         </template>
         <template #title-action>
-          <button type="button" class="edit-profile" aria-label="Editar perfil" title="Editar perfil" @click="startEditing">
+          <button
+            type="button"
+            class="edit-profile"
+            aria-label="Editar perfil"
+            title="Editar perfil"
+            @click="startEditing"
+          >
             <span class="mdi mdi-pencil-outline" aria-hidden="true"></span>
           </button>
         </template>
@@ -70,7 +78,10 @@ function profileSaved() {
         <span class="notice-icon mdi mdi-earth" aria-hidden="true"></span>
         <div>
           <h2 id="delegation-notice-title">Você ainda está sem delegação</h2>
-          <p>Assim que a organização vincular seu perfil a uma delegação, você poderá acompanhar por aqui as tarefas atribuídas a você.</p>
+          <p>
+            Assim que a organização vincular seu perfil a uma delegação, você poderá acompanhar por
+            aqui as tarefas atribuídas a você.
+          </p>
           <RouterLink to="/delegacao" class="notice-link">
             Consultar situação da delegação
             <span class="mdi mdi-arrow-right" aria-hidden="true"></span>
@@ -216,7 +227,6 @@ input:focus-visible {
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
-
 
 .success {
   margin-right: auto;

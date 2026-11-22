@@ -13,6 +13,15 @@ const loading = ref(false)
 const error = ref('')
 let requestId = 0
 
+function safeUrl(value) {
+  try {
+    const url = new URL(value)
+    return ['https:', 'http:'].includes(url.protocol) ? url.href : undefined
+  } catch {
+    return undefined
+  }
+}
+
 async function loadDocuments() {
   const currentRequest = ++requestId
   links.value = []
@@ -58,9 +67,13 @@ onBeforeUnmount(() => {
     </div>
     <ul v-else-if="links.length">
       <li v-for="link in links" :key="link.id">
-        <a :href="link.url" target="_blank" rel="noopener noreferrer">{{
-          link.name || link.url
-        }}</a>
+        <a
+          :href="safeUrl(link.url)"
+          :aria-disabled="!safeUrl(link.url) || undefined"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ link.name || link.url }}</a
+        >
       </li>
     </ul>
     <p v-else>Nenhum documento relacionado.</p>

@@ -25,7 +25,7 @@ export const useScheduleStore = defineStore('schedule', () => {
   async function getSchedules() {
     loading.value = true
     try {
-      schedules.value = await getAllPages(page => scheduleService.getSchedules(page))
+      schedules.value = await getAllPages((page) => scheduleService.getSchedules(page))
     } finally {
       loading.value = false
     }
@@ -54,6 +54,7 @@ export const useScheduleStore = defineStore('schedule', () => {
   }
 
   return {
+    loading,
     schedules,
     schedule,
     getSchedules,

@@ -3,6 +3,7 @@ import { useIsDesktop } from '../../composables/useIsDesktop'
 import AppHeaderMob from '../../components/layout/mobile/AppHeaderMob.vue'
 import AppTabFooter from '../../components/layout/mobile/AppTabFooter.vue'
 import AppSidebarDesktop from '../../components/layout/desktop/AppSidebarDesktop.vue'
+import NotificationPrompt from '@/components/NotificationPrompt.vue'
 
 defineProps({
   // Título exibido no header mobile
@@ -28,6 +29,7 @@ const isDesktop = useIsDesktop()
     <div class="app-content">
       <div class="content-inner" :class="{ 'with-corner-ods': isDesktop && showCornerOds }">
         <div v-if="isDesktop && showCornerOds" class="corner-ods" aria-hidden="true"></div>
+        <NotificationPrompt />
         <slot />
       </div>
     </div>
@@ -38,7 +40,8 @@ const isDesktop = useIsDesktop()
 </template>
 
 <style scoped>
-.app-content, .content-inner {
+.app-content,
+.content-inner {
   min-width: 0;
 }
 

@@ -34,6 +34,7 @@ const statusOptions = [
   flex-wrap: wrap;
 }
 .status-option {
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 8px;

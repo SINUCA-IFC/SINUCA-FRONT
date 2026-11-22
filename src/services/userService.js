@@ -25,7 +25,17 @@ export default class UserService {
       if (Number.isInteger(Number(value)) && Number(value) > 0) payload[field] = Number(value)
     }
     if (matriculation) payload.matriculation = matriculation
-    const response = await axios.post('/registro/', payload, { skipAuth: true })
+    let body = payload
+    const hasPhoto = typeof File !== 'undefined' && foto instanceof File
+    if (hasPhoto) {
+      body = new FormData()
+      for (const [field, value] of Object.entries(payload)) body.append(field, value)
+      body.set('foto', foto)
+    }
+    const response = await axios.post('/registro/', body, {
+      skipAuth: true,
+      ...(hasPhoto ? { headers: { 'Content-Type': 'multipart/form-data' } } : {}),
+    })
     return response.data
   }
 

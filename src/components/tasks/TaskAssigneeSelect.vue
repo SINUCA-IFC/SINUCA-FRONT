@@ -40,6 +40,7 @@ function toggleUser(userId) {
 }
 
 .user-option {
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 10px;

@@ -87,7 +87,10 @@ const categoryName = (category) =>
 </template>
 
 <style scoped>
-.task-card--highlighted { outline: 3px solid #ffb30f; outline-offset: 3px; }
+.task-card--highlighted {
+  outline: 3px solid #ffb30f;
+  outline-offset: 3px;
+}
 .task-card {
   display: flex;
   align-items: flex-start;
@@ -123,8 +126,8 @@ const categoryName = (category) =>
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  min-width: 1.75rem;
-  min-height: 2rem;
+  min-width: 44px;
+  min-height: 44px;
   color: #657185;
   font-size: 1.15rem;
   cursor: grab;

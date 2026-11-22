@@ -19,7 +19,13 @@ watch(
 )
 </script>
 <template>
-  <AuthShell :title="checkingEmail ? 'Confirme seu e-mail' : 'Criar conta'">
+  <AuthShell
+    title="Criar conta"
+    :subtitle="
+      checkingEmail ? 'Verifique sua caixa de entrada' : 'Preencha seus dados para se cadastrar'
+    "
+    login-layout
+  >
     <RegisterStepTwo v-if="checkingEmail" />
     <RegisterStepOne v-else-if="currentStep === 1" :draft="draft" @next-step="currentStep = 2" />
     <RegisterStepThree

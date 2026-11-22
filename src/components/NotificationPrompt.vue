@@ -54,11 +54,10 @@ async function activate() {
 
 <style scoped>
 .notification-prompt {
-  position: fixed;
-  z-index: 1000;
-  right: 1rem;
-  bottom: 1rem;
-  width: min(380px, calc(100vw - 2rem));
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 1.25rem;
   padding: 1.25rem;
   border: 1px solid #ddd;
   border-radius: 12px;
@@ -90,10 +89,5 @@ button {
 button:disabled {
   opacity: 0.6;
   cursor: wait;
-}
-@media (max-width: 1023px) {
-  .notification-prompt {
-    bottom: calc(135px + env(safe-area-inset-bottom, 0px));
-  }
 }
 </style>
