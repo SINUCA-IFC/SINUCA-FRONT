@@ -9,6 +9,18 @@ import router from './router'
 import { onAuthExpired } from './plugins/axios'
 import { useUserStore } from './stores/userStore'
 
+// Remove registrations left by earlier development builds of the PWA.
+if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .getRegistrations()
+    .then((registrations) =>
+      Promise.all(registrations.map((registration) => registration.unregister())),
+    )
+    .catch((error) =>
+      console.warn('Não foi possível remover o service worker de desenvolvimento.', error),
+    )
+}
+
 const app = createApp(App)
 
 app.use(createPinia())

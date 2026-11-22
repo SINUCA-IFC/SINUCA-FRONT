@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { apiOrigin } from '@/services/authService'
 
-axios.defaults.baseURL = apiOrigin + '/api'
+axios.defaults.baseURL = import.meta.env?.DEV ? '/api' : apiOrigin + '/api'
 axios.defaults.timeout = 15000
 let refreshPromise
 let onExpired = () => {}
