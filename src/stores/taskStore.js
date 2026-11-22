@@ -64,7 +64,7 @@ export const useTaskStore = defineStore('task', () => {
 
   async function moveTask(id, status, nextTaskId, previousTaskId) {
     const current = generation
-    const movingTask = tasks.value.find(task => task.id === id)
+    const movingTask = tasks.value.find((task) => task.id === id)
     if (!movingTask) return
 
     if (movingTask.status !== status) {
@@ -72,12 +72,12 @@ export const useTaskStore = defineStore('task', () => {
     }
     if (current !== generation) return
 
-    const index = tasks.value.findIndex(task => task.id === id)
+    const index = tasks.value.findIndex((task) => task.id === id)
     if (index === -1) return
 
     const [moved] = tasks.value.splice(index, 1)
-    const nextIndex = tasks.value.findIndex(task => task.id === nextTaskId)
-    const previousIndex = tasks.value.findIndex(task => task.id === previousTaskId)
+    const nextIndex = tasks.value.findIndex((task) => task.id === nextTaskId)
+    const previousIndex = tasks.value.findIndex((task) => task.id === previousTaskId)
     const destination = nextIndex !== -1 ? nextIndex : previousIndex + 1
     tasks.value.splice(destination, 0, moved)
   }
@@ -101,6 +101,7 @@ export const useTaskStore = defineStore('task', () => {
   )
 
   return {
+    loading: carregando,
     tasks,
     task,
     getTasks,

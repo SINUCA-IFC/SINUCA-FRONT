@@ -28,6 +28,7 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+!.env.production
 *.local
 
 # Editor / IDE

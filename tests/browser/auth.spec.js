@@ -24,6 +24,7 @@ test('registration validates passwords, resumes after reload, resends, confirms 
         email: 'ana@example.com',
         name: 'Ana',
         password: 'Password123!',
+        role: 'organizer',
       })
       return { status: 201, body: pending }
     }
@@ -35,7 +36,7 @@ test('registration validates passwords, resumes after reload, resends, confirms 
       return { body: jwt }
     }
   })
-  await page.goto('/cadastro')
+  await page.goto('/cadastro?id=1')
   await page.getByLabel('E-mail', { exact: false }).fill('ana@example.com')
   await page.getByLabel('Senha', { exact: false }).first().fill('Password123!')
   await page.getByLabel('Confirme sua senha').fill('different')
@@ -44,14 +45,14 @@ test('registration validates passwords, resumes after reload, resends, confirms 
   await page.getByRole('button', { name: 'CONTINUAR', exact: true }).click()
   await page.getByLabel('Nome Completo').fill('Ana')
   await page.getByRole('button', { name: 'CADASTRAR', exact: true }).click()
-  await expect(page).toHaveURL(/cadastro\?etapa=email/)
+  await expect(page).toHaveURL(/cadastro\?.*etapa=email/)
   await page.reload()
   await expect(page.getByText(/ana@example.com/)).toBeVisible()
   expect(await page.evaluate(() => localStorage.getItem('access_token'))).toBeNull()
   await page.getByRole('button', { name: 'REENVIAR CÓDIGO' }).click()
-  await expect(page.getByRole('status')).toContainText('novo código')
+  await expect(page.getByRole('status').first()).toContainText('novo código')
   await expect(page.getByRole('button', { name: /REENVIAR EM/ })).toBeDisabled()
-  const code = page.getByLabel('Código de seis dígitos')
+  const code = page.getByLabel('Dígito 1 de 6', { exact: true })
   await expect(code).toHaveAttribute('inputmode', 'numeric')
   await expect(code).toHaveAttribute('autocomplete', 'one-time-code')
   await code.fill('012345')
@@ -67,16 +68,16 @@ test('pending login never refreshes, closed verification offers login', async ({
     if (path === '/api/token/') return { status: 401, body: pending }
     if (path === '/api/registro/confirmar-email/') return { status: 410, body: {} }
   })
-  await page.goto('/login')
+  await page.goto('/login?id=2')
   await page.getByLabel('E-mail').fill('ana@example.com')
   await page.getByLabel(/^Senha/).fill('Password123!')
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
-  await expect(page).toHaveURL(/\/login$/)
+  await expect(page).toHaveURL(/\/login(?:\?id=2)?$/)
   await expect(page.getByRole('alert')).toContainText('Confirme seu e-mail')
   await expect(page.getByLabel('Código de seis dígitos')).toHaveCount(0)
   await page.getByRole('link', { name: 'Concluir cadastro' }).click()
-  await expect(page).toHaveURL(/cadastro\?etapa=email/)
-  await page.getByLabel('Código de seis dígitos').fill('000000')
+  await expect(page).toHaveURL(/cadastro\?.*etapa=email/)
+  await page.getByLabel('Dígito 1 de 6', { exact: true }).fill('000000')
   await page.getByRole('button', { name: 'CONFIRMAR E-MAIL' }).click()
   await expect(page.getByRole('alert')).toContainText('encerrada')
   await expect(
@@ -93,7 +94,7 @@ test('verified password login enters directly without requesting confirmation', 
     if (path.includes('/registro/')) confirmationRequests.push(path)
     if (path === '/api/token/') return { body: jwt }
   })
-  await page.goto('/login')
+  await page.goto('/login?id=2')
   await page.getByLabel('E-mail').fill('ana@example.com')
   await page.getByLabel(/^Senha/).fill('Password123!')
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
@@ -166,7 +167,7 @@ test('Google callback exchanges cookies for JWT once and logout clears tokens', 
 
 test('mobile login and missing verification remain usable without overflow', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 })
-  await page.goto('/login')
+  await page.goto('/login?id=2')
   await expect(page.getByRole('button', { name: 'Continuar com Google' })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.goto('/verificar-email')
@@ -179,14 +180,38 @@ test('login and registration use the same Google button and no separate link for
   page,
 }) => {
   for (const path of ['/login', '/cadastro']) {
-    await page.goto(path)
-    await expect(page.locator('.auth-brand img')).toBeVisible()
+    await page.goto(path + '?id=2')
+    await expect(page.locator('.auth-brand')).toHaveText('Discente')
+    await expect(page.locator('.auth-brand img')).toHaveCount(0)
     const google = page.getByRole('button', { name: 'Continuar com Google' })
     await expect(google).toBeVisible()
     await expect(google).toHaveCSS('background-color', 'rgb(17, 17, 17)')
     await expect(page.getByRole('link', { name: /vincular/i })).toHaveCount(0)
   }
   await page.goto('/auth/vincular-google')
-  await expect(page).toHaveURL(/\/login$/)
-  await expect(page.getByRole('heading', { name: 'Entrar' })).toBeVisible()
+  await expect(page).toHaveURL(/\/login(?:\?id=2)?$/)
+  await expect(page.getByRole('heading', { name: 'Bem-vindo' })).toBeVisible()
+})
+
+test('profile selection preserves the current form and evaluator stays under construction', async ({
+  page,
+}) => {
+  await page.goto('/login?redirect=/perfil')
+  await page.getByRole('button', { name: 'Organizador', exact: true }).click()
+  await expect(page.locator('.auth-brand')).toHaveText('Organizador')
+  await expect(page).toHaveURL(/id=1/)
+  await page.getByRole('link', { name: 'Novo no SINUCA? Clique aqui.' }).click()
+  await expect(page.locator('.auth-brand')).toHaveText('Organizador')
+  await page.reload()
+  await expect(page.locator('.auth-brand')).toHaveText('Organizador')
+  await page.setViewportSize({ width: 360, height: 740 })
+  await page.getByRole('button', { name: 'Voltar', exact: true }).click()
+  await page.getByRole('button', { name: 'Avaliador', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Área do avaliador em construção' })).toBeVisible()
+  await expect(page.getByText(/obrigatoriamente um e-mail @ifc.edu.br/)).toBeVisible()
+  await expect(page.getByLabel('E-mail')).toHaveCount(0)
+  await expect(page.getByText(/continuar como convidado/i)).toHaveCount(0)
+  await page.setViewportSize({ width: 360, height: 740 })
+  await page.screenshot({ path: 'test-results/evaluator-mobile.png' })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })

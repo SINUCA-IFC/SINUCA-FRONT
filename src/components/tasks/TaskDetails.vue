@@ -9,6 +9,8 @@ import { useUserStore } from '@/stores/userStore'
 import { UseCategoryStore } from '@/stores/categoryStore'
 import AppInput from '@/components/forms/AppInput.vue'
 import AppButton from '@/components/forms/AppButton.vue'
+import { useToastStore } from '@/stores/toastStore'
+const toasts = useToastStore()
 
 const taskStore = useTaskStore()
 const userStore = useUserStore()
@@ -31,6 +33,14 @@ const isFormUnchanged = computed(() => {
 async function handleSubmit() {
   if (props.readOnly || saving.value || loading.value) return
   error.value = ''
+  if (
+    taskStore.task.startDate &&
+    taskStore.task.endDate &&
+    taskStore.task.endDate < taskStore.task.startDate
+  ) {
+    error.value = 'A data de fim não pode ser anterior ao início.'
+    return
+  }
   if (!taskStore.task.category.length || !taskStore.task.user.length) {
     error.value = 'Selecione pelo menos uma categoria e um responsável.'
     return
@@ -42,6 +52,7 @@ async function handleSubmit() {
     } else {
       await taskStore.createTask(taskStore.task)
     }
+    toasts.show(isEditMode.value ? 'Tarefa atualizada.' : 'Tarefa criada.')
     emits('close')
   } catch (err) {
     const data = err.response?.data
@@ -68,6 +79,7 @@ async function deleteTask() {
   error.value = ''
   try {
     await taskStore.deleteTask(taskStore.task.id ?? props.taskId)
+    toasts.show('Tarefa excluída.')
     emits('close')
   } catch {
     error.value = 'Não foi possível excluir a tarefa. Tente novamente.'
@@ -108,16 +120,19 @@ onMounted(loadTask)
 </script>
 
 <template>
-  <section class="form-create">
+  <section class="form-create" role="dialog" aria-modal="true" aria-labelledby="task-dialog-title">
     <div class="header-section">
-      <h1 style="font-size: 1.7rem">
+      <h1 id="task-dialog-title" style="font-size: 1.7rem">
         {{ readOnly ? 'Tarefa atribuída' : isEditMode ? 'Editar tarefa' : 'Nova tarefa' }}
       </h1>
-      <span
+      <button
+        type="button"
+        aria-label="Fechar tarefa"
+        :disabled="saving"
         class="mdi mdi-close"
         style="color: #969696; font-size: 2rem"
         @click="emits('close')"
-      ></span>
+      ></button>
     </div>
 
     <p v-if="loading" role="status">Carregando tarefa...</p>
@@ -274,6 +289,10 @@ onMounted(loadTask)
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 .mdi-close {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
   cursor: pointer;
   transition: transform 0.15s ease;
 }

@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import AppButton from './AppButton.vue'
 import { startGoogle, authError } from '@/services/authService'
-defineProps({ disabled: Boolean })
+const props = defineProps({ disabled: Boolean, role: String })
 const emit = defineEmits(['busy'])
 const busy = ref(false)
 const error = ref('')
@@ -12,7 +12,7 @@ async function google() {
   emit('busy', true)
   error.value = ''
   try {
-    await startGoogle()
+    await startGoogle(props.role)
   } catch (failure) {
     error.value = authError(failure)
     busy.value = false

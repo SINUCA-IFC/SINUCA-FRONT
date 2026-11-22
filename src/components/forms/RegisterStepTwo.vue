@@ -9,7 +9,9 @@ import {
   resendCode,
   authError,
 } from '@/services/authService'
-import AppInput from './AppInput.vue'
+import VerificationCode from './VerificationCode.vue'
+import { useToastStore } from '@/stores/toastStore'
+const toasts = useToastStore()
 import AppButton from './AppButton.vue'
 const router = useRouter()
 const store = useUserStore()
@@ -47,6 +49,7 @@ async function confirm() {
   message.value = ''
   try {
     await store.completeLogin(await confirmEmail(code.value))
+    toasts.show('E-mail confirmado. Sua conta está pronta para acessar o SINUCA!')
     code.value = ''
     await router.replace('/')
   } catch (failure) {
@@ -66,6 +69,7 @@ async function resend() {
     pending.value = readPending()
     code.value = ''
     message.value = 'Enviamos um novo código para seu e-mail.'
+    toasts.show(message.value)
     cooldown()
   } catch (failure) {
     handleError(failure)
@@ -77,16 +81,7 @@ async function resend() {
 <template>
   <form v-if="pending" @submit.prevent="confirm" class="auth-form" :aria-busy="loading">
     <p>Digite o código enviado para {{ pending.email }}. Ele expira em dez minutos.</p>
-    <AppInput
-      v-model="code"
-      label="Código de seis dígitos"
-      type="text"
-      inputmode="numeric"
-      autocomplete="one-time-code"
-      pattern="[0-9]{6}"
-      maxlength="6"
-      required
-    />
+    <VerificationCode v-model="code" :disabled="loading" />
     <AppButton type="submit" :disabled="loading || !validCode">{{
       loading ? 'AGUARDE...' : 'CONFIRMAR E-MAIL'
     }}</AppButton>

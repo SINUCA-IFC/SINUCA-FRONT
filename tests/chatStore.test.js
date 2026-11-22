@@ -5,10 +5,7 @@ import axios from 'axios'
 import { useUserStore } from '../src/stores/userStore.js'
 
 const originalAdapter = axios.defaults.adapter
-let useChatStore
-try {
-  ;({ useChatStore } = await import('../src/stores/chatStore.js'))
-} catch {}
+const { useChatStore } = await import('../src/stores/chatStore.js')
 const respond = (config, rows) => ({
   config,
   data: { results: rows, total_pages: 1 },
@@ -168,16 +165,26 @@ test('a pending task move cannot reorder tasks loaded by another account', async
   auth.loggedIn = true
   auth.user = { id: 1 }
   const tasks = useTaskStore()
-  tasks.tasks = [{ id: 9, status: 1 }, { id: 10, status: 2 }]
+  tasks.tasks = [
+    { id: 9, status: 1 },
+    { id: 10, status: 2 },
+  ]
   let release
-  axios.defaults.adapter = (config) => new Promise((resolve) => {
-    release = () => resolve({ ...respond(config, []), data: { id: 9, status: 2 } })
-  })
+  axios.defaults.adapter = (config) =>
+    new Promise((resolve) => {
+      release = () => resolve({ ...respond(config, []), data: { id: 9, status: 2 } })
+    })
   const request = tasks.moveTask(9, 2, 10)
   await new Promise((resolve) => setTimeout(resolve, 0))
   auth.user = { id: 2 }
-  tasks.tasks = [{ id: 8, title: 'Conta B' }, { id: 9, title: 'Conta B' }]
+  tasks.tasks = [
+    { id: 8, title: 'Conta B' },
+    { id: 9, title: 'Conta B' },
+  ]
   release()
   await request
-  assert.deepEqual(tasks.tasks, [{ id: 8, title: 'Conta B' }, { id: 9, title: 'Conta B' }])
+  assert.deepEqual(tasks.tasks, [
+    { id: 8, title: 'Conta B' },
+    { id: 9, title: 'Conta B' },
+  ])
 })

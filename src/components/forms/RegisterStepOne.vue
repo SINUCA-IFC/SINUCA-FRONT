@@ -1,5 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { getAuthProfile } from '@/services/authProfiles'
+const route = useRoute()
 import GoogleLoginButton from './GoogleLoginButton.vue'
 import AppInput from './AppInput.vue'
 import AppButton from './AppButton.vue'
@@ -97,6 +100,7 @@ function nextStep() {
     >
     <AppInput
       label="Confirme sua senha"
+      placeholder="Digite sua senha novamente"
       type="password"
       v-model="confirmPassword"
       autocomplete="new-password"
@@ -106,9 +110,11 @@ function nextStep() {
       As senhas não coincidem.
     </p>
     <AppButton type="submit" :disabled="isDisabled">CONTINUAR</AppButton>
-    <GoogleLoginButton @busy="googleBusy = $event" />
+    <GoogleLoginButton :role="getAuthProfile(route.query.id)?.role" @busy="googleBusy = $event" />
   </form>
-  <RouterLink class="auth-link" to="/login">Já tem uma conta? Clique aqui.</RouterLink>
+  <RouterLink class="auth-link" :to="{ name: 'login', query: route.query }"
+    >Já tem uma conta? Clique aqui.</RouterLink
+  >
 </template>
 
 <style scoped>
@@ -121,9 +127,14 @@ function nextStep() {
 .toggle-password {
   position: absolute;
   right: 0.45rem;
-  bottom: 0.18rem;
-  width: 2rem;
-  height: 2rem;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: var(--auth-input-height, 48px);
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
   border: 0;
   background: transparent;
   color: #01295f;

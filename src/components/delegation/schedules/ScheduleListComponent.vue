@@ -1,62 +1,82 @@
 <script setup>
-import { ref } from "vue";
-import { onMounted } from "vue";
-import { useScheduleStore } from "@/stores/scheduleStore";
+import { ref } from 'vue'
+import { onMounted } from 'vue'
+import { useScheduleStore } from '@/stores/scheduleStore'
+import AppButton from '@/components/forms/AppButton.vue'
+import { formatShortDate as formatDate } from '@/utils/date'
+import { useToastStore } from '@/stores/toastStore'
+const error = ref('')
 
-const scheduleStore = useScheduleStore();
+const scheduleStore = useScheduleStore()
 
-const emit = defineEmits(["openDetails"]);
+const emit = defineEmits(['openDetails'])
 
-onMounted(() => {
-  scheduleStore.getSchedules();
-});
-
-const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-
-  return `${day}/${month}`;
-};
+async function loadSchedules() {
+  error.value = ''
+  try {
+    await scheduleStore.getSchedules()
+  } catch {
+    error.value = 'Não foi possível carregar o cronograma. Tente novamente.'
+    useToastStore().show(error.value, 'error')
+  }
+}
+onMounted(loadSchedules)
 
 function openSchedule(scheduleId) {
-    emit("openDetails", scheduleId)
-};
-
+  emit('openDetails', scheduleId)
+}
 </script>
 
 <template>
   <section>
     <div class="header-section">
-      <h4 style="font-weight: bolder; font-size: 1.5rem; margin-bottom: 1.5rem;">Cronograma</h4>
+      <h4 style="font-weight: bolder; font-size: 1.5rem; margin-bottom: 1.5rem">Cronograma</h4>
     </div>
-    <ul>
-      <li v-for="s in scheduleStore.schedules" :key="s.id" class="schedule-item" @click="openSchedule(String(s.id))">
+    <p v-if="scheduleStore.loading" role="status">Carregando cronograma...</p>
+    <div v-else-if="error">
+      <p role="alert">{{ error }}</p>
+      <AppButton @click="loadSchedules">Tentar novamente</AppButton>
+    </div>
+    <p v-else-if="!scheduleStore.schedules.length">Nenhuma atividade no cronograma por enquanto.</p>
+    <ul v-else>
+      <li
+        v-for="s in scheduleStore.schedules"
+        :key="s.id"
+        class="schedule-item"
+        role="button"
+        tabindex="0"
+        @click="openSchedule(String(s.id))"
+        @keydown.enter="openSchedule(String(s.id))"
+        @keydown.space.prevent="openSchedule(String(s.id))"
+      >
         <div class="header-schedule">
-        
-          <span style="color: #969696;" v-if="s.category == '1'" class="mdi mdi-instagram">
+          <span style="color: #969696" v-if="s.category == '1'" class="mdi mdi-instagram">
             Postagem
           </span>
 
-          <span style="color: #969696;" v-else-if="s.category == '2'" class="mdi mdi-forum-outline">
+          <span style="color: #969696" v-else-if="s.category == '2'" class="mdi mdi-forum-outline">
             Debate
           </span>
 
-          <span style="color: #969696;" v-else-if="s.category == '3'" class="mdi mdi-handshake-outline">
+          <span
+            style="color: #969696"
+            v-else-if="s.category == '3'"
+            class="mdi mdi-handshake-outline"
+          >
             Mesa de cooperação
           </span>
 
-          <span style="color: #969696;" v-else-if="s.category == '4'" class="mdi mdi-drama-masks">
+          <span style="color: #969696" v-else-if="s.category == '4'" class="mdi mdi-drama-masks">
             Apresentação cultural
           </span>
 
           <p style="font-weight: 500">
-            <span class="mdi mdi-calendar-blank" style="font-size: 1.05rem; white-space: nowrap;"></span>
+            <span
+              class="mdi mdi-calendar-blank"
+              style="font-size: 1.05rem; white-space: nowrap"
+            ></span>
             {{ formatDate(s.endDate) }}
           </p>
-          
         </div>
         <h3>
           {{ s.title }}
@@ -74,24 +94,29 @@ ul {
   gap: 1rem;
 }
 
-li:active{
-    transition: all .3s;
-    transform: scale(0.95);
+li:active {
+  transition: all 0.3s;
+  transform: scale(0.95);
 }
 
 .schedule-item {
+  cursor: pointer;
   margin-top: 0.6rem;
   padding: 1.2rem 1.4rem;
   background-color: #fff;
   border-radius: 0.8rem;
 }
+.schedule-item:focus-visible {
+  outline: 3px solid #01295f;
+  outline-offset: 3px;
+}
 
 .schedule-item:has(.mdi-instagram) {
-  border-left: 0.9rem solid #FD151B;
+  border-left: 0.9rem solid #fd151b;
 }
 
 .schedule-item:has(.mdi-forum-outline) {
-  border-left: 0.9rem solid #01295F;
+  border-left: 0.9rem solid #01295f;
 }
 
 .schedule-item:has(.mdi-handshake-outline) {
@@ -99,7 +124,7 @@ li:active{
 }
 
 .schedule-item:has(.mdi-drama-masks) {
-  border-left: 0.9rem solid #FFB30F;
+  border-left: 0.9rem solid #ffb30f;
 }
 
 .header-schedule {
@@ -109,14 +134,21 @@ li:active{
 }
 
 h3 {
-    font-size: 1.2rem; 
-    margin-bottom: 0.6rem;
-    max-width: 90%;
-    word-break: break-word;
+  font-size: 1.2rem;
+  margin-bottom: 0.6rem;
+  max-width: 90%;
+  word-break: break-word;
 }
 
 @media (max-width: 1023px) {
-  .header-schedule { flex-wrap: wrap; gap: 0.75rem; line-height: 1.5; }
-  .schedule-item h3 { max-width: 100%; line-height: 1.5; }
+  .header-schedule {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    line-height: 1.5;
+  }
+  .schedule-item h3 {
+    max-width: 100%;
+    line-height: 1.5;
+  }
 }
 </style>

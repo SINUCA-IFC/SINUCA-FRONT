@@ -283,36 +283,51 @@
       "blocks": [
         {
           "text": "O SINUCA acontece anualmente no IFC Campus Araquari, durante dois dias da última semana do mês de outubro. O evento reúne os discentes do segundo ano e os divide em grupos, os quais são atribuídos países de relevância no cenário global. Os alunos realizam pesquisas sobre o aspecto cultural, político e econômico do país selecionado. Durante o simulado, são realizados debates, mesas de cooperação e apresentações culturais, incluindo danças e o desafio gastronômico.",
-          "image": "83377.png"
+          "image": "sinuca-funciona.png",
+          "layout": "overview",
+          "alt": "Letras SINUCA decoradas com bandeiras de pa?ses"
         },
         {
-          "heading": "Debates:",
+          "heading": "Debates",
           "text": "Os debates são intermediados pela organização e são estruturados em um discurso inicial de cada representante da delegação, nele é construída e esclarecida a posição dos países em relação ao tema discutido; para cada turno, as delegações têm direito a réplicas e tréplicas. Os argumentos defendidos nos debates têm de coincidir com o interesse pessoal de cada país envolvido, sendo assim, o debate é mediado de acordo com a qualidade argumentativa e a capacidade de defesa da posição da delegação.",
-          "image": "6ad8d.png"
+          "layout": "debates",
+          "image": "sinuca-debates.png",
+          "alt": "Representantes da delega??o apresentando seus argumentos durante um debate"
         },
         {
           "heading": "Mesas de Cooperação",
           "text": "Os discentes participantes das mesas de cooperação, que atuam como diplomatas, são direcionados a uma sala onde, em uma roda de conversa, ocorre uma discussão acerca de um tema de grande relevância e interesse global. Nesse diálogo, diferentemente dos debates, os países têm como objetivo chegar a um consenso geral, ainda que defendam seus próprios interesses. Caso o acordo proposto entre em grave divergência com os interesses ou posicionamentos de algum país participante, a delegação pode optar por não aderir a ele, embora seja priorizada a busca por uma conciliação entre todas as delegações. As mesas de cooperação ocorrem no fim da primeira rodada de debates e antes da segunda, a qual todos os países participam.",
-          "image": "da136.png"
+          "image": "da136.png",
+          "layout": "cooperation",
+          "alt": "Participantes votando em uma mesa de coopera??o"
         },
         {
           "text": "Durante o processo de discussão, as delegações podem ser divididas em pequenos grupos, visando proporcionar diálogos mais fluidos. Cada delegação tem direito a uma breve fala no início da discussão, e o processo de tomada de decisões é feito por meio de votações.",
-          "image": "2f9d3.png"
+          "image": "2f9d3.png",
+          "layout": "cooperation-followup",
+          "alt": "Delega??o participando das discuss?es"
         },
         {
           "heading": "Apresentação Cultural (Dança)",
           "text": "As danças culturais são realizadas durante os intervalos dos debates, proporcionando ao público um maior contato com a cultura dos países participantes. Dessa forma, o SINUCA amplia sua abordagem para além da geopolítica, incorporando também aspectos artísticos e culturais das diferentes nações representadas no evento. Geralmente as apresentações são curtas, possuindo 10 minutos, e utilizam de vestimentas culturais e músicas.",
-          "image": "1a97c.png"
+          "image": "1a97c.png",
+          "layout": "dance",
+          "alt": "Estudantes durante uma apresenta??o de dan?a cultural"
         },
         {
-          "image": "73149.png"
+          "layout": "dance-followup",
+          "image": "73149.png",
+          "alt": "Participantes da apresenta??o cultural com a bandeira de Cuba"
         },
         {
           "heading": "Apresentação Cultural (Desafio Gastronômico)",
           "text": "O desafio gastronômico consiste na criação e na apresentação de pratos típicos dos países os quais cada delegação recebe, tem o objetivo de imergir ainda mais os participantes do evento na cultura dos países de uma forma diferenciada. A apresentação dos pratos permite explorar a gastronomia como uma manifestação cultural, mostrando costumes e tradições de cada povo. ",
-          "image": "4060d.png"
+          "image": "4060d.png",
+          "layout": "gastronomy",
+          "alt": "Prato t?pico apresentado pela delega??o do Afeganist?o"
         }
-      ]
+      ],
+      "layout": "how-it-works"
     },
     {
       "accent": "#ffb30f",

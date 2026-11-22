@@ -6,6 +6,10 @@ import { useStatusStore } from '../../stores/statusStore'
 import { UseCategoryStore } from '../../stores/categoryStore.js'
 import KanbanColumn from '@/components/tasks/KanbanColumn.vue'
 import TaskCategoryFilter from '@/components/tasks/TaskCategoryFilter.vue'
+import { useToastStore } from '@/stores/toastStore'
+import AppButton from '@/components/forms/AppButton.vue'
+const toasts = useToastStore()
+const loadError = ref('')
 
 const taskStore = useTaskStore()
 const statusStore = useStatusStore()
@@ -50,16 +54,20 @@ function applyFilters(tasks) {
   )
 }
 
-watch(() => [route.query.task, taskStore.tasks], async () => {
-  const taskId = Number(route.query.task)
-  if (!Number.isSafeInteger(taskId) || taskId <= 0) return
-  selectedCategory.value = null
-  searchText.value = ''
-  await nextTick()
-  const card = document.getElementById(`task-${taskId}`)
-  card?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-  card?.focus({ preventScroll: true })
-}, { immediate: true })
+watch(
+  () => [route.query.task, taskStore.tasks],
+  async () => {
+    const taskId = Number(route.query.task)
+    if (!Number.isSafeInteger(taskId) || taskId <= 0) return
+    selectedCategory.value = null
+    searchText.value = ''
+    await nextTick()
+    const card = document.getElementById(`task-${taskId}`)
+    card?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    card?.focus({ preventScroll: true })
+  },
+  { immediate: true },
+)
 
 const columns = computed(() => [
   {
@@ -96,8 +104,10 @@ async function moveTask(column, { element, newIndex }) {
   savingMove.value = true
   try {
     await taskStore.moveTask(element.id, column.status, nextTask?.id, previousTask?.id)
+    toasts.show('Tarefa movida com sucesso.')
   } catch {
     moveError.value = 'Não foi possível mover a tarefa. Tente novamente.'
+    toasts.show(moveError.value, 'error')
   } finally {
     savingMove.value = false
   }
@@ -108,14 +118,25 @@ function openTask(taskId) {
   router.push(`/delegacao/tarefas/${taskId}/editar`)
 }
 
-onMounted(() => {
-  taskStore.getTasks()
-  categoryStore.getCategories() // necessário para o filtro e para o nome das categorias
-})
+async function loadTasks() {
+  loadError.value = ''
+  try {
+    await Promise.all([taskStore.getTasks(), categoryStore.getCategories()])
+  } catch {
+    loadError.value = 'Não foi possível carregar as tarefas. Tente novamente.'
+    toasts.show(loadError.value, 'error')
+  }
+}
+onMounted(loadTasks)
 </script>
 
 <template>
   <section class="list-section">
+    <p v-if="taskStore.loading" role="status">Carregando tarefas...</p>
+    <div v-if="loadError">
+      <p role="alert">{{ loadError }}</p>
+      <AppButton @click="loadTasks">Tentar novamente</AppButton>
+    </div>
     <div class="header-title">
       <h4 class="section-title">Quadro de Tarefas</h4>
 

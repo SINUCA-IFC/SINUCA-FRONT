@@ -228,7 +228,13 @@ onUnmounted(() => {
 
 <template>
   <AppLayout
-    :title="showingDelegations ? 'Delegações' : isOrganizer && country?.name ? `Chat · ${country.name}` : 'Chat'"
+    :title="
+      showingDelegations
+        ? 'Delegações'
+        : isOrganizer && country?.name
+          ? `Chat · ${country.name}`
+          : 'Chat'
+    "
     :show-corner-ods="!canChat || !countryId"
     class="chat-layout"
     :class="{
@@ -257,16 +263,20 @@ onUnmounted(() => {
         <div>
           <h2 id="chat-delegation-title">Você ainda está sem delegação</h2>
           <p v-if="userStore.user.approval_pending">
-            Seu cadastro aguarda aprovação. Quando a organização vincular você a uma delegação,
-            o chat da sua equipe ficará disponível aqui.
+            Seu cadastro aguarda aprovação. Quando a organização vincular você a uma delegação, o
+            chat da sua equipe ficará disponível aqui.
           </p>
           <p v-else-if="userStore.user.role === 'student'">
-            É por aqui que sua delegação conversa com a organização. Você poderá participar
-            assim que seu perfil estiver vinculado a uma equipe.
+            É por aqui que sua delegação conversa com a organização. Você poderá participar assim
+            que seu perfil estiver vinculado a uma equipe.
           </p>
           <p v-else>O chat reúne a organização e os alunos de cada delegação.</p>
           <RouterLink to="/delegacao" class="notice-link">
-            {{ userStore.user.approval_pending ? 'Acompanhar aprovação' : 'Consultar situação da delegação' }}
+            {{
+              userStore.user.approval_pending
+                ? 'Acompanhar aprovação'
+                : 'Consultar situação da delegação'
+            }}
             <span class="mdi mdi-arrow-right" aria-hidden="true"></span>
           </RouterLink>
         </div>
@@ -430,9 +440,13 @@ onUnmounted(() => {
 }
 .chat-layout :deep(.content-inner) {
   display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
   width: 100%;
+}
+.chat-layout :deep(.notification-prompt) {
+  flex-shrink: 0;
 }
 .chat-page {
   display: flex;
@@ -708,7 +722,9 @@ select:focus-visible {
   text-underline-offset: 0.2em;
 }
 @media (max-width: 1023px) {
-  .delegation-notice { margin: 1rem; }
+  .delegation-notice {
+    margin: 1rem;
+  }
 }
 
 .chat-notice {

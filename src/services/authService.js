@@ -61,12 +61,12 @@ async function csrf() {
   if (!data.csrfToken) throw new Error('CSRF indisponível')
   return data.csrfToken
 }
-export async function startGoogle() {
+export async function startGoogle(role) {
   callbackPromise = undefined
   const token = await csrf()
-  submitGoogleForm('/api/auth/google/', token)
+  submitGoogleForm('/api/auth/google/', token, role)
 }
-function submitGoogleForm(path, token) {
+function submitGoogleForm(path, token, role) {
   const form = document.createElement('form')
   form.method = 'POST'
   form.action = apiOrigin + path
@@ -75,6 +75,13 @@ function submitGoogleForm(path, token) {
   input.name = 'csrfmiddlewaretoken'
   input.value = token
   form.appendChild(input)
+  if (role) {
+    const profile = document.createElement('input')
+    profile.type = 'hidden'
+    profile.name = 'role'
+    profile.value = role
+    form.appendChild(profile)
+  }
   document.body.appendChild(form)
   form.submit()
   form.remove()
