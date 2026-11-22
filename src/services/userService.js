@@ -1,8 +1,10 @@
+import { validateProfileEmail } from './authProfiles'
 import axios from 'axios'
 
 export default class UserService {
-  async login(email, password) {
-    const response = await axios.post('/token/', { email, password })
+  async login(email, password, role) {
+    validateProfileEmail(email, role)
+    const response = await axios.post('/token/', { email, password, ...(role ? { role } : {}) })
     return response.data
   }
 
@@ -16,8 +18,9 @@ export default class UserService {
     return data
   }
 
-  async register(email, name, password, gang, matriculation, foto) {
-    const payload = { email, name, password }
+  async register(email, name, password, gang, matriculation, foto, role) {
+    validateProfileEmail(email, role)
+    const payload = { email, name, password, ...(role ? { role } : {}) }
     for (const [field, value] of Object.entries({ gang, foto })) {
       if (Number.isInteger(Number(value)) && Number(value) > 0) payload[field] = Number(value)
     }
@@ -37,8 +40,8 @@ export default class UserService {
   }
 
   async getUsers(page = 1) {
-    const {data} = await axios.get('/usuarios/', { params: { page } });
-    return data;
+    const { data } = await axios.get('/usuarios/', { params: { page } })
+    return data
   }
 
   async getPendingUsers(page = 1) {

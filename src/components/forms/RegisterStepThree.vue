@@ -4,6 +4,7 @@ import { useGangStore } from '@/stores/gangStore.js'
 import { useUserStore } from '@/stores/userStore.js'
 import AppButton from './AppButton.vue'
 import AppInput from './AppInput.vue'
+import { getAuthProfile } from '@/services/authProfiles'
 import { authError } from '@/services/authService'
 
 const userStore = useUserStore()
@@ -60,6 +61,7 @@ async function register() {
       props.draft.gang,
       props.draft.matriculation,
       photoId,
+      getAuthProfile(props.userId)?.role,
     )
     props.draft.password = ''
     emit('registered')

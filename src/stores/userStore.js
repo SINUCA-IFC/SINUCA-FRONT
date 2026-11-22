@@ -51,9 +51,9 @@ export const useUserStore = defineStore('auth', () => {
     savePending(email, data.session_token)
     return false
   }
-  const login = async (email, password) => {
+  const login = async (email, password, role) => {
     try {
-      const data = await userService.login(email, password)
+      const data = await userService.login(email, password, role)
       await completeLogin(data)
       return true
     } catch (error) {
@@ -68,8 +68,8 @@ export const useUserStore = defineStore('auth', () => {
       throw error
     }
   }
-  async function register(email, name, password, gang, matriculation, foto) {
-    const data = await userService.register(email, name, password, gang, matriculation, foto)
+  async function register(email, name, password, gang, matriculation, foto, role) {
+    const data = await userService.register(email, name, password, gang, matriculation, foto, role)
     if (!data.email_verification_required || !data.session_token)
       throw new Error('Confirmação indisponível')
     beginVerification(email, data)

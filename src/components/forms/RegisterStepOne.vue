@@ -1,5 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { getAuthProfile } from '@/services/authProfiles'
+const route = useRoute()
 import GoogleLoginButton from './GoogleLoginButton.vue'
 import AppInput from './AppInput.vue'
 import AppButton from './AppButton.vue'
@@ -106,9 +109,11 @@ function nextStep() {
       As senhas não coincidem.
     </p>
     <AppButton type="submit" :disabled="isDisabled">CONTINUAR</AppButton>
-    <GoogleLoginButton @busy="googleBusy = $event" />
+    <GoogleLoginButton :role="getAuthProfile(route.query.id)?.role" @busy="googleBusy = $event" />
   </form>
-  <RouterLink class="auth-link" to="/login">Já tem uma conta? Clique aqui.</RouterLink>
+  <RouterLink class="auth-link" :to="{ name: 'login', query: route.query }"
+    >Já tem uma conta? Clique aqui.</RouterLink
+  >
 </template>
 
 <style scoped>
