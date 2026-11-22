@@ -110,7 +110,7 @@ async function login() {
           v-if="registrationPending"
           class="auth-link"
           :to="{ name: 'cadastro', query: { id: profile?.id, etapa: 'email' } }"
-          >Concluir cadastro</RouterLink
+          >Clique aqui para digitar o código</RouterLink
         >
         <AppButton type="submit" :disabled="loading || googleBusy">{{
           loading ? 'Entrando…' : 'Entrar'

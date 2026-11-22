@@ -228,7 +228,7 @@ test('Google submits a full navigation POST, exchanges once with fresh CSRF and 
   await startGoogle()
   assert.equal(submitted, true)
   assert.equal(elements[0].method, 'POST')
-  assert.equal(elements[0].action, 'http://localhost:8000/api/auth/google/')
+  assert.equal(elements[0].action, 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br/api/auth/google/')
   assert.equal(elements[1].name, 'csrfmiddlewaretoken')
   assert.equal(elements[1].value, 'csrf-1')
   const [first, second] = await Promise.all([exchangeGoogleSession(), exchangeGoogleSession()])

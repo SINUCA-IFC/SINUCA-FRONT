@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const apiOrigin = (import.meta.env?.VITE_API_BASE_URL || 'http://localhost:8000')
+export const apiOrigin = (import.meta.env?.VITE_API_BASE_URL || 'https://sinuca-backend.class.fabricadesoftware.ifc.edu.br')
   .replace(/\/api\/?$/, '')
   .replace(/\/$/, '')
 export const pendingKey = 'sinuca_pending_verification'

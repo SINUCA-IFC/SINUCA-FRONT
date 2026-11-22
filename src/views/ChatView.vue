@@ -1,4 +1,5 @@
 <script setup>
+import BackButton from '@/components/layout/BackButton.vue'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
@@ -296,15 +297,12 @@ onUnmounted(() => {
       <template v-else>
         <section class="chat-panel" aria-label="Conversa com a organização">
           <div class="conversation-tools">
-            <RouterLink
+            <BackButton
               v-if="isOrganizer"
               to="/chat"
               class="back-to-delegations"
-              aria-label="Voltar às delegações"
-            >
-              <span class="mdi mdi-arrow-left" aria-hidden="true"></span>
-              Voltar
-            </RouterLink>
+              label="Voltar ao chat"
+            />
             <span class="visually-hidden">Mensagens da delegação e da organização</span>
             <button
               v-if="countryId"
@@ -468,7 +466,7 @@ onUnmounted(() => {
   min-height: 171px;
 }
 .chat-layout--organizer .chat-banner :deep(.title-area) {
-  padding: 2rem 2.375rem;
+  padding: clamp(1rem, 4vw, 2rem);
 }
 .chat-layout--organizer .chat-banner :deep(.title) {
   font-size: 1.875rem;
@@ -484,15 +482,17 @@ onUnmounted(() => {
 }
 .chat-country-flag {
   display: inline-block;
-  width: 14px;
-  height: 9px;
+  width: 30px;
+  height: 20px;
+  vertical-align: middle;
   margin-left: 0.25rem;
   border-radius: 2px;
-  object-fit: cover;
+  object-fit: contain;
 }
 .chat-banner :deep(.ods-shape) {
-  flex: 0 0 90px;
-  width: 90px;
+  flex: 0 1 25%;
+  width: 25%;
+  max-width: 90px;
   height: 163px;
   max-height: 163px;
 }
@@ -508,6 +508,7 @@ onUnmounted(() => {
 }
 .conversation-tools {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   padding: 0.25rem 0.5rem 0;
@@ -528,13 +529,7 @@ onUnmounted(() => {
   cursor: pointer;
 }
 .back-to-delegations {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 44px;
   margin-right: auto;
-  color: #01295f;
-  font-size: 0.875rem;
 }
 .refresh-button,
 .send-button {

@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 
 const emit = defineEmits(['close'])
+defineProps({ centered: Boolean })
 let previousOverflow = ''
 const modal = ref(null)
 let previousFocus
@@ -52,7 +53,7 @@ onUnmounted(() => {
 
 <template>
   <Teleport to="body">
-    <div ref="modal" class="app-modal" tabindex="-1" @keydown="keyboard">
+    <div ref="modal" class="app-modal" :class="{ centered }" tabindex="-1" @keydown="keyboard">
       <div class="background" @click="emit('close')"></div>
       <slot />
     </div>
@@ -76,6 +77,24 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.3);
   height: 100vh;
   width: 100%;
+}
+.app-modal.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.centered :deep(.modal-panel) {
+  position: relative;
+  z-index: 11;
+  width: min(640px, 100%);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 24px 80px rgb(1 29 67 / 24%);
+  border: 1px solid #e6ebf1;
 }
 
 @media (min-width: 1024px) {

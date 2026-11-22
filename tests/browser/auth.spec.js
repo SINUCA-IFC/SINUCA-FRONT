@@ -75,7 +75,7 @@ test('pending login never refreshes, closed verification offers login', async ({
   await expect(page).toHaveURL(/\/login(?:\?id=2)?$/)
   await expect(page.getByRole('alert')).toContainText('Confirme seu e-mail')
   await expect(page.getByLabel('Código de seis dígitos')).toHaveCount(0)
-  await page.getByRole('link', { name: 'Concluir cadastro' }).click()
+  await page.getByRole('link', { name: 'Clique aqui para digitar o código' }).click()
   await expect(page).toHaveURL(/cadastro\?.*etapa=email/)
   await page.getByLabel('Dígito 1 de 6', { exact: true }).fill('000000')
   await page.getByRole('button', { name: 'CONFIRMAR E-MAIL' }).click()
