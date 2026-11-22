@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 const pending = { email_verification_required: true, session_token: 'pending' }
 const jwt = { access: 'test-access', refresh: 'test-refresh' }
 async function mockApi(page, handler = () => null) {
-  await page.route('http://localhost:8000/api/**', async (route) => {
+  await page.route('**/api/**', async (route) => {
     const request = route.request()
     const path = new URL(request.url()).pathname
     const custom = await handler(path, request)
@@ -19,6 +19,8 @@ test('registration validates passwords, resumes after reload, resends, confirms 
   page,
 }) => {
   await mockApi(page, (path, request) => {
+    if (path === '/api/usuarios/me/')
+      return { body: { id: 1, name: 'Ana', role: 'organizer', country: null } }
     if (path === '/api/registro/') {
       expect(request.postDataJSON()).toEqual({
         email: 'ana@example.com',
@@ -43,6 +45,8 @@ test('registration validates passwords, resumes after reload, resends, confirms 
   await expect(page.getByRole('button', { name: 'CONTINUAR', exact: true })).toBeDisabled()
   await page.getByLabel('Confirme sua senha').fill('Password123!')
   await page.getByRole('button', { name: 'CONTINUAR', exact: true }).click()
+  await expect(page.getByLabel('Turma', { exact: true })).toHaveCount(0)
+  await expect(page.getByLabel('Matrícula', { exact: true })).toHaveCount(0)
   await page.getByLabel('Nome Completo').fill('Ana')
   await page.getByRole('button', { name: 'CADASTRAR', exact: true }).click()
   await expect(page).toHaveURL(/cadastro\?.*etapa=email/)
@@ -57,7 +61,7 @@ test('registration validates passwords, resumes after reload, resends, confirms 
   await expect(code).toHaveAttribute('autocomplete', 'one-time-code')
   await code.fill('012345')
   await page.getByRole('button', { name: 'CONFIRMAR E-MAIL' }).click()
-  await expect(page).toHaveURL(/delegacao/)
+  await expect(page).toHaveURL(/organizador/)
   expect(await page.evaluate(() => localStorage.getItem('refresh_token'))).toBe('test-refresh')
 })
 

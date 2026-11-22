@@ -22,6 +22,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['back', 'registered'])
+const profile = computed(() => getAuthProfile(props.userId))
+const isStudent = computed(() => profile.value?.role === 'student')
 const previewUrl = ref(null)
 const selectedFile = ref(null)
 
@@ -53,7 +55,11 @@ function handleImage(event) {
 
 async function register() {
   if (loading.value) return
-  if (props.userId === '2' && requirements.value[0].valid) {
+  if (!profile.value) {
+    errorMessage.value = 'Selecione um perfil válido antes de se cadastrar.'
+    return
+  }
+  if (isStudent.value && requirements.value[0].valid) {
     errorMessage.value = 'A matrícula deve ter 10 dígitos.'
     return
   }
@@ -65,10 +71,10 @@ async function register() {
       props.draft.email,
       props.draft.name.trim(),
       props.draft.password,
-      props.draft.gang,
-      props.draft.matriculation,
+      isStudent.value ? props.draft.gang : null,
+      isStudent.value ? props.draft.matriculation : '',
       selectedFile.value,
-      getAuthProfile(props.userId)?.role,
+      profile.value.role,
     )
     props.draft.password = ''
     toasts.show('Cadastro enviado. Confira o código no seu e-mail.')
@@ -81,6 +87,7 @@ async function register() {
 }
 
 onMounted(() => {
+  if (!isStudent.value) return
   gangStore.getGangs().catch((error) => {
     errorMessage.value = authError(error)
   })
@@ -117,7 +124,7 @@ onUnmounted(() => {
       required
     />
     <AppInput
-      v-if="userId === '2'"
+      v-if="isStudent"
       v-model="props.draft.matriculation"
       label="Matrícula"
       type="text"
@@ -132,12 +139,12 @@ onUnmounted(() => {
 
     <span
       style="color: #fd151b; margin-bottom: 1rem"
-      v-if="requirements[0].valid && focusMatriculation"
+      v-if="isStudent && requirements[0].valid && focusMatriculation"
     >
       <span class="mdi mdi-alert-circle-outline" />
       {{ requirements[0].requirement }}</span
     >
-    <div class="class-area">
+    <div v-if="isStudent" class="class-area">
       <label for="class" class="label-class">Turma</label>
       <select id="class" class="select-class" v-model="props.draft.gang">
         <option :value="null">Selecione uma turma (opcional)</option>

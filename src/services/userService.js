@@ -21,10 +21,11 @@ export default class UserService {
   async register(email, name, password, gang, matriculation, foto, role) {
     validateProfileEmail(email, role)
     const payload = { email, name, password, ...(role ? { role } : {}) }
-    for (const [field, value] of Object.entries({ gang, foto })) {
+    const studentFields = !role || role === 'student'
+    for (const [field, value] of Object.entries({ ...(studentFields ? { gang } : {}), foto })) {
       if (Number.isInteger(Number(value)) && Number(value) > 0) payload[field] = Number(value)
     }
-    if (matriculation) payload.matriculation = matriculation
+    if (studentFields && matriculation) payload.matriculation = matriculation
     let body = payload
     const hasPhoto = typeof File !== 'undefined' && foto instanceof File
     if (hasPhoto) {
