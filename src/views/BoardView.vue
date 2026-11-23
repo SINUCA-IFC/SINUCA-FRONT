@@ -1,4 +1,5 @@
 <script setup>
+import ModalActions from '@/components/layout/ModalActions.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { useToastStore } from '@/stores/toastStore'
@@ -83,7 +84,14 @@ onMounted(loadPosts)
         icon="mdi mdi-bulletin-board"
       />
 
-      <AppButton v-if="isOrganizer" class="new-post" @click="editPost()">Nova postagem</AppButton>
+      <AppButton
+        v-if="isOrganizer"
+        floating
+        aria-label="Nova postagem"
+        title="Nova postagem"
+        @click="editPost()"
+        ><span class="mdi mdi-plus" aria-hidden="true"></span
+      ></AppButton>
       <section class="post-list">
         <p v-if="loading" role="status">Carregando mural...</p>
         <div v-else-if="error">
@@ -125,14 +133,14 @@ onMounted(loadPosts)
             A postagem “{{ deletingPost.title }}” será excluída. Esta ação não pode ser desfeita.
           </p>
           <p v-if="deleteError" role="alert">{{ deleteError }}</p>
-          <footer>
+          <ModalActions>
             <AppButton variant="danger" :disabled="deleting" @click="deletingPost = null"
               >Cancelar</AppButton
             >
             <AppButton variant="danger" :disabled="deleting" @click="deletePost">{{
               deleting ? 'Excluindo...' : 'Excluir postagem'
             }}</AppButton>
-          </footer>
+          </ModalActions>
         </section>
       </AppModal>
     </main>
@@ -150,12 +158,6 @@ onMounted(loadPosts)
 .delete-panel h2 {
   font-size: 1.4rem;
   margin-bottom: 1rem;
-}
-.delete-panel footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.75rem;
 }
 .delete-panel [role='alert'] {
   color: #a11a20;

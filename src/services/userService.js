@@ -64,4 +64,9 @@ export default class UserService {
     const { data } = await axios.post(`/usuarios/${id}/aprovar/`, { country: countryId })
     return data
   }
+
+  async removeFromDelegation(id, countryId) {
+    const { data } = await axios.post(`/usuarios/${id}/remover-delegacao/`, { country: countryId })
+    return data
+  }
 }

@@ -14,7 +14,7 @@ const tabsFooter = computed(() =>
         { id: 1, name: 'Mural', icon: 'mdi mdi-bulletin-board', path: '/mural' },
         { id: 2, name: 'Chat', icon: 'mdi mdi-chat', path: '/chat' },
         { id: 3, name: 'História', icon: 'mdi mdi-book-open-page-variant', path: '/historia' },
-        { id: 4, name: 'Organizador', icon: 'mdi mdi-account-circle', path: '/organizador' },
+        { id: 4, name: 'Organizador', icon: 'mdi mdi-crown-outline', path: '/organizador' },
       ]
     : [
         {
@@ -38,7 +38,7 @@ const isTabActive = (path) => route.path === path || route.path.startsWith(`${pa
 </script>
 
 <template>
-  <footer :class="{ 'organizer-footer': userStore.user.role === 'organizer' }">
+  <footer>
     <nav class="nav-footer">
       <ul class="navtabs-list">
         <li
@@ -80,6 +80,7 @@ const isTabActive = (path) => route.path === path || route.path.startsWith(`${pa
 }
 footer {
   position: fixed;
+  z-index: 20;
   bottom: 0;
   right: 0;
   left: 0;
@@ -121,21 +122,5 @@ footer {
 .active a {
   color: #01295f;
   font-weight: bold;
-}
-
-.organizer-footer {
-  border-top: 0;
-}
-
-.organizer-footer .navtabs-list {
-  min-height: 110px;
-  padding-top: 1.5rem;
-  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
-}
-
-.organizer-footer .navtab-item .icon {
-  font-size: 2.1875rem;
-  line-height: 1;
-  margin-bottom: 0;
 }
 </style>

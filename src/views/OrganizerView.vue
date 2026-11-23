@@ -1,4 +1,5 @@
 <script setup>
+import ModalActions from '@/components/layout/ModalActions.vue'
 import { computed, onMounted, ref } from 'vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import BannerComponent from '@/components/layout/BannerComponent.vue'
@@ -127,8 +128,13 @@ onMounted(load)
           <h2 id="delegations-title">
             Delegações <span v-if="!loading && !error">({{ delegations.length }})</span>
           </h2>
-          <AppButton :disabled="loading || !!error" @click="openModal('add')"
-            >Adicionar delegação <span class="mdi mdi-plus" aria-hidden="true"></span
+          <AppButton
+            v-if="!loading && !error"
+            floating
+            aria-label="Adicionar delegação"
+            title="Adicionar delegação"
+            @click="openModal('add')"
+            ><span class="mdi mdi-plus" aria-hidden="true"></span
           ></AppButton>
         </div>
         <p v-if="loading" class="status" role="status">Carregando delegações...</p>
@@ -166,7 +172,7 @@ onMounted(load)
     </main>
     <AppModal v-if="modal" centered @close="closeModal">
       <section
-        class="country-modal"
+        class="modal-panel country-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="country-modal-title"
@@ -223,7 +229,7 @@ onMounted(load)
           <p v-else class="official-name">{{ selected.political_name }}</p>
         </template>
         <p v-if="actionError" class="error" role="alert">{{ actionError }}</p>
-        <footer class="modal-actions">
+        <ModalActions>
           <AppButton
             v-if="modal === 'add' && selected"
             variant="danger"
@@ -247,7 +253,7 @@ onMounted(load)
                   : 'Confirmar cadastro'
             }}</AppButton
           >
-        </footer>
+        </ModalActions>
       </section>
     </AppModal>
   </AppLayout>
@@ -275,11 +281,6 @@ onMounted(load)
 .country-modal .modal-heading {
   border-bottom: 1px solid #e8edf2;
   padding-bottom: 1rem;
-}
-.modal-actions {
-  border-top: 1px solid #e8edf2;
-  margin-top: 1rem;
-  padding-top: 0.25rem;
 }
 .organizer-content {
   display: flex;
@@ -417,12 +418,6 @@ onMounted(load)
 .country-option:hover {
   background: #edf2f8;
 }
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
 .delete-warning {
   margin-top: 1rem;
   color: #626e76;
@@ -463,6 +458,25 @@ button:focus-visible {
   .flag {
     width: 36px;
     height: 26px;
+  }
+}
+.country-card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+@media (hover: hover) {
+  .country-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgb(0 18 40 / 15%) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .country-card {
+    transition: none;
+  }
+  .country-card:hover {
+    transform: none;
   }
 }
 </style>

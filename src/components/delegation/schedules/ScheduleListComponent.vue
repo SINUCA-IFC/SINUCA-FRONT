@@ -159,4 +159,7 @@ h3 {
     line-height: 1.5;
   }
 }
+.schedule-item { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+@media (hover: hover) { .schedule-item:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgb(0 18 40 / 15%) !important; } }
+@media (prefers-reduced-motion: reduce) { .schedule-item { transition: none; } .schedule-item:hover { transform: none; } }
 </style>

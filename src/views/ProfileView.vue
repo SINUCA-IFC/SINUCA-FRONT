@@ -123,6 +123,20 @@ function profileSaved() {
   </AppLayout>
 </template>
 <style scoped>
+@media (max-width: 1023px) {
+  .page-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .page-heading > .app-back {
+    align-self: flex-start;
+    margin-top: 0;
+  }
+  .page-heading > .banner {
+    width: 100%;
+    flex: auto;
+  }
+}
 .page-heading {
   display: flex;
   align-items: center;

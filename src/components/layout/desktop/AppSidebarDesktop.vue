@@ -59,7 +59,7 @@ async function logout() {
           <RouterLink :to="panelPath" class="sidebar-item delegation-link" :aria-label="panelName">
             <span
               class="item-icon mdi"
-              :class="userStore.user.role === 'evaluator' ? 'mdi-crown-outline' : 'mdi-earth'"
+              :class="['evaluator', 'organizer'].includes(userStore.user.role) ? 'mdi-crown-outline' : 'mdi-earth'"
               aria-hidden="true"
             ></span>
             <span class="sidebar-label">{{ panelName }}</span>

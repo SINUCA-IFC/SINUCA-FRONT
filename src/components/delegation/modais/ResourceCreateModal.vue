@@ -1,4 +1,5 @@
 <script setup>
+import ModalActions from '@/components/layout/ModalActions.vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import AppModal from '@/components/layout/AppModal.vue'
 import AppInput from '@/components/forms/AppInput.vue'
@@ -235,23 +236,23 @@ async function save() {
           :categories="categories.filter((item) => [2, 3].includes(item.id))"
           :category-styles="categoryStyles"
         />
-        <footer class="form-actions">
+        <ModalActions>
           <AppButton variant="danger" @click="close">Cancelar</AppButton
           ><AppButton type="submit" :disabled="saving || loading">Adicionar</AppButton>
-        </footer>
+        </ModalActions>
       </form>
       <div v-else>
         <p>
           Confirmar o cadastro de <strong>{{ form.title }}</strong> nesta delegação?
         </p>
-        <footer class="form-actions">
+        <ModalActions>
           <AppButton variant="danger" :disabled="saving" @click="confirming = false"
             >Cancelar confirmação</AppButton
           >
           <AppButton :disabled="saving" @click="save">{{
             saving ? 'Salvando...' : 'Confirmar cadastro'
           }}</AppButton>
-        </footer>
+        </ModalActions>
       </div>
       <p v-if="error" role="alert" class="error">{{ error }}</p>
       <AppButton
@@ -318,17 +319,6 @@ select {
 .resource-panel .field {
   margin: 0;
   gap: 0.5rem;
-}
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  border-top: 1px solid #e8edf2;
-  padding-top: 1.25rem;
-  margin-top: 0.25rem;
-}
-.form-actions .app-button {
-  margin: 0;
 }
 .resource-panel header {
   padding-bottom: 1rem;

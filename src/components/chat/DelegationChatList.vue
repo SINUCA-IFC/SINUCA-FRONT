@@ -120,4 +120,7 @@ defineEmits(['retry'])
     padding-right: 1rem;
   }
 }
+.delegation-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+@media (hover: hover) { .delegation-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgb(0 18 40 / 15%) !important; } }
+@media (prefers-reduced-motion: reduce) { .delegation-card { transition: none; } .delegation-card:hover { transform: none; } }
 </style>

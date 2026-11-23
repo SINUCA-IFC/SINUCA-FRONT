@@ -9,16 +9,42 @@ defineProps({
     default: 'primary', //secondary and danger
   },
   disabled: Boolean,
+  floating: Boolean,
 })
 </script>
 
 <template>
-  <button :type="type" :disabled="disabled" :class="['app-button', `variant-${variant}`]">
+  <button
+    :type="type"
+    :disabled="disabled"
+    :class="['app-button', `variant-${variant}`, { 'app-button--floating': floating }]"
+  >
     <slot></slot>
   </button>
 </template>
 
 <style scoped>
+.app-button.app-button--floating {
+  position: fixed;
+  right: max(1.25rem, env(safe-area-inset-right));
+  bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  margin: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  box-shadow: 0 4px 14px #01295f40;
+}
+@media (min-width: 1024px) {
+  .app-button.app-button--floating {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+}
 .app-button {
   min-height: 44px;
   touch-action: manipulation;

@@ -1,4 +1,5 @@
 <script setup>
+import ModalActions from '@/components/layout/ModalActions.vue'
 import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
@@ -193,14 +194,14 @@ onBeforeRouteLeave(canClose)
             O nome deve ter no máximo 255 caracteres.
           </p>
           <p v-if="error" class="error" role="alert">{{ error }}</p>
-          <div class="form-actions">
+          <ModalActions>
             <AppButton type="submit" :disabled="!changed || !validName || saving">{{
               saving ? 'Salvando...' : 'Salvar alterações'
             }}</AppButton>
             <AppButton variant="danger" :disabled="saving" @click="requestClose"
               >Cancelar</AppButton
             >
-          </div>
+          </ModalActions>
         </fieldset>
       </form>
     </section>
@@ -296,14 +297,6 @@ h2 {
   color: #969696;
   font-size: 0.85rem;
   margin-bottom: 1.5rem;
-}
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-.form-actions > * {
-  flex: 1;
 }
 .error {
   color: #fd151b;

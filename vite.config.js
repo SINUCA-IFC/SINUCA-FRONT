@@ -60,19 +60,19 @@ export default defineConfig(({ command, mode }) => {
           start_url: '/',
           icons: [
             {
-              src: '/logo-sinuca.svg',
+              src: '/logo-app192x192.png',
               sizes: '192x192',
-              type: 'image/svg+xml',
+              type: 'image/png',
             },
             {
-              src: '/logo-sinuca.svg',
+              src: '/logo-app512x512.png',
               sizes: '512x512',
-              type: 'image/svg+xml',
+              type: 'image/png',
             },
             {
-              src: '/logo-sinuca.svg',
+              src: '/logo-app512x512.png',
               sizes: '512x512',
-              type: 'image/svg+xml',
+              type: 'image/png',
               purpose: 'maskable',
             },
           ],

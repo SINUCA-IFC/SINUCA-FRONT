@@ -1,6 +1,6 @@
 ﻿import { test, expect } from '@playwright/test'
 
-for (const width of [390, 1440]) {
+for (const width of [320, 390, 1440]) {
   test(`delegation participants and resources at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     await page.addInitScript(() => localStorage.setItem('access_token', 'test'))
@@ -25,6 +25,11 @@ for (const width of [390, 1440]) {
         student.country = countries[0]
         data = student
       }
+      if (path === '/api/usuarios/8/remover-delegacao/') {
+        expect(request.postDataJSON()).toEqual({ country: 1 })
+        student.country = null
+        data = student
+      }
       if (path === '/api/docs/') {
         if (request.method() === 'POST') {
           data = { ...request.postDataJSON(), id: 9, categories: [] }
@@ -42,8 +47,31 @@ for (const width of [390, 1440]) {
     await page.goto('/organizador/delegacoes/1')
     await page.getByRole('button', { name: 'Adicionar participante +' }).click()
     await page.getByRole('button', { name: /Ana.*ana@example.com/ }).click()
+    await page.getByRole('button', { name: 'Continuar (1)' }).click()
     await page.getByRole('button', { name: 'Confirmar', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Ana', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Remover Ana da delegação' }).click()
+    const dialog = page.getByRole('dialog')
+    const cancel = dialog.getByRole('button', { name: 'Cancelar', exact: true })
+    const confirm = dialog.getByRole('button', { name: 'Confirmar remoção' })
+    const cancelBox = await cancel.boundingBox(), confirmBox = await confirm.boundingBox()
+    expect(Math.abs(cancelBox.y - confirmBox.y)).toBeLessThan(2)
+    await page.screenshot({ path: `test-results/removal-modal-${width}.png` })
+    await cancel.click()
+    await expect(page.getByRole('heading', { name: 'Ana', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Remover Ana da delegação' }).click()
+    await confirm.click()
+    await expect(page.getByRole('heading', { name: 'Ana', exact: true })).toHaveCount(0)
+    if (width < 1024) {
+      const back = await page.getByRole('link', { name: 'Voltar ao painel' }).boundingBox()
+      const banner = await page.locator('.page-heading .banner').boundingBox()
+      expect(back.y + back.height).toBeLessThanOrEqual(banner.y)
+      await expect(page.locator('.nav-footer .mdi-crown-outline')).toBeVisible()
+      const fab = await page.locator('.app-button--floating').boundingBox()
+      const footer = await page.locator('.nav-footer').boundingBox()
+      expect(fab.y + fab.height).toBeLessThan(footer.y)
+    }
+    await page.screenshot({ path: `test-results/delegation-ui-${width}.png`, fullPage: true })
     await page.getByRole('button', { name: 'Documentos', exact: true }).click()
     await page.getByRole('button', { name: 'Adicionar documento +' }).click()
     await page.getByLabel('Nome', { exact: false }).fill('Guia do debate')

@@ -1,4 +1,5 @@
 <script setup>
+import ModalActions from '@/components/layout/ModalActions.vue'
 import { computed, onBeforeUnmount, ref } from 'vue'
 import AppModal from '@/components/layout/AppModal.vue'
 import AppButton from '@/components/forms/AppButton.vue'
@@ -100,12 +101,12 @@ onBeforeUnmount(clearPreview)
           >
         </fieldset>
         <p v-if="error" role="alert">{{ error }}</p>
-        <footer>
+        <ModalActions>
           <AppButton variant="danger" :disabled="saving" @click="close">Cancelar</AppButton>
           <AppButton type="submit" :disabled="saving">{{
             saving ? 'Salvando...' : post ? 'Salvar alterações' : 'Publicar'
           }}</AppButton>
-        </footer>
+        </ModalActions>
       </form>
     </section>
   </AppModal>
@@ -146,12 +147,6 @@ label {
 .preview {
   max-height: 240px;
   object-fit: contain;
-}
-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.75rem;
 }
 [role='alert'] {
   color: #a11a20;
