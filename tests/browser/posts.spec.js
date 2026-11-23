@@ -37,6 +37,10 @@ for (const width of [320, 1440]) {
     await page.goto('/mural')
     await page.getByRole('button', { name: 'Nova postagem' }).click()
     const dialog = page.getByRole('dialog')
+    await expect(dialog.locator('.mdi-image-plus')).toBeVisible()
+    const chooser = page.waitForEvent('filechooser')
+    await dialog.getByRole('button', { name: /Adicionar imagem/ }).click()
+    await chooser
     await page.getByLabel('Título', { exact: true }).fill('Aviso importante')
     await page.getByLabel('Descrição', { exact: true }).fill('Descrição da postagem')
     await page.getByLabel('Imagem (opcional)').setInputFiles({
@@ -48,6 +52,8 @@ for (const width of [320, 1440]) {
       ),
     })
     await expect(page.getByAltText('Prévia da imagem da postagem')).toBeVisible()
+    await expect(dialog.getByRole('button', { name: /Trocar imagem/ })).toContainText('foto.png')
+    await page.screenshot({ path: `test-results/post-image-picker-${width}.png` })
     expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
     await page.getByRole('button', { name: 'Publicar', exact: true }).click()
     await expect(dialog).toHaveCount(0)
@@ -87,4 +93,40 @@ test('student sees posts without publishing or management controls', async ({ pa
   await expect(page.getByRole('heading', { name: 'Notícia' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Nova postagem' })).toHaveCount(0)
   await expect(page.locator('.post-actions')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Ver mais' })).toHaveCount(0)
 })
+
+for (const width of [320, 1440]) {
+  test(`post descriptions expand only above 300 characters at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 })
+    const state = await setup(page, 'student')
+    const boundary = 'Texto '.repeat(50).trim() + '!'
+    const long = 'Uma descrição longa da postagem. '.repeat(40)
+    state.posts = [
+      { id: 1, title: 'Curta', content: 'Olá' },
+      { id: 2, title: 'Limite', content: boundary },
+      { id: 3, title: 'Longa', content: long },
+    ]
+    await page.goto('/mural')
+    const shortCard = page
+      .locator('.card')
+      .filter({ has: page.getByRole('heading', { name: 'Curta', exact: true }) })
+    const boundaryCard = page
+      .locator('.card')
+      .filter({ has: page.getByRole('heading', { name: 'Limite', exact: true }) })
+    const longCard = page
+      .locator('.card')
+      .filter({ has: page.getByRole('heading', { name: 'Longa', exact: true }) })
+    await expect(shortCard.locator('.toggle-btn')).toHaveCount(0)
+    await expect(boundaryCard.locator('.toggle-btn')).toHaveCount(0)
+    await expect(boundaryCard.locator('.post-desc')).toHaveText(boundary)
+    await longCard.getByRole('button', { name: 'Ver mais' }).click()
+    await expect(longCard.locator('.post-desc')).toHaveText(long.trim())
+    await expect(longCard.getByRole('button', { name: 'Ver menos' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    await longCard.getByRole('button', { name: 'Ver menos' }).click()
+    expect((await longCard.locator('.post-desc').textContent()).length).toBeLessThanOrEqual(301)
+  })
+}

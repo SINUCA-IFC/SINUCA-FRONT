@@ -1,5 +1,6 @@
+
 <script setup>
-import { ref } from 'vue'
+import { computed, ref, watch, nextTick } from 'vue'
 
 const props = defineProps({
   title: String,
@@ -16,12 +17,34 @@ function action(name) {
 }
 
 const isExpanded = ref(false)
-const textWrapref = ref(null)
+const textWrap = ref(null)
+const previewLimit = 300
+const text = computed(() => props.description?.trim() || '')
+const canExpand = computed(() => text.value.length > previewLimit)
 
-function toggle() {
+const visibleDescription = computed(() => {
+  if (!canExpand.value || isExpanded.value) return text.value
+  const excerpt = text.value.slice(0, previewLimit)
+  const lastSpace = excerpt.lastIndexOf(' ')
+  return `${lastSpace > previewLimit * 0.8 ? excerpt.slice(0, lastSpace) : excerpt}…`
+})
+
+watch(
+  () => props.description,
+  async () => {
+    isExpanded.value = false
+    await nextTick()
+    if (textWrap.value) textWrap.value.scrollTop = 0
+  },
+)
+
+async function toggle() {
   isExpanded.value = !isExpanded.value
-  if (!isExpanded.value && textWrapref.value) {
-    textWrapref.value.scrollTop = 0
+
+  await nextTick()
+
+  if (textWrap.value) {
+    textWrap.value.scrollTop = 0
   }
 }
 </script>
@@ -52,15 +75,30 @@ function toggle() {
       <span class="post-date">Postado em {{ props.date }}</span>
     </div>
 
-    <div class="text-wrap" :class="{ expanded: isExpanded }" ref="textWrapref">
-      <p class="post-desc">{{ props.description }}</p>
+    <div
+      ref="textWrap"
+      class="text-wrap"
+      :class="{
+        expanded: isExpanded,
+        'has-fade': canExpand && !isExpanded,
+      }"
+    >
+      <p class="post-desc">{{ visibleDescription }}</p>
     </div>
 
-    <button class="toggle-btn" @click="toggle">
-      {{ isExpanded ? 'Ver menos' : 'Ver mais' }}
+    <button
+      v-if="canExpand"
+      type="button"
+      class="toggle-btn"
+      :aria-expanded="isExpanded"
+      @click="toggle"
+    >
+      {{ isExpanded ? 'Ler menos' : 'Ler mais' }}
     </button>
 
-    <img class="img-post" v-if="props.imageUrl" :src="props.imageUrl" :alt="props.title" />
+    <div v-if="props.imageUrl" class="image-wrap">
+      <img class="img-post" :src="props.imageUrl" :alt="props.title" />
+    </div>
   </div>
 </template>
 
@@ -159,33 +197,36 @@ function toggle() {
   }
 }
 
-.text-wrap {
-  max-height: 90px;
-  overflow: hidden;
-  position: relative;
-  transition: max-height 0.25s ease;
-}
-
-.text-wrap.expanded {
-  max-height: 180px;
-  overflow-y: auto;
-}
-
-.text-wrap:not(.expanded)::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 28px;
-  background: linear-gradient(to bottom, transparent, #ffffff);
-}
-
 .post-desc {
+  white-space: pre-wrap;
   font-size: 0.9rem;
   text-align: justify;
   color: #525050;
   line-height: 1.3;
+}
+
+.text-wrap {
+  position: relative;
+  overflow-anchor: none;
+}
+
+.text-wrap.expanded {
+  height: 320px;
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #b5c5d8 transparent;
+}
+
+.text-wrap.has-fade::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3rem;
+  background: linear-gradient(to bottom, transparent, white);
+  pointer-events: none;
 }
 
 .toggle-btn {
@@ -193,18 +234,30 @@ function toggle() {
   background: none;
   border: none;
   padding: 0;
-  color: #01295f;
-  outline: none;
+  color: #525050;
   cursor: pointer;
   font-weight: 600;
+}
+.toggle-btn:focus-visible {
+  outline: 2px solid #01295f;
+  outline-offset: 4px;
+}
+
+.image-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 1rem;
 }
 
 .img-post {
   display: block;
-  width: 100%;
-  height: auto;
-  margin-top: 1rem;
-  border-radius: 10px;
+  width: auto;
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 12px;
 }
 
 @media (max-width: 479px) {
@@ -236,22 +289,13 @@ function toggle() {
     font-size: 0.95rem;
   }
 
-  .text-wrap {
-    max-height: 110px;
-  }
-
-  .text-wrap.expanded {
-    max-height: 240px;
-  }
-
   .post-desc {
     font-size: 1rem;
     line-height: 1.5;
   }
 
   .img-post {
-    max-height: 420px;
-    object-fit: cover;
+    max-height: 650px;
   }
 }
 </style>

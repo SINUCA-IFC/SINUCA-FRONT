@@ -3,6 +3,7 @@ import ModalActions from '@/components/layout/ModalActions.vue'
 import { computed, onBeforeUnmount, ref } from 'vue'
 import AppModal from '@/components/layout/AppModal.vue'
 import AppButton from '@/components/forms/AppButton.vue'
+import AppImageInput from '@/components/forms/AppImageInput.vue'
 import { usePostStore } from '@/stores/postStore'
 import { useUserStore } from '@/stores/userStore'
 
@@ -92,9 +93,13 @@ onBeforeUnmount(clearPreview)
           <input id="post-title" v-model="title" maxlength="200" required />
           <label for="post-content">Descrição</label>
           <textarea id="post-content" v-model="content" rows="6" required></textarea>
-          <label for="post-image">Imagem (opcional)</label>
-          <input id="post-image" type="file" accept="image/jpeg,image/png" @change="selectImage" />
-          <p class="hint">JPG ou PNG, até 5 MB.</p>
+          <span class="image-label">Imagem (opcional)</span>
+          <AppImageInput
+            :disabled="saving"
+            :file-name="file?.name"
+            :has-image="!!photo"
+            @change="selectImage"
+          />
           <img v-if="photo" :src="photo" alt="Prévia da imagem da postagem" class="preview" />
           <AppButton v-if="file" variant="secondary" @click="removePhoto"
             >Cancelar seleção da imagem</AppButton
@@ -135,7 +140,8 @@ textarea {
 textarea {
   resize: vertical;
 }
-label {
+label,
+.image-label {
   margin-top: 0.5rem;
   line-height: 1.5;
 }

@@ -257,7 +257,7 @@ watch(
           {{ confirmingParticipants ? 'Adicionando participantes...' : 'Carregando...' }}
         </p>
         <template v-if="confirmingParticipants"
-          ><p>
+          ><p >
             Adicionar {{ selectedParticipants.length }} participante(s) à delegação de
             {{ country.name }}?
           </p>
@@ -293,7 +293,7 @@ watch(
           </ul>
           <p v-if="!saving && !available.length">Nenhum discente disponível.</p></template
         >
-        <p v-if="!confirmingParticipants" role="status">
+        <p v-if="!confirmingParticipants" role="status" style="margin-top: 1rem;">
           {{ selectedIds.length }} participante(s) selecionado(s)
         </p>
         <p v-if="modalError" role="alert">{{ modalError }}</p>
