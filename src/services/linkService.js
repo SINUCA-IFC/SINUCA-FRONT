@@ -13,10 +13,6 @@ export default class LinkService {
         const { data } = await axios.post('/docs/', link);
         return data;
     }
-    async updateLink(id, link) {
-        const { data } = await axios.patch(`/docs/${id}/`, link);
-        return data;
-    }
     async deleteLink(id) {
         await axios.delete(`/docs/${id}/`);
     }

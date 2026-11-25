@@ -24,9 +24,6 @@ export const useUserStore = defineStore('auth', () => {
   const user = ref(getDefaultUser())
   const loggedIn = ref(false)
   const users = ref([])
-  const pendingUsers = ref([])
-  const loading = ref(false)
-  const userType = ref()
 
   let authVersion = 0
   async function completeLogin(data) {
@@ -78,7 +75,6 @@ export const useUserStore = defineStore('auth', () => {
     authVersion++
     user.value = getDefaultUser()
     users.value = []
-    pendingUsers.value = []
     loggedIn.value = false
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
@@ -112,24 +108,7 @@ export const useUserStore = defineStore('auth', () => {
   }
 
   async function getAllUsers() {
-    loading.value = true
-    try {
-      users.value = await getAllPages((page) => userService.getUsers(page))
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function getPendingUsers(page = 1) {
-    const data = await userService.getPendingUsers(page)
-    pendingUsers.value = data.results
-    return data
-  }
-
-  async function approveUser(id, countryId) {
-    const approved = await userService.approveUser(id, countryId)
-    pendingUsers.value = pendingUsers.value.filter((user) => String(user.id) !== String(id))
-    return approved
+    users.value = await getAllPages((page) => userService.getUsers(page))
   }
 
   function uploadImage(file, description, skipAuth = false) {
@@ -151,8 +130,6 @@ export const useUserStore = defineStore('auth', () => {
     user,
     loggedIn,
     users,
-    pendingUsers,
-    loading,
     completeLogin,
     clearLocal,
     login,
@@ -160,9 +137,6 @@ export const useUserStore = defineStore('auth', () => {
     logout,
     checkAuth,
     getAllUsers,
-    getPendingUsers,
-    approveUser,
-    userType,
     uploadImage,
     updateProfile,
   }

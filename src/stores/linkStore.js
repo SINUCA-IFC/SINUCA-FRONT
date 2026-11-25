@@ -8,13 +8,6 @@ const linkService = new LinkService()
 
 export const useLinkStore = defineStore('link', () => {
   const links = ref([])
-  const link = ref({
-    name: '',
-    url: '',
-    country: 0,
-    categories: [],
-  })
-
   const loading = ref(false)
 
   async function getLinks() {
@@ -26,21 +19,9 @@ export const useLinkStore = defineStore('link', () => {
     }
   }
 
-  async function getLink(id) {
-    link.value = await linkService.getLink(id)
-  }
-
   async function createLink(newLink) {
     const createdLink = await linkService.createLink(newLink)
     links.value.push(createdLink)
-  }
-
-  async function updateLink(id, updatedLink) {
-    const updated = await linkService.updateLink(id, updatedLink)
-    const index = links.value.findIndex((t) => t.id === id)
-    if (index !== -1) {
-      links.value[index] = updated
-    }
   }
 
   async function deleteLink(id) {
@@ -50,12 +31,9 @@ export const useLinkStore = defineStore('link', () => {
 
   return {
     links,
-    link,
     loading,
     getLinks,
-    getLink,
     createLink,
-    updateLink,
     deleteLink,
   }
 })

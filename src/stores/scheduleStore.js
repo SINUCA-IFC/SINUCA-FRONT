@@ -8,18 +8,6 @@ const scheduleService = new ScheduleService()
 
 export const useScheduleStore = defineStore('schedule', () => {
   const schedules = ref([])
-  const schedule = ref({
-    category: 1,
-    title: 'string',
-    startDate: '2026-08-12T18:49:50.611Z',
-    endDate: '2026-08-12T18:49:50.611Z',
-    location: 'string',
-    description: 'string',
-    tipo: 1,
-    country: [0],
-    docs: [0],
-  })
-
   const loading = ref(false)
 
   async function getSchedules() {
@@ -29,10 +17,6 @@ export const useScheduleStore = defineStore('schedule', () => {
     } finally {
       loading.value = false
     }
-  }
-
-  async function getSchedule(id) {
-    schedule.value = await scheduleService.getSchedule(id)
   }
 
   async function createSchedule(newSchedule) {
@@ -56,9 +40,7 @@ export const useScheduleStore = defineStore('schedule', () => {
   return {
     loading,
     schedules,
-    schedule,
     getSchedules,
-    getSchedule,
     createSchedule,
     updateSchedule,
     deleteSchedule,

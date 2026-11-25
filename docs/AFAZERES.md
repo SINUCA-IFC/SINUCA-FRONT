@@ -1,5 +1,7 @@
 # Afazeres do SINUCA
 
+> Registro histórico de 11/11/2026. Vários itens já foram implementados. Para a situação consolidada de 25/11/2026 e o escopo futuro de avaliador/notas, consultar a [passagem de bastão](PASSAGEM-DE-BASTAO.md).
+
 Atualizado em 11/11/2026. Esta lista registra trabalho futuro e identifica as correções já concluídas.
 
 ## Ordem de trabalho durante o desenvolvimento

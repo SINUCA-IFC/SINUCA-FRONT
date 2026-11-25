@@ -8,16 +8,6 @@ export default class UserService {
     return response.data
   }
 
-  async refreshToken(refresh) {
-    const response = await axios.post('/token/refresh/', { refresh })
-    return response.data
-  }
-
-  async verifyToken(token) {
-    const { data } = await axios.post('/token/verify/', { token }, { skipAuth: true })
-    return data
-  }
-
   async register(email, name, password, gang, matriculation, foto, role) {
     validateProfileEmail(email, role)
     const payload = { email, name, password, ...(role ? { role } : {}) }
