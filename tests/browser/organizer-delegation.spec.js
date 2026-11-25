@@ -1,4 +1,4 @@
-﻿import { test, expect } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
 for (const width of [320, 390, 1440]) {
   test(`delegation participants and resources at ${width}px`, async ({ page }) => {
@@ -8,7 +8,14 @@ for (const width of [320, 390, 1440]) {
       { id: 1, name: 'Brasil', political_name: 'República Federativa do Brasil' },
       { id: 2, name: 'Chile' },
     ]
-    const student = { id: 8, name: 'Ana', email: 'ana@example.com', role: 'student', country: null }
+    const student = {
+      id: 8,
+      name: 'Ana',
+      email: 'ana@example.com',
+      role: 'student',
+      country: null,
+      gang: { id: 4, name: '1INFO' },
+    }
     const docs = [],
       schedules = []
     await page.route('**/api/**', async (route) => {
@@ -18,6 +25,7 @@ for (const width of [320, 390, 1440]) {
       if (path === '/api/usuarios/me/') data = { id: 7, name: 'Organizador', role: 'organizer' }
       if (path === '/api/paises/1') data = countries[0]
       if (path === '/api/paises/') data.results = countries
+      if (path === '/api/turmas/') data.results = [{ id: 4, name: '1INFO' }]
       if (path === '/api/usuarios/') data.results = [student]
       if (path === '/api/usuarios/pendentes/') data.results = student.country ? [] : [student]
       if (path === '/api/usuarios/8/aprovar/') {
@@ -46,6 +54,7 @@ for (const width of [320, 390, 1440]) {
     })
     await page.goto('/organizador/delegacoes/1')
     await page.getByRole('button', { name: 'Adicionar participante +' }).click()
+    await page.getByRole('button', { name: '1INFO', exact: true }).click()
     await page.getByRole('button', { name: /Ana.*ana@example.com/ }).click()
     await page.getByRole('button', { name: 'Continuar (1)' }).click()
     await page.getByRole('button', { name: 'Confirmar', exact: true }).click()
@@ -54,7 +63,8 @@ for (const width of [320, 390, 1440]) {
     const dialog = page.getByRole('dialog')
     const cancel = dialog.getByRole('button', { name: 'Cancelar', exact: true })
     const confirm = dialog.getByRole('button', { name: 'Confirmar remoção' })
-    const cancelBox = await cancel.boundingBox(), confirmBox = await confirm.boundingBox()
+    const cancelBox = await cancel.boundingBox(),
+      confirmBox = await confirm.boundingBox()
     expect(Math.abs(cancelBox.y - confirmBox.y)).toBeLessThan(2)
     await page.screenshot({ path: `test-results/removal-modal-${width}.png` })
     await cancel.click()

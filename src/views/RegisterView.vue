@@ -9,12 +9,12 @@ const route = useRoute()
 const router = useRouter()
 const currentStep = ref(1)
 const checkingEmail = computed(() => route.query.etapa === 'email')
-const draft = reactive({ email: '', password: '', name: '', gang: null, matriculation: '' })
+const draft = reactive({ email: '', password: '', name: '', gang: '', matriculation: '' })
 watch(
   () => route.query.id,
   () => {
     currentStep.value = 1
-    Object.assign(draft, { email: '', password: '', name: '', gang: null, matriculation: '' })
+    Object.assign(draft, { email: '', password: '', name: '', gang: '', matriculation: '' })
   },
 )
 </script>
