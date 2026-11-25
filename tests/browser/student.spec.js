@@ -24,7 +24,7 @@ async function mockStudent(page, handler = () => null) {
     localStorage.setItem('access_token', 'test-access')
     localStorage.setItem('refresh_token', 'test-refresh')
   })
-  await page.route('http://localhost:8000/api/**', async (route) => {
+  await page.route('**/api/**', async (route) => {
     const request = route.request(),
       path = new URL(request.url()).pathname
     const custom = await handler(path, request)
@@ -55,7 +55,7 @@ test('six digits support typing, correction, paste, errors and successful confir
     ),
   )
   let attempts = 0
-  await page.route('http://localhost:8000/api/**', async (route) => {
+  await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname
     if (path.endsWith('/confirmar-email/')) {
       attempts++

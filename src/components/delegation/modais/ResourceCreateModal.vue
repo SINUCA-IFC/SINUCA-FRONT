@@ -9,8 +9,9 @@ import { useScheduleStore } from '@/stores/scheduleStore'
 import { useLinkStore } from '@/stores/linkStore'
 import { useCountryStore } from '@/stores/countryStore'
 import { useToastStore } from '@/stores/toastStore'
+import ScheduleService from '@/services/scheduleService'
 
-const props = defineProps({ kind: String, countryId: Number })
+const props = defineProps({ kind: String, countryId: Number, scheduleId: [String, Number] })
 const emit = defineEmits(['close'])
 const schedules = useScheduleStore(),
   links = useLinkStore(),
@@ -19,12 +20,29 @@ const saving = ref(false),
   error = ref(''),
   confirming = ref(false),
   loading = ref(false)
+const loadError = ref('')
+const original = ref(null)
+const isEditing = computed(() => props.kind === 'schedule' && props.scheduleId != null)
+const dateFields = (value) => {
+  const date = new Date(value)
+  const pad = (part) => String(part).padStart(2, '0')
+  return {
+    date: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+    time: `${pad(date.getHours())}:${pad(date.getMinutes())}`,
+  }
+}
+const multiDay = computed(
+  () =>
+    original.value &&
+    dateFields(original.value.startDate).date !== dateFields(original.value.endDate).date,
+)
 const form = reactive({
   title: '',
   description: '',
   url: '',
   category: 2,
   date: '',
+  endDate: '',
   start: '',
   end: '',
   location: '',
@@ -62,12 +80,21 @@ const categoryStyles = {
     activeStyle: 'background:#fff7e3;color:#795400;border-color:#d69a00',
   },
 }
+const scheduleCountries = computed(() => {
+  if (original.value && Number(original.value.category) === form.category) {
+    const ids = original.value.country.map((country) => Number(country.id ?? country))
+    if (form.category !== 2 || !form.opponent) return ids
+    const previousOpponent = ids.find((id) => id !== props.countryId)
+    if (previousOpponent == null) return [...ids, Number(form.opponent)]
+    return [...new Set(ids.map((id) => (id === previousOpponent ? Number(form.opponent) : id)))]
+  }
+  return [props.countryId, ...(form.category === 2 && form.opponent ? [Number(form.opponent)] : [])]
+})
 const eligibleDocs = computed(() =>
   links.links.filter((doc) =>
-    [
-      props.countryId,
-      ...(form.category === 2 && form.opponent ? [Number(form.opponent)] : []),
-    ].every((id) => doc.country?.some((country) => Number(country.id ?? country) === id)),
+    scheduleCountries.value.every((id) =>
+      doc.country?.some((country) => Number(country.id ?? country) === id),
+    ),
   ),
 )
 function close() {
@@ -76,10 +103,36 @@ function close() {
 async function load() {
   loading.value = true
   error.value = ''
+  loadError.value = ''
   try {
-    await Promise.all([countries.getCountrys(), links.getLinks()])
+    const [, , schedule] = await Promise.all([
+      countries.getCountrys(),
+      links.getLinks(),
+      isEditing.value ? new ScheduleService().getSchedule(props.scheduleId) : null,
+    ])
+    if (schedule) {
+      original.value = schedule
+      Object.assign(form, {
+        title: schedule.title,
+        description: schedule.description,
+        category: Number(schedule.category),
+        date: dateFields(schedule.startDate).date,
+        endDate: dateFields(schedule.endDate).date,
+        start: dateFields(schedule.startDate).time,
+        end: dateFields(schedule.endDate).time,
+        location: schedule.location || '',
+        opponent:
+          (schedule.country || [])
+            .map((country) => Number(country.id ?? country))
+            .find((id) => id !== props.countryId) ?? '',
+        tipo: schedule.tipo ?? null,
+        docs: (schedule.docs || []).map((doc) => doc.id ?? doc),
+      })
+    }
   } catch {
-    error.value = 'Não foi possível carregar as opções. Tente novamente.'
+    loadError.value = isEditing.value
+      ? 'Não foi possível carregar o cronograma. Tente novamente.'
+      : 'Não foi possível carregar as opções. Tente novamente.'
   } finally {
     loading.value = false
   }
@@ -88,15 +141,37 @@ onMounted(() => {
   if (props.kind === 'schedule') load()
 })
 function review() {
+  if (loading.value || loadError.value || saving.value) return
   error.value = ''
-  if (props.kind === 'schedule' && form.category !== 1 && form.end <= form.start) {
+  if (
+    props.kind === 'schedule' &&
+    ((multiDay.value && form.endDate < form.date) ||
+      (form.category !== 1 &&
+        (!multiDay.value || form.endDate === form.date) &&
+        form.end <= form.start))
+  ) {
     error.value = 'O horário final deve ser posterior ao inicial.'
     return
   }
   confirming.value = true
 }
+function scheduleDate(edge) {
+  const date = edge === 'start' || !multiDay.value ? form.date : form.endDate
+  const time = form.category === 1 ? (edge === 'start' ? '00:00' : '23:59') : form[edge]
+  if (original.value) {
+    const value = original.value[`${edge}Date`]
+    const previous = dateFields(value)
+    if (
+      date === previous.date &&
+      Number(original.value.category) === form.category &&
+      (form.category === 1 || form[edge] === previous.time)
+    )
+      return value
+  }
+  return new Date(`${date}T${time}`).toISOString()
+}
 async function save() {
-  if (saving.value) return
+  if (saving.value || loading.value || loadError.value) return
   saving.value = true
   error.value = ''
   try {
@@ -111,21 +186,38 @@ async function save() {
         category: form.category,
       })
     } else {
-      const start = form.category === 1 ? '00:00' : form.start
-      const end = form.category === 1 ? '23:59' : form.end
-      await schedules.createSchedule({
+      const payload = {
         title: form.title.trim(),
         description: form.description.trim(),
         category: form.category,
-        startDate: new Date(`${form.date}T${start}`).toISOString(),
-        endDate: new Date(`${form.date}T${end}`).toISOString(),
-        location: form.category === 1 ? '' : form.location.trim(),
-        tipo: form.category === 4 ? Number(form.tipo) : null,
-        country: [props.countryId, ...(form.category === 2 ? [Number(form.opponent)] : [])],
-        docs: form.docs.filter((id) => eligibleDocs.value.some((doc) => doc.id === id)),
-      })
+        startDate: scheduleDate('start'),
+        endDate: scheduleDate('end'),
+        location:
+          form.category === 1
+            ? Number(original.value?.category) === 1
+              ? original.value.location
+              : ''
+            : form.location.trim(),
+        tipo:
+          form.category === 4
+            ? form.tipo == null
+              ? null
+              : Number(form.tipo)
+            : Number(original.value?.category) === form.category
+              ? original.value.tipo
+              : null,
+        country: scheduleCountries.value,
+        docs: form.docs.filter((id) =>
+          eligibleDocs.value.some((doc) => String(doc.id) === String(id)),
+        ),
+      }
+      if (isEditing.value) await schedules.updateSchedule(props.scheduleId, payload)
+      else await schedules.createSchedule(payload)
     }
-    useToastStore().show('Cadastro concluído.', 'success')
+    useToastStore().show(
+      isEditing.value ? 'Cronograma atualizado.' : 'Cadastro concluído.',
+      'success',
+    )
     emit('close')
   } catch (cause) {
     error.value = cause.response
@@ -146,14 +238,20 @@ async function save() {
     >
       <header>
         <h2 id="resource-title">
-          {{ kind === 'document' ? 'Novo documento' : 'Novo Cronograma' }}
+          {{
+            kind === 'document'
+              ? 'Novo documento'
+              : isEditing
+                ? 'Editar cronograma'
+                : 'Novo Cronograma'
+          }}
         </h2>
         <AppButton variant="secondary" aria-label="Fechar" :disabled="saving" @click="close"
           ><span class="mdi mdi-close" aria-hidden="true"></span
         ></AppButton>
       </header>
       <p v-if="loading" role="status">Carregando opções...</p>
-      <form v-if="!confirming" @submit.prevent="review">
+      <form v-if="!loading && !loadError && !confirming" @submit.prevent="review">
         <AppInput
           v-model="form.title"
           :label="kind === 'document' ? 'Nome' : 'Tema'"
@@ -209,7 +307,20 @@ async function save() {
             />
           </div>
           <div class="two-columns">
-            <AppInput v-model="form.date" label="Data" type="date" required /><AppInput
+            <AppInput
+              v-model="form.date"
+              :label="multiDay ? 'Data inicial' : 'Data'"
+              type="date"
+              required
+            />
+            <AppInput
+              v-if="multiDay"
+              v-model="form.endDate"
+              label="Data final"
+              type="date"
+              required
+            />
+            <AppInput
               v-if="form.category !== 1"
               v-model="form.location"
               label="Local"
@@ -218,7 +329,10 @@ async function save() {
             />
           </div>
           <label v-if="form.category === 4" class="field"
-            >Categoria de apresentação *<select v-model="form.tipo" required>
+            >Categoria de apresentação<select v-model="form.tipo" :required="!isEditing">
+              <option v-if="isEditing && original?.tipo == null" :value="null">
+                Não informado
+              </option>
               <option :value="1">Dança Típica</option>
               <option :value="2">Comida Típica</option>
             </select></label
@@ -238,28 +352,29 @@ async function save() {
         />
         <ModalActions>
           <AppButton variant="danger" @click="close">Cancelar</AppButton
-          ><AppButton type="submit" :disabled="saving || loading">Adicionar</AppButton>
+          ><AppButton type="submit" :disabled="saving || loading">{{
+            isEditing ? 'Salvar alterações' : 'Adicionar'
+          }}</AppButton>
         </ModalActions>
       </form>
-      <div v-else>
+      <div v-else-if="confirming">
         <p>
-          Confirmar o cadastro de <strong>{{ form.title }}</strong> nesta delegação?
+          {{ isEditing ? 'Confirmar as alterações de' : 'Confirmar o cadastro de' }}
+          <strong>{{ form.title }}</strong> nesta delegação?
         </p>
         <ModalActions>
           <AppButton variant="danger" :disabled="saving" @click="confirming = false"
             >Cancelar confirmação</AppButton
           >
           <AppButton :disabled="saving" @click="save">{{
-            saving ? 'Salvando...' : 'Confirmar cadastro'
+            saving ? 'Salvando...' : isEditing ? 'Confirmar alterações' : 'Confirmar cadastro'
           }}</AppButton>
         </ModalActions>
       </div>
       <p v-if="error" role="alert" class="error">{{ error }}</p>
-      <AppButton
-        v-if="error && kind === 'schedule' && !confirming"
-        variant="secondary"
-        @click="load"
-        >Recarregar opções</AppButton
+      <p v-if="loadError" role="alert" class="error">{{ loadError }}</p>
+      <AppButton v-if="loadError && !loading" variant="secondary" @click="load"
+        >Tentar novamente</AppButton
       >
     </section>
   </AppModal>

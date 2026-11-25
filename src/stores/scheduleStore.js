@@ -42,7 +42,7 @@ export const useScheduleStore = defineStore('schedule', () => {
 
   async function updateSchedule(id, updatedSchedule) {
     const updated = await scheduleService.updateSchedule(id, updatedSchedule)
-    const index = schedules.value.findIndex((t) => t.id === id)
+    const index = schedules.value.findIndex((t) => String(t.id) === String(id))
     if (index !== -1) {
       schedules.value[index] = updated
     }
@@ -50,7 +50,7 @@ export const useScheduleStore = defineStore('schedule', () => {
 
   async function deleteSchedule(id) {
     await scheduleService.deleteSchedule(id)
-    schedules.value = schedules.value.filter((t) => t.id !== id)
+    schedules.value = schedules.value.filter((t) => String(t.id) !== String(id))
   }
 
   return {
