@@ -8,7 +8,7 @@ import { useToastStore } from '@/stores/toastStore'
 const error = ref('')
 
 const scheduleStore = useScheduleStore()
-const props = defineProps({ countryId: [String, Number] })
+const props = defineProps({ countryId: [String, Number], manageable: Boolean })
 const schedules = computed(() =>
   scheduleStore.schedules.filter(
     (item) =>
@@ -17,7 +17,7 @@ const schedules = computed(() =>
   ),
 )
 
-const emit = defineEmits(['openDetails'])
+const emit = defineEmits(['openDetails', 'edit', 'remove'])
 
 async function loadSchedules() {
   error.value = ''
@@ -47,49 +47,67 @@ function openSchedule(scheduleId) {
     </div>
     <p v-else-if="!schedules.length">Nenhuma atividade no cronograma por enquanto.</p>
     <ul v-else>
-      <li
-        v-for="s in schedules"
-        :key="s.id"
-        class="schedule-item"
-        role="button"
-        tabindex="0"
-        @click="openSchedule(String(s.id))"
-        @keydown.enter="openSchedule(String(s.id))"
-        @keydown.space.prevent="openSchedule(String(s.id))"
-      >
-        <div class="header-schedule">
-          <span style="color: #969696" v-if="s.category == '1'" class="mdi mdi-instagram">
-            Postagem
-          </span>
+      <li v-for="s in schedules" :key="s.id" class="schedule-item">
+        <div
+          class="schedule-details-trigger"
+          role="button"
+          tabindex="0"
+          @click="openSchedule(String(s.id))"
+          @keydown.enter="openSchedule(String(s.id))"
+          @keydown.space.prevent="openSchedule(String(s.id))"
+        >
+          <div class="header-schedule">
+            <span style="color: #969696" v-if="s.category == '1'" class="mdi mdi-instagram">
+              Postagem
+            </span>
 
-          <span style="color: #969696" v-else-if="s.category == '2'" class="mdi mdi-forum-outline">
-            Debate
-          </span>
-
-          <span
-            style="color: #969696"
-            v-else-if="s.category == '3'"
-            class="mdi mdi-handshake-outline"
-          >
-            Mesa de cooperação
-          </span>
-
-          <span style="color: #969696" v-else-if="s.category == '4'" class="mdi mdi-drama-masks">
-            Apresentação cultural
-          </span>
-
-          <p style="font-weight: 500">
             <span
-              class="mdi mdi-calendar-blank"
-              style="font-size: 1.05rem; white-space: nowrap"
-            ></span>
-            {{ formatDate(s.endDate) }}
-          </p>
+              style="color: #969696"
+              v-else-if="s.category == '2'"
+              class="mdi mdi-forum-outline"
+            >
+              Debate
+            </span>
+
+            <span
+              style="color: #969696"
+              v-else-if="s.category == '3'"
+              class="mdi mdi-handshake-outline"
+            >
+              Mesa de cooperação
+            </span>
+
+            <span style="color: #969696" v-else-if="s.category == '4'" class="mdi mdi-drama-masks">
+              Apresentação cultural
+            </span>
+
+            <p style="font-weight: 500">
+              <span
+                class="mdi mdi-calendar-blank"
+                style="font-size: 1.05rem; white-space: nowrap"
+              ></span>
+              {{ formatDate(s.endDate) }}
+            </p>
+          </div>
+          <h3>
+            {{ s.title }}
+          </h3>
+          <p style="font-size: 1rem; color: #969696">Clique para ver mais detalhes.</p>
         </div>
-        <h3>
-          {{ s.title }}
-        </h3>
-        <p style="font-size: 1rem; color: #969696">Clique para ver mais detalhes.</p>
+        <div v-if="manageable" class="schedule-actions">
+          <AppButton
+            variant="secondary"
+            :aria-label="`Editar cronograma ${s.title}`"
+            @click="emit('edit', s)"
+            >Editar</AppButton
+          >
+          <AppButton
+            variant="danger"
+            :aria-label="`Remover cronograma ${s.title}`"
+            @click="emit('remove', s)"
+            >Remover</AppButton
+          >
+        </div>
       </li>
     </ul>
   </section>
@@ -114,9 +132,17 @@ li:active {
   background-color: #fff;
   border-radius: 0.8rem;
 }
-.schedule-item:focus-visible {
+.schedule-details-trigger:focus-visible {
   outline: 3px solid #01295f;
   outline-offset: 3px;
+}
+.schedule-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.schedule-actions .app-button {
+  padding-inline: 1rem;
 }
 
 .schedule-item:has(.mdi-instagram) {
@@ -159,7 +185,23 @@ h3 {
     line-height: 1.5;
   }
 }
-.schedule-item { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-@media (hover: hover) { .schedule-item:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgb(0 18 40 / 15%) !important; } }
-@media (prefers-reduced-motion: reduce) { .schedule-item { transition: none; } .schedule-item:hover { transform: none; } }
+.schedule-item {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+@media (hover: hover) {
+  .schedule-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgb(0 18 40 / 15%) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .schedule-item {
+    transition: none;
+  }
+  .schedule-item:hover {
+    transform: none;
+  }
+}
 </style>

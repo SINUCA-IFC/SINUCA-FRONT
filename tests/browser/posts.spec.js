@@ -93,7 +93,7 @@ test('student sees posts without publishing or management controls', async ({ pa
   await expect(page.getByRole('heading', { name: 'Notícia' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Nova postagem' })).toHaveCount(0)
   await expect(page.locator('.post-actions')).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Ver mais' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Ler mais' })).toHaveCount(0)
 })
 
 for (const width of [320, 1440]) {
@@ -120,13 +120,13 @@ for (const width of [320, 1440]) {
     await expect(shortCard.locator('.toggle-btn')).toHaveCount(0)
     await expect(boundaryCard.locator('.toggle-btn')).toHaveCount(0)
     await expect(boundaryCard.locator('.post-desc')).toHaveText(boundary)
-    await longCard.getByRole('button', { name: 'Ver mais' }).click()
+    await longCard.getByRole('button', { name: 'Ler mais' }).click()
     await expect(longCard.locator('.post-desc')).toHaveText(long.trim())
-    await expect(longCard.getByRole('button', { name: 'Ver menos' })).toHaveAttribute(
+    await expect(longCard.getByRole('button', { name: 'Ler menos' })).toHaveAttribute(
       'aria-expanded',
       'true',
     )
-    await longCard.getByRole('button', { name: 'Ver menos' }).click()
+    await longCard.getByRole('button', { name: 'Ler menos' }).click()
     expect((await longCard.locator('.post-desc').textContent()).length).toBeLessThanOrEqual(301)
   })
 }

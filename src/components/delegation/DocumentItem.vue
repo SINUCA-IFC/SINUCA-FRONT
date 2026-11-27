@@ -1,8 +1,11 @@
 ﻿<script setup>
 import { computed } from 'vue'
+import AppButton from '@/components/forms/AppButton.vue'
+const emit = defineEmits(['remove'])
 const props = defineProps({
   title: String,
   link: String,
+  removable: Boolean,
   category: {
     type: String,
     default: 'debate',
@@ -19,25 +22,50 @@ const safeLink = computed(() => {
 </script>
 
 <template>
-  <a
-    :href="safeLink"
-    target="_blank"
-    rel="noopener noreferrer"
-    :aria-disabled="!safeLink || undefined"
-    :class="['docs-card', props.category]"
-  >
-    <div class="docs-main">
-      <span class="docs-icon mdi mdi-link-variant" aria-hidden="true"></span>
-      <div class="docs-content">
-        <h6 class="docs-title">{{ props.title }}</h6>
-        <span class="docs-link">{{ props.link }}</span>
+  <div class="document-item">
+    <a
+      :href="safeLink"
+      target="_blank"
+      rel="noopener noreferrer"
+      :aria-disabled="!safeLink || undefined"
+      :class="['docs-card', props.category]"
+    >
+      <div class="docs-main">
+        <span class="docs-icon mdi mdi-link-variant" aria-hidden="true"></span>
+        <div class="docs-content">
+          <h6 class="docs-title">{{ props.title }}</h6>
+          <span class="docs-link">{{ props.link }}</span>
+        </div>
       </div>
-    </div>
-    <span class="docs-open mdi mdi-open-in-new"></span>
-  </a>
+      <span class="docs-open mdi mdi-open-in-new"></span>
+    </a>
+    <AppButton
+      v-if="removable"
+      class="remove-document"
+      variant="danger"
+      :aria-label="`Remover documento ${title}`"
+      @click="emit('remove')"
+      >Remover</AppButton
+    >
+  </div>
 </template>
 
 <style scoped>
+.document-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.document-item .docs-card {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+.remove-document {
+  margin: 0;
+  padding-inline: 1rem;
+}
 .docs-card {
   display: flex;
   justify-content: space-between;

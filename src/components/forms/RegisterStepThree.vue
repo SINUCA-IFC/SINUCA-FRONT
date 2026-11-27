@@ -63,6 +63,13 @@ async function register() {
     errorMessage.value = 'A matrícula deve ter 10 dígitos.'
     return
   }
+  if (
+    isStudent.value &&
+    !gangStore.gangs.some((gang) => String(gang.id) === String(props.draft.gang))
+  ) {
+    errorMessage.value = 'Selecione uma turma para se cadastrar.'
+    return
+  }
   loading.value = true
   errorMessage.value = ''
 
@@ -146,8 +153,8 @@ onUnmounted(() => {
     >
     <div v-if="isStudent" class="class-area">
       <label for="class" class="label-class">Turma</label>
-      <select id="class" class="select-class" v-model="props.draft.gang">
-        <option :value="null">Selecione uma turma (opcional)</option>
+      <select id="class" class="select-class" v-model="props.draft.gang" required>
+        <option value="" disabled>Selecione uma turma</option>
         <option
           v-for="c in gangStore.gangs"
           :key="c.id"

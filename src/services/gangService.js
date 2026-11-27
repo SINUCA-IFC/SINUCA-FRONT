@@ -5,8 +5,4 @@ export default class GangService{
         const {data} = await axios.get('/turmas/', { params: { page } });
         return data;
     }
-    async getGang(id){
-        const {data} = await axios.get(`turmas/${id}`);
-        return data;
-    }
 }

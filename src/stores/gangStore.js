@@ -13,13 +13,8 @@ export const useGangStore = defineStore('gang', () => {
         gangs.value = await getAllPages(page => gangService.getGangs(page));
     }
 
-    async function getGang(id) {
-        return await gangService.getGang(id);
-    }
-
     return {
         gangs,
-        getGangs,
-        getGang
+        getGangs
     }
 });

@@ -9,8 +9,6 @@ const categoryService = new CategoryService();
 
 export const UseCategoryStore = defineStore('categoria', () => {
     const categories = ref([]);
-    const category = ref();
-    const loading = ref(false);
 
     const categoriesStyle = {
         2: { icon: 'mdi mdi-book-open-page-variant-outline', activeStyle: 'background-color: #FFB30F;', },
@@ -27,20 +25,13 @@ export const UseCategoryStore = defineStore('categoria', () => {
 
 
     async function getCategories() {
-        loading.value = true
-        try {
-            categories.value = await getAllPages(page => categoryService.getAllCategorys(page));
-        }
-        finally {
-            loading.value = false
-        }
+        categories.value = await getAllPages(page => categoryService.getAllCategorys(page));
     }
 
     return {
         getCategories,
         getCategoryActive,
         categories,
-        category,
         categoriesStyle,
     }
 });

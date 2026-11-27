@@ -8,7 +8,7 @@
 - “Marcar como não lida” volta a última mensagem recebida ao estado de não lida e fecha a conversa. Se já houver outras não lidas, mantém todas. O organizador volta à lista; o aluno volta ao mural. Isso evita que a conversa aberta confirme a leitura novamente.
 - A lista mostra primeiro as delegações com mensagens não lidas. Dentro de cada grupo, a conversa mais recente aparece primeiro. Delegações sem mensagens ficam no final.
 - Alunos acessam somente sua delegação. Os organizadores acessam todas. Pendentes e avaliadores continuam sem acesso ao chat.
-- Notificações de postagens, entrega de notificações e central de notificações serão trabalhos futuros.
+- Web Push de postagens, tarefas e chat usa VAPID; contadores de não lidas funcionam mesmo sem permissão de push. Ver [notificações](../NOTIFICACOES.md).
 
 ## Como manter simples
 
@@ -47,14 +47,6 @@ A lista e a conversa atualizam a cada dez segundos enquanto a página está vis�
 
 ## Migração e verificação
 
-Aplicar a migração [0028_message_read.py](../../../SINUCA-BACK/core/migrations/0028_message_read.py) no ambiente da API antes de usar o novo front. No diretório do backend:
+No backend, aplicar as migrações com `pdm run migrate` antes de usar os contratos de leitura. MessageRead guarda uma linha por usuário/delegação; a migração não apaga mensagens.
 
-```sh
-pdm run python manage.py migrate
-```
-
-A migração cria somente a tabela de leitura; não apaga mensagens. Os testes desta entrega usam banco isolado. Nenhuma migração foi aplicada ao banco real.
-
-Os testes de regressão ficam em [test_message_reads.py](../../../SINUCA-BACK/core/tests/test_message_reads.py) e [messageService.test.js](../../tests/messageService.test.js). As notificações futuras estão em [AFAZERES.md](../AFAZERES.md#notificações--trabalho-futuro).
-
-Validação em 11/11/2026: 95 testes de backend e 21 testes de services/stores passaram, assim como o build. `check` não apontou problemas e `makemigrations --check --dry-run` não indicou modelos sem migração. A integração do build com a API Django real e SQLite em memória cobriu contadores, ordem, leitura independente, página escondida, histórico antigo, falhas e ações manuais. A revisão identificou o caso de envio com mensagem intermediária não consultada: foi reproduzido no Chrome antes da correção e passou após limitar a confirmação ao ID obtido no GET. Uma nova consulta confirmou o histórico completo. As capturas do contador em 440 e 1440 px foram inspecionadas; o SVG mantém 23×23 px. Não houve acesso à API publicada nem alteração do banco real.
+As regressões estão em `SINUCA-BACK/core/tests/test_message_reads.py` e `tests/messageService.test.js`. Executar os testes isolados dos dois repositórios e homologar leitura com duas contas diferentes, troca de delegação, mensagens novas, marcação manual e falhas de rede. Testes com API simulada não comprovam estado compartilhado entre navegadores reais.

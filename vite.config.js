@@ -9,7 +9,6 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig(({ command, mode }) => {
   const { VITE_API_BASE_URL } = loadEnv(mode, process.cwd(), 'VITE_')
   if (command === 'build' && mode !== 'development') {
-    const { VITE_API_BASE_URL } = loadEnv(mode, process.cwd(), 'VITE_')
     let url
     try {
       url = new URL(VITE_API_BASE_URL)
@@ -26,7 +25,7 @@ export default defineConfig(({ command, mode }) => {
       url.password
     ) {
       throw new Error(
-        'Configure VITE_API_BASE_URL com a origem HTTPS pÃºblica do backend antes do deploy.',
+        'Configure VITE_API_BASE_URL com a origem HTTPS pública do backend antes do deploy.',
       )
     }
   }

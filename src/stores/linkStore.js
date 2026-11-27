@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 import LinkService from '../services/linkService'
 import { getAllPages } from '@/services/pagination'
@@ -7,56 +7,33 @@ import { getAllPages } from '@/services/pagination'
 const linkService = new LinkService()
 
 export const useLinkStore = defineStore('link', () => {
-    
-    const links = ref([]);
-    const link = ref({
-        name: '',
-        url: '',
-        country: 0,
-        categories: []
-    });
-    
-    const loading = ref(false);
+  const links = ref([])
+  const loading = ref(false)
 
-    async function getLinks() {
-        loading.value = true;
-        try {
-            links.value = await getAllPages(page => linkService.getLinks(page));
-        } finally {
-            loading.value = false;
-        }
+  async function getLinks() {
+    loading.value = true
+    try {
+      links.value = await getAllPages((page) => linkService.getLinks(page))
+    } finally {
+      loading.value = false
     }
+  }
 
-    async function getLink(id) {
-        link.value = await linkService.getLink(id);
-    }
+  async function createLink(newLink) {
+    const createdLink = await linkService.createLink(newLink)
+    links.value.push(createdLink)
+  }
 
-    async function createLink(newLink) {
-        const createdLink = await linkService.createLink(newLink);
-        links.value.push(createdLink);
-    }
+  async function deleteLink(id) {
+    await linkService.deleteLink(id)
+    links.value = links.value.filter((t) => String(t.id) !== String(id))
+  }
 
-    async function updateLink(id, updatedLink) {
-        const updated = await linkService.updateLink(id, updatedLink);
-        const index = links.value.findIndex(t => t.id === id);
-        if (index !== -1) {
-            links.value[index] = updated;
-        }
-    }
-
-    async function deleteLink(id) {
-        await linkService.deleteLink(id);
-        links.value = links.value.filter(t => t.id !== id);
-    }
-
-    return {
-        links,
-        link,
-        loading,
-        getLinks,
-        getLink,
-        createLink,
-        updateLink,
-        deleteLink
-    }
+  return {
+    links,
+    loading,
+    getLinks,
+    createLink,
+    deleteLink,
+  }
 })

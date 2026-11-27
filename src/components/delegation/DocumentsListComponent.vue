@@ -7,7 +7,8 @@ import { useToastStore } from '@/stores/toastStore'
 
 const linkStore = useLinkStore()
 const error = ref('')
-const props = defineProps({ countryId: [String, Number] })
+const props = defineProps({ countryId: [String, Number], manageable: Boolean })
+const emit = defineEmits(['remove'])
 const documents = computed(() =>
   linkStore.links.filter(
     (item) =>
@@ -59,6 +60,8 @@ onMounted(loadDocuments)
         :key="document.id"
         :title="document.name"
         :link="document.url"
+        :removable="manageable"
+        @remove="emit('remove', document)"
       />
       <section v-for="group in groups" :key="group.id" :class="['documents-group', group.category]">
         <h5 class="group-title"><span :class="group.icon" /> {{ group.title }}</h5>
@@ -68,6 +71,8 @@ onMounted(loadDocuments)
               :title="document.name || document.url"
               :link="document.url"
               :category="group.category"
+              :removable="manageable"
+              @remove="emit('remove', document)"
             />
           </li>
         </ul>

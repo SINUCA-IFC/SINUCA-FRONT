@@ -5,10 +5,6 @@ export default class PostService {
         const { data } = await axios.get('/postagens/', { params: { page } });
         return data;
     }
-    async getPost(id) {
-        const { data } = await axios.get(`/postagens/${id}/`);
-        return data;
-    }
     async createPost(post) {
         const { data } = await axios.post('/postagens/', post);
         return data;
