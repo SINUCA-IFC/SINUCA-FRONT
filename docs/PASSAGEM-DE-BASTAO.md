@@ -50,7 +50,7 @@ O login Google usa **diretamente a origem da API**, com cookies e CSRF. O callba
 | Avaliador | Existe como papel no modelo. Ao selecionar esse perfil na entrada, o front mostra “Área do avaliador em construção”. Ainda não há painel nem lançamento de notas. |
 | Superusuário/Admin | Usado na administração técnica. `is_staff`, `is_superuser` e `role` são campos diferentes: acesso ao Django Admin não deve ser confundido com o papel de organizador do site. |
 
-O cadastro público utiliza allauth e cria **aluno**, sem delegação. A escolha de perfil na interface não concede privilégios. Contas da organização e futuros avaliadores precisam de provisionamento controlado; não há sistema pronto de convites. Para operar o painel como organizador, conferir o `role` da conta, além das flags administrativas.
+O cadastro público utiliza allauth e cria **aluno**, sem delegação. A escolha de perfil na interface não concede privilégios. Contas da organização e futuros avaliadores precisam de provisionamento controlado; **não há sistema pronto de convites**, é necessário um sistema para gestão de organizadores e avaliadores, preferência para url secreta de convite. Para operar o painel como organizador, conferir o `role` da conta, além das flags administrativas.
 
 `User` usa e-mail como identificação; contém nome, foto, turma (`Gang`), matrícula e país (`Country`). O perfil não permite que o próprio usuário altere papel, país ou privilégios. O e-mail também é somente leitura na edição atual. Criar, desativar ou alterar contas privilegiadas exige cuidado administrativo.
 
