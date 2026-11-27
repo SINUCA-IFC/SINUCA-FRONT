@@ -30,10 +30,8 @@ Paginação, tratamento de erros, permissões e proteção contra respostas anti
 
 | Parte | Endereço |
 | --- | --- |
-| Front local | `http://localhost:5173` |
 | Front publicado | `https://sinuca-ifc-mocha.vercel.app` |
 | API publicada | `https://sinuca-backend.class.fabricadesoftware.ifc.edu.br` |
-| API local, quando iniciada | `http://localhost:8000` |
 
 Fluxo comum: **componente → store ou service → Axios → `/api` → viewset → serializer → modelo/banco**. Nem toda consulta precisa passar por store: detalhes usados por um único modal podem ficar no componente.
 
