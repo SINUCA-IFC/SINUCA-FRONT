@@ -2,8 +2,8 @@
 
 Interface do Simulado Interdisciplinar das Nações Unidas do Campus Araquari, com Vue 3, Vite, Vue Router, Pinia, Axios e PWA.
 
-- [Passagem de bastão: funcionamento, operação e pendências](docs/PASSAGEM-DE-BASTAO.md).
-- [Revisão recomendada da documentação PI](docs/REVISAO-DOCUMENTACAO-PI.md).
+- [Passagem de bastão: funcionamento, operação e pendências](https://github.com/SINUCA-IFC/SINUCA-Documentacao-PI/blob/main/docs/PASSAGEM-DE-BASTAO.md).
+- [Revisão recomendada da documentação PI](https://github.com/SINUCA-IFC/SINUCA-Documentacao-PI/blob/main/docs/REVISAO-DOCUMENTACAO-PI.md).
 - [Backend](https://github.com/SINUCA-IFC/SINUCA-BACK).
 - [Documentação do projeto](https://github.com/SINUCA-IFC/SINUCA-Documentacao-PI).
 - [Site publicado](https://sinuca-ifc-mocha.vercel.app).
