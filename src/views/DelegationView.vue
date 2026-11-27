@@ -15,7 +15,6 @@ import ScheduleListComponent from '../components/delegation/schedules/ScheduleLi
 import ScheduleModal from '../components/delegation/modais/ScheduleModal.vue'
 import DocumentsListComponent from '../components/delegation/DocumentsListComponent.vue'
 import NotesListComponent from '../components/delegation/NotesListComponent.vue'
-import LogoAzul from '/logo-azul.svg'
 import MascoteSinuca from '/static/sinuca-mascote.png'
 import { useToastStore } from '@/stores/toastStore'
 const delegationError = ref('')
@@ -26,10 +25,7 @@ const countryId = ref()
 const hasDelegation = computed(() => Boolean(userStore.user.country?.id))
 const checkingApproval = ref(false)
 
-// Cópia local do país da delegação. O ScheduleModal chama
-// countryStore.getCountry() para os países do debate, o que sobrescreve
-// countryStore.country — sem esta cópia o banner passaria a mostrar
-// o país adversário depois de abrir um debate.
+// Mantém o país do banner separado das outras consultas ao store.
 const delegationCountry = ref(null)
 
 // Aba ativa compartilhada com a sidebar (desktop)
@@ -116,11 +112,6 @@ const refreshApproval = async () => {
   } finally {
     checkingApproval.value = false
   }
-}
-
-const logout = async () => {
-  await userStore.logout()
-  router.push('/bem-vindo')
 }
 
 watch(() => userStore.user.country?.id, loadDelegation)

@@ -14,8 +14,10 @@ import ScheduleListComponent from '@/components/delegation/schedules/ScheduleLis
 import ScheduleModal from '@/components/delegation/modais/ScheduleModal.vue'
 import UnderConstruction from '@/components/layout/UnderConstruction.vue'
 import ResourceCreateModal from '@/components/delegation/modais/ResourceCreateModal.vue'
+import ResourceDeleteModal from '@/components/delegation/modais/ResourceDeleteModal.vue'
 import CountryService from '@/services/countryService'
 import UserService from '@/services/userService'
+import GangService from '@/services/gangService'
 import { getAllPages } from '@/services/pagination'
 import { useToastStore } from '@/stores/toastStore'
 
@@ -32,7 +34,23 @@ const loading = ref(false),
   saving = ref(false),
   modalError = ref(''),
   scheduleId = ref(null)
+const editingScheduleId = ref(null)
+const resourceToRemove = ref(null)
+function editSchedule(schedule) {
+  editingScheduleId.value = schedule.id
+  modal.value = 'schedule'
+}
+function removeResource(kind, resource) {
+  resourceToRemove.value = { kind, resource }
+}
+function openResourceForm(kind) {
+  editingScheduleId.value = null
+  modal.value = kind
+}
 const service = new UserService()
+const classes = ref([])
+const selectedClass = ref(null)
+let participantsRequest = 0
 const selectedIds = ref([])
 const confirmingParticipants = ref(false)
 const selectedParticipants = computed(() =>
@@ -58,10 +76,26 @@ const participants = computed(() =>
   ),
 )
 const available = computed(() =>
-  pending.value.filter((user) =>
-    `${user.name} ${user.email}`.toLocaleLowerCase().includes(query.value.toLocaleLowerCase()),
+  pending.value.filter(
+    (user) =>
+      selectedClass.value &&
+      String(user.gang?.id ?? user.gang ?? '') === String(selectedClass.value.id) &&
+      `${user.name} ${user.email}`.toLocaleLowerCase().includes(query.value.toLocaleLowerCase()),
   ),
 )
+const availableClasses = computed(() =>
+  classes.value.filter((gang) =>
+    gang.name.toLocaleLowerCase().includes(query.value.toLocaleLowerCase()),
+  ),
+)
+function selectClass(gang) {
+  selectedClass.value = gang
+  query.value = ''
+}
+function backToClasses() {
+  selectedClass.value = null
+  query.value = ''
+}
 async function load() {
   loading.value = true
   error.value = ''
@@ -80,20 +114,30 @@ async function load() {
   }
 }
 async function openParticipants() {
+  const request = ++participantsRequest
   modal.value = 'participants'
   selected.value = null
   selectedIds.value = []
   confirmingParticipants.value = false
   pending.value = []
+  classes.value = []
+  selectedClass.value = null
   query.value = ''
   modalError.value = ''
   saving.value = true
   try {
-    pending.value = await getAllPages((page) => service.getPendingUsers(page))
+    const [students, gangs] = await Promise.all([
+      getAllPages((page) => service.getPendingUsers(page)),
+      getAllPages((page) => new GangService().getGangs(page)),
+    ])
+    if (request !== participantsRequest) return
+    pending.value = students
+    classes.value = gangs
   } catch {
-    modalError.value = 'Não foi possível carregar os participantes disponíveis.'
+    if (request !== participantsRequest) return
+    modalError.value = 'Não foi possível carregar as turmas e os participantes disponíveis.'
   } finally {
-    saving.value = false
+    if (request === participantsRequest) saving.value = false
   }
 }
 function close() {
@@ -150,11 +194,15 @@ async function addParticipant() {
 watch(
   () => route.params.id,
   () => {
+    participantsRequest++
     tab.value = 0
     saving.value = false
     selectedIds.value = []
     confirmingParticipants.value = false
     modal.value = ''
+    resourceToRemove.value = null
+    editingScheduleId.value = null
+    scheduleId.value = null
     load()
   },
   { immediate: true },
@@ -199,10 +247,18 @@ watch(
           </ul>
         </section>
         <template v-if="tab === 1"
-          ><ScheduleListComponent :country-id="route.params.id" @open-details="scheduleId = $event"
+          ><ScheduleListComponent
+            :country-id="route.params.id"
+            manageable
+            @open-details="scheduleId = $event"
+            @edit="editSchedule"
+            @remove="removeResource('schedule', $event)"
         /></template>
         <template v-if="tab === 2"
-          ><DocumentsListComponent :country-id="route.params.id"
+          ><DocumentsListComponent
+            :country-id="route.params.id"
+            manageable
+            @remove="removeResource('document', $event)"
         /></template>
         <UnderConstruction v-if="tab === 3" title="Notas em construção" />
         <AppButton
@@ -212,12 +268,20 @@ watch(
             ['Adicionar participante +', 'Adicionar cronograma +', 'Adicionar documento +'][tab]
           "
           :title="['Adicionar participante', 'Adicionar cronograma', 'Adicionar documento'][tab]"
-          @click="tab === 0 ? openParticipants() : (modal = tab === 1 ? 'schedule' : 'document')"
+          @click="
+            tab === 0 ? openParticipants() : openResourceForm(tab === 1 ? 'schedule' : 'document')
+          "
           ><span class="mdi mdi-plus" aria-hidden="true"></span
         ></AppButton>
       </template>
     </main>
     <ScheduleModal v-if="scheduleId" :schedule-id="scheduleId" @close="scheduleId = null" />
+    <ResourceDeleteModal
+      v-if="resourceToRemove"
+      :kind="resourceToRemove.kind"
+      :resource="resourceToRemove.resource"
+      @close="resourceToRemove = null"
+    />
     <AppModal v-if="modal === 'remove'" centered @close="close">
       <section
         class="modal-panel"
@@ -243,6 +307,7 @@ watch(
       v-if="['schedule', 'document'].includes(modal)"
       :kind="modal"
       :country-id="Number(route.params.id)"
+      :schedule-id="editingScheduleId"
       @close="modal = ''"
     />
     <AppModal v-if="modal === 'participants'" centered @close="close">
@@ -252,12 +317,20 @@ watch(
         aria-modal="true"
         aria-labelledby="participants-title"
       >
-        <h2 id="participants-title">Adicionar participantes</h2>
+        <h2 id="participants-title">
+          {{
+            confirmingParticipants
+              ? 'Adicionar participantes'
+              : selectedClass
+                ? `Alunos de ${selectedClass.name}`
+                : 'Selecionar turma'
+          }}
+        </h2>
         <p v-if="saving" role="status">
           {{ confirmingParticipants ? 'Adicionando participantes...' : 'Carregando...' }}
         </p>
         <template v-if="confirmingParticipants"
-          ><p >
+          ><p>
             Adicionar {{ selectedParticipants.length }} participante(s) à delegação de
             {{ country.name }}?
           </p>
@@ -267,8 +340,28 @@ watch(
             </li>
           </ul>
         </template>
-        <template v-else
-          ><AppInput v-model="query" label="Pesquisar discente" type="search" />
+        <template v-else-if="!selectedClass">
+          <AppInput v-model="query" label="Pesquisar turma" type="search" />
+          <ul class="participant-options">
+            <li v-for="gang in availableClasses" :key="gang.id">
+              <AppButton variant="secondary" :disabled="saving" @click="selectClass(gang)">
+                <span class="participant-option-copy"
+                  ><strong>{{ gang.name }}</strong></span
+                >
+                <span class="mdi mdi-chevron-right" aria-hidden="true"></span>
+              </AppButton>
+            </li>
+          </ul>
+          <p v-if="!saving && !modalError && !availableClasses.length">Nenhuma turma disponível.</p>
+        </template>
+        <template v-else>
+          <BackButton
+            class="class-back"
+            label="Voltar às turmas"
+            :disabled="saving"
+            @click="backToClasses"
+          />
+          <AppInput v-model="query" label="Pesquisar discente" type="search" />
           <ul class="participant-options">
             <li v-for="user in available" :key="user.id">
               <AppButton
@@ -291,12 +384,21 @@ watch(
               ></AppButton>
             </li>
           </ul>
-          <p v-if="!saving && !available.length">Nenhum discente disponível.</p></template
+          <p v-if="!saving && !available.length">
+            Nenhum discente disponível nesta turma.
+          </p></template
         >
-        <p v-if="!confirmingParticipants" role="status" style="margin-top: 1rem;">
+        <p v-if="!confirmingParticipants" role="status" style="margin-top: 1rem">
           {{ selectedIds.length }} participante(s) selecionado(s)
         </p>
         <p v-if="modalError" role="alert">{{ modalError }}</p>
+        <AppButton
+          v-if="modalError && !confirmingParticipants"
+          variant="secondary"
+          :disabled="saving"
+          @click="openParticipants"
+          >Tentar novamente</AppButton
+        >
         <ModalActions>
           <AppButton
             v-if="confirmingParticipants"
@@ -324,6 +426,9 @@ watch(
   </AppLayout>
 </template>
 <style scoped>
+.class-back {
+  margin-bottom: 1rem;
+}
 .selected-participants {
   margin: 1rem 0;
   max-height: 35dvh;

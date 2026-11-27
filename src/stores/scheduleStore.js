@@ -8,18 +8,6 @@ const scheduleService = new ScheduleService()
 
 export const useScheduleStore = defineStore('schedule', () => {
   const schedules = ref([])
-  const schedule = ref({
-    category: 1,
-    title: 'string',
-    startDate: '2026-08-12T18:49:50.611Z',
-    endDate: '2026-08-12T18:49:50.611Z',
-    location: 'string',
-    description: 'string',
-    tipo: 1,
-    country: [0],
-    docs: [0],
-  })
-
   const loading = ref(false)
 
   async function getSchedules() {
@@ -31,10 +19,6 @@ export const useScheduleStore = defineStore('schedule', () => {
     }
   }
 
-  async function getSchedule(id) {
-    schedule.value = await scheduleService.getSchedule(id)
-  }
-
   async function createSchedule(newSchedule) {
     const createdSchedule = await scheduleService.createSchedule(newSchedule)
     schedules.value.push(createdSchedule)
@@ -42,7 +26,7 @@ export const useScheduleStore = defineStore('schedule', () => {
 
   async function updateSchedule(id, updatedSchedule) {
     const updated = await scheduleService.updateSchedule(id, updatedSchedule)
-    const index = schedules.value.findIndex((t) => t.id === id)
+    const index = schedules.value.findIndex((t) => String(t.id) === String(id))
     if (index !== -1) {
       schedules.value[index] = updated
     }
@@ -50,15 +34,13 @@ export const useScheduleStore = defineStore('schedule', () => {
 
   async function deleteSchedule(id) {
     await scheduleService.deleteSchedule(id)
-    schedules.value = schedules.value.filter((t) => t.id !== id)
+    schedules.value = schedules.value.filter((t) => String(t.id) !== String(id))
   }
 
   return {
     loading,
     schedules,
-    schedule,
     getSchedules,
-    getSchedule,
     createSchedule,
     updateSchedule,
     deleteSchedule,

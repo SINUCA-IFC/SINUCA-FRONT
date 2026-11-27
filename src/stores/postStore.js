@@ -9,28 +9,8 @@ const postService = new PostService()
 export const usePostStore = defineStore('post', () => {
 
 const posts = ref([])
-const post = ref(
-    {
-  capa_attachment_key: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  title: "string",
-  content: "string",
-  foto: 0
-}
-)
-
-const carregando = ref(false)
-
 async function getPosts() {
-    carregando.value = true;
-    try {
     posts.value = await getAllPages(page => postService.getPosts(page))
-} finally {
-    carregando.value = false;
-}
-}
-
-async function getPost(id) {
-    post.value = await postService.getPost(id)
 }
 
 async function createPost(newPost) {
@@ -53,9 +33,7 @@ async function deletePost(id) {
 
 return {
     posts,
-    post,
     getPosts,
-    getPost,
     createPost,
     updatePost,
     deletePost

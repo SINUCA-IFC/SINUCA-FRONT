@@ -24,7 +24,7 @@ async function mockStudent(page, handler = () => null) {
     localStorage.setItem('access_token', 'test-access')
     localStorage.setItem('refresh_token', 'test-refresh')
   })
-  await page.route('http://localhost:8000/api/**', async (route) => {
+  await page.route('**/api/**', async (route) => {
     const request = route.request(),
       path = new URL(request.url()).pathname
     const custom = await handler(path, request)
@@ -55,7 +55,7 @@ test('six digits support typing, correction, paste, errors and successful confir
     ),
   )
   let attempts = 0
-  await page.route('http://localhost:8000/api/**', async (route) => {
+  await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname
     if (path.endsWith('/confirmar-email/')) {
       attempts++
@@ -98,11 +98,9 @@ test('six digits support typing, correction, paste, errors and successful confir
   await expect(page.locator('.toast')).toHaveCount(0)
 })
 
-test('student registration sends photo as multipart, preserves title and validates matriculation', async ({
-  page,
-}) => {
+test('student registration requires a class and sends photo as multipart', async ({ page }) => {
   let registrations = 0
-  await page.route('http://localhost:8000/api/**', async (route) => {
+  await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname
     if (path === '/api/registro/') {
       registrations++
@@ -111,13 +109,14 @@ test('student registration sends photo as multipart, preserves title and validat
       expect(body).toContain('filename="avatar.png"')
       expect(body).toContain('1234567890')
       expect(body).toContain('student')
+      expect(body).toContain('name="gang"\r\n\r\n4')
       return route.fulfill({
         status: 201,
         json: { email_verification_required: true, session_token: 'pending' },
       })
     }
     expect(path).not.toContain('/media/images/')
-    await route.fulfill({ json: rows() })
+    await route.fulfill({ json: rows(path === '/api/turmas/' ? [{ id: 4, name: '1INFO' }] : []) })
   })
   await page.goto('/cadastro?id=2')
   await page.getByLabel('E-mail').fill('ana@example.com')
@@ -129,16 +128,26 @@ test('student registration sends photo as multipart, preserves title and validat
   await page.getByRole('button', { name: 'CADASTRAR', exact: true }).click()
   expect(registrations).toBe(0)
   await page.getByLabel('Matrícula').fill('1234567890')
-  await page
-    .getByLabel('Escolher foto de perfil')
-    .setInputFiles({
-      name: 'avatar.png',
-      mimeType: 'image/png',
-      buffer: Buffer.from(
-        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aO1cAAAAASUVORK5CYII=',
-        'base64',
-      ),
-    })
+  const turma = page.getByLabel('Turma', { exact: true })
+  await expect(turma).toHaveAttribute('required', '')
+  await page.getByRole('button', { name: 'CADASTRAR', exact: true }).click()
+  expect(await turma.evaluate((el) => el.validity.valueMissing)).toBe(true)
+  expect(registrations).toBe(0)
+  // Exercise the submit handler too, independently of native form validation.
+  await page.locator('.auth-form').evaluate((form) => {
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+  })
+  await expect(page.getByRole('alert')).toContainText('Selecione uma turma')
+  expect(registrations).toBe(0)
+  await turma.selectOption('4')
+  await page.getByLabel('Escolher foto de perfil').setInputFiles({
+    name: 'avatar.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aO1cAAAAASUVORK5CYII=',
+      'base64',
+    ),
+  })
   await page.getByRole('button', { name: 'CADASTRAR', exact: true }).click()
   await expect(page).toHaveURL(/etapa=email/)
   await expect(page.getByRole('heading', { name: 'Criar conta' })).toBeVisible()

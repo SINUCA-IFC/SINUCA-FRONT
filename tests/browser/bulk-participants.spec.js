@@ -7,8 +7,8 @@ for (const width of [320, 1440]) {
     await page.setViewportSize({ width, height: 800 })
     await page.addInitScript(() => localStorage.setItem('access_token', 'test'))
     const students = [
-      { id: 8, name: 'Ana', email: 'ana@example.com', role: 'student', country: null },
-      { id: 9, name: 'Bruno', email: 'bruno@example.com', role: 'student', country: null },
+      { id: 8, name: 'Ana', email: 'ana@example.com', role: 'student', country: null, gang: 4 },
+      { id: 9, name: 'Bruno', email: 'bruno@example.com', role: 'student', country: null, gang: 4 },
     ]
     const attempts = []
     let fail = true
@@ -18,6 +18,7 @@ for (const width of [320, 1440]) {
       let data = { results: [], total_pages: 1 }
       if (path === '/api/usuarios/me/') data = { id: 1, role: 'organizer', name: 'Organizador' }
       if (path === '/api/paises/1') data = { id: 1, name: 'Brasil' }
+      if (path === '/api/turmas/') data.results = [{ id: 4, name: '1INFO' }]
       if (path === '/api/usuarios/') data.results = students
       if (path === '/api/usuarios/pendentes/') data.results = students.filter((s) => !s.country)
       if (/\/usuarios\/\d+\/aprovar\/$/.test(path)) {
@@ -34,6 +35,7 @@ for (const width of [320, 1440]) {
     await page.goto('/organizador/delegacoes/1')
     await page.getByRole('button', { name: 'Adicionar participante +' }).click()
     const dialog = page.getByRole('dialog')
+    await dialog.getByRole('button', { name: '1INFO', exact: true }).click()
     await expect(dialog.getByRole('button', { name: 'Continuar (0)' })).toBeDisabled()
     await dialog.getByRole('button', { name: /Ana.*ana@example.com/ }).click()
     await dialog.getByLabel('Pesquisar discente').fill('Bruno')

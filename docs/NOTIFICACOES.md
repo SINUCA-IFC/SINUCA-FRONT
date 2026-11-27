@@ -18,9 +18,8 @@ npm test
 npm run build
 ```
 
-Publique o build com HTTPS, a API atualizada e as migrações aplicadas. O backend deve ter o par VAPID configurado e executar `python manage.py notify_overdue_tasks` diariamente; os detalhes e o exemplo de cron estão em `SINUCA-BACK/docs/NOTIFICACOES.md`. O agendamento externo não é criado pelo front.
+Publique o build com HTTPS, a API atualizada e as migrações aplicadas. O backend deve ter o par VAPID configurado e executar `pdm run python manage.py notify_overdue_tasks` diariamente; os detalhes e o exemplo de cron estão em `SINUCA-BACK/docs/NOTIFICACOES.md`. O agendamento externo não é criado pelo front.
 
-O CHORE front `df274f7` iniciou o serviço de inscrições e os helpers; o CHORE back `3b06c02` iniciou inscrições, VAPID e envio para postagens. Esta implementação completa a exibição e os cliques, adiciona tarefas/atrasos/chat e os indicadores compartilhados. O resumo cumulativo detalhado está no documento do backend.
 
 Testes automatizados simulam o navegador/Push Service. Entrega real exige dois navegadores inscritos com VAPID válido. Os navegadores precisam suportar Web Push; no iOS, o PWA deve estar instalado na tela inicial quando exigido pelo sistema. Permissão negada é alterada nas configurações do navegador.
 
