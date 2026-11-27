@@ -197,7 +197,7 @@ Com PDM, utilizar `pdm install` e prefixar comandos com `pdm run`. `dev` inicia 
 
 ```sh
 cd SINUCA-FRONT
-npm ci
+npm install
 ```
 
 Para utilizar o backend local, criar `.env.local`:
@@ -226,7 +226,7 @@ Para testes manuais, criar contas específicas em ambiente de teste. Não coloca
 
 ## 10. Publicação e manutenção
 
-Front: `npm ci` e `npm run build`, publicando `dist/` na Vercel. `npm run preview` só serve o build para conferência; não substitui a API. Conferir rewrite `/api`, fallback das rotas, manifesto, ícones e atualização do Service Worker.
+Front: `npm install` e `npm run build`, publicando `dist/` na Vercel. `npm run preview` só serve o build para conferência; não substitui a API. Conferir rewrite `/api`, fallback das rotas, manifesto, ícones e atualização do Service Worker.
 
 Back: configurar PostgreSQL por `DATABASE_URL`, `SECRET_KEY` própria, `DEBUG=False`, `MODE=DEPLOY`, mídia Cloudinary e estáticos WhiteNoise. O processo web usa Gunicorn. `build.sh` e o `release` do `Procfile` aplicam migrações; verificar qual fase a hospedagem executa antes de eliminar um desses caminhos. O deploy não foi realizado nesta revisão.
 
