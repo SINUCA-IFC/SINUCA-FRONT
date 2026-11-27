@@ -1,6 +1,6 @@
-# Permissões e uploads — S07/S08
+# Permissões e uploads
 
-Revisão local de 11/11/2026. A implementação usa as permissões e os modelos existentes, com uma migração pequena para identificar o dono e o tamanho de novos arquivos.
+Permissões de API e limites de upload devem ser mantidos no servidor, independentemente das ações exibidas na interface.
 
 ## Permissões
 
@@ -24,14 +24,14 @@ O cadastro público continua disponível em `/api/registro/`. País, papel e pri
 - O frontend envia a foto opcional como arquivo `foto` no mesmo `multipart/form-data` do cadastro. Não envia mais uma imagem anônima separada nem um ID numérico. Cadastro sem foto continua aceitando JSON.
 - Dados inválidos são rejeitados antes da gravação. Se a criação do registro da imagem ou da conta falhar após salvar o arquivo, a aplicação tenta removê-lo do armazenamento e reverte os registros.
 
-Os limites de tamanho e cota estão em `SINUCA-BACK/app/settings.py`; as taxas estão em `uploader/limits.py`. A verificação real de e-mail continua pendente, sem alteração nesta entrega.
+Os limites de tamanho e cota estão em `SINUCA-BACK/app/settings.py`; as taxas estão em `uploader/limits.py`. A confirmação de e-mail é controlada pelo allauth; ver o [contrato de autenticação](AUTENTICACAO.md). A verificação institucional de matrícula ainda está pendente.
 
 ## Migração e arquivos anteriores
 
 Aplicar no ambiente do backend antes de executar a nova versão:
 
 ```sh
-python manage.py migrate
+pdm run migrate
 ```
 
 A migração `uploader/0002_document_owner_document_size_image_owner_image_size.py` adiciona `owner` e `size`. Arquivos antigos mantêm seus vínculos e URLs. Como não há informação confiável do dono de todo arquivo antigo, eles ficam com `owner=NULL` e não aparecem na listagem de uploads. Podem ser administrados pelo Django Admin. A migração não lê o storage nem exclui arquivos antigos.
@@ -40,6 +40,6 @@ A migração `uploader/0002_document_owner_document_size_image_owner_image_size.
 
 As URLs já publicadas de mídia continuam acessíveis conforme o storage; restringir listagens JSON não torna um arquivo privado por URL. Não enviar documentos confidenciais contando apenas com essas permissões.
 
-O throttle usa o cache configurado no Django. O cache padrão é local a cada processo; em produção com vários workers, configurar cache compartilhado e limites no proxy. O cadastro usa `REMOTE_ADDR`: atrás de um proxy, várias pessoas podem compartilhar esse limite. A validação de tamanho ocorre após o recebimento do multipart; o proxy também precisa limitar o corpo da requisição. Estes controles de infraestrutura não foram configurados nesta revisão.
+O throttle usa o cache configurado no Django. O cache padrão é local a cada processo; em produção com vários workers, configurar cache compartilhado e limites no proxy. O cadastro usa `REMOTE_ADDR`: atrás de um proxy, várias pessoas podem compartilhar esse limite. A validação de tamanho ocorre após o recebimento do multipart; o proxy também precisa limitar o corpo da requisição. Configurar e verificar esses controles na infraestrutura publicada.
 
-Não houve alteração de credenciais, limpeza de histórico, migração do banco real ou publicação. S06 continua pendente.
+Arquivos removidos da versão atual podem permanecer no histórico do Git. Credenciais antigas que tenham sido utilizadas precisam de troca no serviço correspondente; atualizar o arquivo não revoga segredos anteriores.

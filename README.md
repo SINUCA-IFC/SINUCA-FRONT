@@ -12,7 +12,7 @@ Interface do Simulado Interdisciplinar das Nações Unidas do Campus Araquari, c
 
 Visitantes acessam mural e história. Alunos cadastrados confirmam e-mail, aguardam atribuição de delegação e usam tarefas/Kanban, cronogramas, documentos, perfil e chat. Organizadores gerenciam delegações, aprovação de participantes, postagens, cronogramas e links, além das conversas com as delegações. Há PWA e notificações Web Push com VAPID.
 
-A área do avaliador e o sistema de notas estão **em construção** e não foram implementados nesta revisão. A retirada de participante tem interface, mas falta a rota correspondente no backend. Consulte a passagem de bastão antes de considerar todos os fluxos homologados. API simulada em testes não comprova integração real.
+A área do avaliador e o sistema de notas estão **em construção** e ainda não estão implementados. A retirada de participante tem interface, mas falta a rota correspondente no backend. Consulte a passagem de bastão antes de considerar todos os fluxos homologados. API simulada em testes não comprova integração real.
 
 ## Instalar e executar
 
@@ -21,7 +21,7 @@ Requisitos: Git, npm e Node compatível com `^20.19.0 || >=22.12.0`.
 ```sh
 git clone https://github.com/SINUCA-IFC/SINUCA-FRONT.git
 cd SINUCA-FRONT
-npm ci
+npm install
 npm run dev
 ```
 
